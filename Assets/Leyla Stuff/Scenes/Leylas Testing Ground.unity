@@ -136,6 +136,8 @@ GameObject:
   - component: {fileID: 62945092}
   - component: {fileID: 62945091}
   - component: {fileID: 62945096}
+  - component: {fileID: 62945098}
+  - component: {fileID: 62945097}
   m_Layer: 0
   m_Name: Capsule
   m_TagString: Player
@@ -282,6 +284,47 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
+--- !u!114 &62945097
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 62945090}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b30069bedf341c244aaa43a5b48cc242, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  controller: {fileID: 62945098}
+  speed: 12
+  gravity: -9.81
+--- !u!143 &62945098
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 62945090}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 2
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &171742230
 GameObject:
   m_ObjectHideFlags: 0
@@ -636,7 +679,7 @@ Transform:
   m_GameObject: {fileID: 709432640}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.255, y: 0.577, z: 0.031}
+  m_LocalPosition: {x: -0.05, y: 0.577, z: 0.25}
   m_LocalScale: {x: 0.5, y: 0.3, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -932,6 +975,7 @@ GameObject:
   - component: {fileID: 1804969455}
   - component: {fileID: 1804969457}
   - component: {fileID: 1804969456}
+  - component: {fileID: 1804969458}
   m_Layer: 0
   m_Name: Camera
   m_TagString: PlayerCamera
@@ -947,13 +991,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1804969454}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.7071068, z: -0, w: -0.7071068}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.64, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 62945095}
-  m_LocalEulerAnglesHint: {x: 0, y: 270, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!81 &1804969456
 AudioListener:
   m_ObjectHideFlags: 0
@@ -1013,6 +1057,20 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!114 &1804969458
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1804969454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce47abc07d04b824e995604a82263e6c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mouseSensitivity: 100
+  playerBody: {fileID: 62945095}
 --- !u!4 &1914232655 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3859812622371921254, guid: eae525995f0d24e51bf1975e1d4f4f04, type: 3}

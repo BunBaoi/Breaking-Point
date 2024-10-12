@@ -9,9 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7030249888608060991}
-  - component: {fileID: 6630929614661833198}
+  - component: {fileID: 215367831630985172}
   m_Layer: 16
-  m_Name: Pick Up Radius
+  m_Name: Pick Up Collider
   m_TagString: Pick Up Collider
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -32,8 +32,8 @@ Transform:
   m_Children: []
   m_Father: {fileID: 3859812622371921254}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &6630929614661833198
-BoxCollider:
+--- !u!135 &215367831630985172
+SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -51,7 +51,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 4, y: 1, z: 4}
+  m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &6966494784962024344
 GameObject:
@@ -64,8 +64,8 @@ GameObject:
   - component: {fileID: 3859812622371921254}
   - component: {fileID: 5701062664405581089}
   - component: {fileID: 1871463914223378423}
-  - component: {fileID: 535245489044171990}
   - component: {fileID: 3407735954489364013}
+  - component: {fileID: 778047884948910781}
   m_Layer: 15
   m_Name: Testing Item
   m_TagString: Untagged
@@ -139,27 +139,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!135 &535245489044171990
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6966494784962024344}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &3407735954489364013
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -174,7 +153,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   item: {fileID: 11400000, guid: 1ff94f1e8742d464e86ccb3a5ade5139, type: 2}
   pickupKey: 101
-  raycastDistance: 5
+  raycastDistance: 3
   pickupRadius: 1
   playerCameraTag: PlayerCamera
   playerTag: Player
@@ -186,3 +165,24 @@ MonoBehaviour:
     m_Bits: 65536
   canPickUp: 0
   isPickingUp: 0
+--- !u!65 &778047884948910781
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6966494784962024344}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 3, y: 1, z: 3}
+  m_Center: {x: 0, y: 0, z: 0}
