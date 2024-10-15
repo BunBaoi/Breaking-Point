@@ -5,9 +5,11 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     public CharacterController controller;
+    private PlayerStats playerStats;
 
     public float speed = 12f;
     public float gravity = -9.81f;
+    public bool IsSprint = false;
 
     public float playerHeight;
 
@@ -19,7 +21,7 @@ public class PlayerMovement : MonoBehaviour
 
     void Start()
     {
-        
+        playerStats = GetComponent<PlayerStats>();
     }
 
     void Update()
@@ -35,11 +37,36 @@ public class PlayerMovement : MonoBehaviour
 
         controller.Move(velocity * Time.deltaTime);
 
-        //if (Vector3.Angle < maxSlopeAngle)
-        //{
-
-        //}
+        sprint();
+        OxyOuputRate();
     }
 
+    private void sprint()
+    {
+        if(Input.GetKey(KeyCode.LeftShift))
+        {
+            speed = 20f;
+            IsSprint = true;
+        }
+        else
+        {
+            speed = 12f;
+            IsSprint = false;
+        }
+        
+    }
+    public void OxyOuputRate()
+    {
+        if(Input.GetKeyDown(KeyCode.Q))
+        {
+            playerStats.OxygenTankRefillRate++;
+            Debug.Log(playerStats.OxygenTankRefillRate);
+        }
+        else if (Input.GetKeyDown(KeyCode.E))
+        {
+            playerStats.OxygenTankRefillRate--;
+            Debug.Log(playerStats.OxygenTankRefillRate);
+        }
+    }
 
 }

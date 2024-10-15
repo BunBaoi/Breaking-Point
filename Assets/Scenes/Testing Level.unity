@@ -2973,6 +2973,7 @@ MonoBehaviour:
   controller: {fileID: 1656980319}
   speed: 12
   gravity: -3
+  IsSprint: 0
   playerHeight: 2
   maxSlopeAngle: 40
 --- !u!143 &1656980319
@@ -3083,9 +3084,9 @@ MonoBehaviour:
   Oxygen: 100
   Stamina: 100
   OxygenTank: 200
-  OxygenDeduction: 2
+  OxygenDeductionRate: 0
   StaminaDeduction: 2
-  OxygenTankDeduction: 2
+  OxygenTankRefillRate: 2
   Atmosphere: 0
 --- !u!1 &1688893441
 GameObject:

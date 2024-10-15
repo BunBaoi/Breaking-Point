@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,11 +11,13 @@ public class PlayerStats : MonoBehaviour
 
     public float OxygenTank;
 
-    public float OxygenDeduction;
+    public float OxygenDeductionRate;
     public float StaminaDeduction;
-    public float OxygenTankDeduction;
+    public float OxygenTankRefillRate;
 
     public bool Atmosphere;
+
+    private PlayerMovement playerMovement;
 
 
     // Timer
@@ -28,30 +31,58 @@ public class PlayerStats : MonoBehaviour
 
     void Start()
     {
-        {
-            controller = GetComponent<CharacterController>();
-            controller.slopeLimit = 45.0f;
-        }
+        controller = GetComponent<CharacterController>();
+        controller.slopeLimit = 45.0f;
+
+        playerMovement = GetComponent<PlayerMovement>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
-        if(Atmosphere == true)
+        DeadZone();
+
+    }
+    private void DeadZone ()
+    {
+        if (Atmosphere == true)
         {
             TickTimer += Time.deltaTime;
-            if(TickTimer >= TickMax)
+            if (TickTimer >= TickMax)
             {
                 TickTimer -= TickMax;
                 Tick++;
                 Debug.Log(Tick);
-                Oxygen = Oxygen - OxygenDeduction;
-                OxygenTank = OxygenTank - OxygenTankDeduction;
+                Oxygen = Oxygen - OxygenDeductionRate;
+                if (Oxygen < 100 || OxygenTank > 0)
+                {
+                    Oxygen = Oxygen + OxygenTankRefillRate;
+                    OxygenTank = OxygenTank - OxygenTankRefillRate;
+                }
+                else
+                {
+                    
+                }
+
+
             }
+            
+            // PlayerSprint consume more oxygen
+            if (playerMovement.IsSprint == true)
+            {
+                Debug.Log("Player Consumption Increase");
+                OxygenDeductionRate = 12f;
+            }
+            else
+            {
+                OxygenDeductionRate = 2f;
+            }
+
+
 
         }
     }
+
 
     public void OnTriggerEnter(Collider other)
     {
