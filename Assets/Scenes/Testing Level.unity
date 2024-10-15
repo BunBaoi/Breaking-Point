@@ -513,7 +513,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 70278d9e2b5010242aa821065d3cd13d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1081,7 +1081,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 70278d9e2b5010242aa821065d3cd13d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1451,8 +1451,8 @@ GameObject:
   m_Component:
   - component: {fileID: 892929484}
   - component: {fileID: 892929483}
-  - component: {fileID: 892929482}
   - component: {fileID: 892929485}
+  - component: {fileID: 892929486}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1460,14 +1460,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!81 &892929482
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 892929481}
-  m_Enabled: 1
 --- !u!20 &892929483
 Camera:
   m_ObjectHideFlags: 0
@@ -1548,6 +1540,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mouseSensitivity: 180
   playerBody: {fileID: 1656980320}
+--- !u!114 &892929486
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 892929481}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c6556701af9e04380698b89f691b6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  nonRigidbodyVelocity: 0
+  attenuationObject: {fileID: 0}
 --- !u!1 &1007515495
 GameObject:
   m_ObjectHideFlags: 0
@@ -1939,7 +1945,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 70278d9e2b5010242aa821065d3cd13d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2209,7 +2215,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 70278d9e2b5010242aa821065d3cd13d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -3010,15 +3016,15 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1656980317}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2.42, z: 0}
+  m_LocalRotation: {x: -0, y: 0.94593674, z: -0, w: -0.32435116}
+  m_LocalPosition: {x: -12.13, y: 2.42, z: -6.52}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1478993460}
   - {fileID: 892929484}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 217.853, z: 0}
 --- !u!136 &1656980321
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -3082,12 +3088,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Oxygen: 100
-  Stamina: 100
-  OxygenTank: 200
-  OxygenDeductionRate: 0
-  StaminaDeduction: 2
+  OxygenTank: 100
+  OxygenDeductionRate: 2
   OxygenTankRefillRate: 2
   Atmosphere: 0
+  IsAlive: 1
 --- !u!1 &1688893441
 GameObject:
   m_ObjectHideFlags: 0

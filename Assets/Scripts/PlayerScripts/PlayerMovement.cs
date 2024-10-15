@@ -60,12 +60,12 @@ public class PlayerMovement : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.Q))
         {
             playerStats.OxygenTankRefillRate++;
-            Debug.Log(playerStats.OxygenTankRefillRate);
+            //Debug.Log(playerStats.OxygenTankRefillRate);
         }
         else if (Input.GetKeyDown(KeyCode.E))
         {
             playerStats.OxygenTankRefillRate--;
-            Debug.Log(playerStats.OxygenTankRefillRate);
+            //Debug.Log(playerStats.OxygenTankRefillRate);
         }
     }
 

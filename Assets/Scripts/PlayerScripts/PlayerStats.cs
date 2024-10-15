@@ -7,15 +7,16 @@ public class PlayerStats : MonoBehaviour
 {
 
     public float Oxygen;
-    public float Stamina;
+    //public float Stamina;
 
     public float OxygenTank;
 
     public float OxygenDeductionRate;
-    public float StaminaDeduction;
+    //public float StaminaDeduction;
     public float OxygenTankRefillRate;
 
     public bool Atmosphere;
+    public bool IsAlive = true;
 
     private PlayerMovement playerMovement;
 
@@ -32,38 +33,41 @@ public class PlayerStats : MonoBehaviour
     void Start()
     {
         controller = GetComponent<CharacterController>();
+        playerMovement = GetComponent<PlayerMovement>();
         controller.slopeLimit = 45.0f;
 
-        playerMovement = GetComponent<PlayerMovement>();
     }
 
     // Update is called once per frame
     void Update()
     {
         DeadZone();
-
+        PlayerAlive();
     }
     private void DeadZone ()
     {
         if (Atmosphere == true)
         {
+            // Tick Rate
             TickTimer += Time.deltaTime;
-            if (TickTimer >= TickMax)
+            if (TickTimer >= TickMax && IsAlive == true)
             {
                 TickTimer -= TickMax;
                 Tick++;
-                Debug.Log(Tick);
+
+                //Oxygen Rate deduction
                 Oxygen = Oxygen - OxygenDeductionRate;
-                if (Oxygen < 100 || OxygenTank > 0)
+
+                // Tank replanish Oxygen
+                if (OxygenTankRefillRate > OxygenTank) // Step 1: Checks rate enough in tank
+                {
+                    OxygenTankRefillRate = OxygenTank;
+                }
+                else if (Oxygen < 100 && OxygenTank > 0) // Step 2: Checks there is oxygen in tank
                 {
                     Oxygen = Oxygen + OxygenTankRefillRate;
                     OxygenTank = OxygenTank - OxygenTankRefillRate;
                 }
-                else
-                {
-                    
-                }
-
 
             }
             
@@ -77,12 +81,8 @@ public class PlayerStats : MonoBehaviour
             {
                 OxygenDeductionRate = 2f;
             }
-
-
-
         }
     }
-
 
     public void OnTriggerEnter(Collider other)
     {
@@ -95,5 +95,14 @@ public class PlayerStats : MonoBehaviour
     {
         Atmosphere = false;
         Debug.Log("Atmosphere Safe");
+    }
+
+    public void PlayerAlive()
+    {
+        if (Oxygen <= 0)
+        {
+            IsAlive = false;
+            Debug.Log("Player Died From Oxygen Starvation");
+        }
     }
 }
