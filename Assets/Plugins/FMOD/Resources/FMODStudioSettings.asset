@@ -234,8 +234,8 @@ MonoBehaviour:
   switchSettingsMigration: 1
   HasSourceProject: 1
   HasPlatforms: 1
-  sourceProjectPath: 
-  sourceBankPath: 
+  sourceProjectPath: ../Breaking-Point-Audio-FMOD/Breaking-Point-Audio-FMOD.fspro
+  sourceBankPath: ../Breaking-Point-Audio-FMOD/Build
   sourceBankPathUnformatted: 
   BankRefreshCooldown: 5
   ShowBankRefreshWindow: 1
@@ -256,8 +256,10 @@ MonoBehaviour:
   VirtualChannelSettings: []
   RealChannelSettings: []
   Plugins: []
-  MasterBanks: []
-  Banks: []
+  MasterBanks:
+  - Master
+  Banks:
+  - Dialogue_Audio
   BanksToLoad: []
   LiveUpdatePort: 9264
   EnableMemoryTracking: 0
