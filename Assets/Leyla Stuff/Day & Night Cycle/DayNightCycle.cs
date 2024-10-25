@@ -28,8 +28,9 @@ public class DayNightCycle : MonoBehaviour
     [SerializeField] private SunriseSunsetTimes sunsetTime; // Sunset time
 
     [Header("Light Rotation Settings")]
-    [SerializeField] private float sunriseRotation = 30f; // Rotation angle for sunrise
+    [SerializeField] private float sunriseRotation = -30f; // Rotation angle for sunrise
     [SerializeField] private float sunsetRotation = 210f; // Rotation angle for sunset
+    [SerializeField] private float nightRotation = 290f; // Rotation angle for straight up at night
 
     [Header("UI")]
     [SerializeField] private TMP_Text timeText;
@@ -101,18 +102,21 @@ public class DayNightCycle : MonoBehaviour
                 // Before sunrise: set to sunrise rotation
                 lightRotation = sunriseRotation;
             }
-            else if (currentTotalMinutes >= sunsetTotalMinutes)
-            {
-                // After sunset: set to sunset rotation
-                lightRotation = sunsetRotation;
-            }
-            else
+            else if (currentTotalMinutes < sunsetTotalMinutes)
             {
                 // Between sunrise and sunset: interpolate
                 float t = Mathf.InverseLerp(sunriseTotalMinutes, sunsetTotalMinutes, currentTotalMinutes);
                 lightRotation = Mathf.Lerp(sunriseRotation, sunsetRotation, t);
             }
+            else
+            {
+                // After sunset: continue rotating toward night rotation
+                // Here we calculate how far it is past sunset and adjust accordingly
+                float t = Mathf.InverseLerp(sunsetTotalMinutes, 1440, currentTotalMinutes);
+                lightRotation = Mathf.Lerp(sunsetRotation, nightRotation, t);
+            }
 
+            // Apply the rotation to the directional light
             directionalLight.transform.rotation = Quaternion.Euler(new Vector3(lightRotation, 170f, 0));
         }
 
