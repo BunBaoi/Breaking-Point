@@ -2,60 +2,122 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-using UnityEngine;
-
 public class PlayerMovement : MonoBehaviour
 {
+    [Header("Character Components")]
     public CharacterController controller;
     private PlayerStats playerStats;
+    public Transform leftHandTransform;
+    public Transform rightHandTransform;
+    public Transform cameraTransform;
+    public float playerHeight;
+
+    [Header("Movement Settings")]
     public float walkSpeed = 12f;
     public float climbSpeed = 5f;
     public float gravity = -9.81f;
     public bool IsSprint = false;
-    public float playerHeight;
-    public float maxArmReach = 2f;
+    public float sprintSpeed = 20f;
+
+    [Header("Climbing Settings")]
+    public float maxClimbDistance = 4f; // Maximum distance for climb detection
+    public float handReachOffset = 1f; // How far hands can reach from hit point
     public float pullForce = 20f;
+    public float staminaDrainRate = 10f;
+    public float staminaRegenRate = 5f;
+    public float maxStamina = 100f;
+    public float currentStamina;
+    public float handSlipThreshold = 20f;
+    public float slipProbability = 0.1f;
     public string climbableTag = "Climbable";
 
-    public Transform leftHandTransform;
-    public Transform rightHandTransform;
-    public Transform cameraTransform;
+    [Header("Hand Physics")]
+    public float handSwayAmount = 0.1f;
+    public float handReturnSpeed = 10f;
+    public float handStabilityMultiplier = 0.5f;
 
-    Vector3 velocity;
-    bool leftHandHolding = false;
-    bool rightHandHolding = false;
-    Vector3 leftHandHoldPosition;
-    Vector3 rightHandHoldPosition;
-    Vector3 leftHandOriginalLocalPos;
-    Vector3 rightHandOriginalLocalPos;
+    private Vector3 velocity;
+    private bool leftHandHolding = false;
+    private bool rightHandHolding = false;
+    private Vector3 leftHandHoldPosition;
+    private Vector3 rightHandHoldPosition;
+    private Vector3 leftHandOriginalLocalPos;
+    private Vector3 rightHandOriginalLocalPos;
+    private float timeSinceLastGrab;
+    private bool isExhausted = false;
 
     void Start()
     {
         playerStats = GetComponent<PlayerStats>();
         leftHandOriginalLocalPos = leftHandTransform.localPosition;
         rightHandOriginalLocalPos = rightHandTransform.localPosition;
+        currentStamina = maxStamina;
     }
 
     void Update()
     {
-        HandleClimbingInput();
+        if (playerStats.IsAlive)
+        {
+            HandleClimbingInput();
+            HandleStamina();
+
+            if (IsHolding())
+            {
+                HandleClimbingMovement();
+                CheckForSlipping();
+            }
+            else
+            {
+                HandleGroundMovement();
+            }
+
+            ApplyGravity();
+            UpdateHandPositions();
+            HandleSprint();
+            OxyOuputRate();
+        }
+    }
+
+    void HandleStamina()
+    {
         if (IsHolding())
         {
-            HandleClimbingMovement();
+            float movementFactor = (Input.GetAxis("Vertical") != 0 || Input.GetAxis("Horizontal") != 0) ? 1.5f : 1f;
+            currentStamina -= staminaDrainRate * movementFactor * Time.deltaTime;
+            playerStats.DrainStamina(staminaDrainRate * movementFactor * Time.deltaTime);
         }
         else
         {
-            HandleGroundMovement();
+            currentStamina += staminaRegenRate * Time.deltaTime;
+            playerStats.RegenerateStamina(staminaRegenRate * Time.deltaTime);
         }
-        ApplyGravity();
-        UpdateHandPositions();
-        sprint();
-        OxyOuputRate();
+
+        currentStamina = Mathf.Clamp(currentStamina, 0f, maxStamina);
+        isExhausted = currentStamina < handSlipThreshold;
+    }
+
+    void CheckForSlipping()
+    {
+        if (isExhausted)
+        {
+            if (Random.value < slipProbability * Time.deltaTime)
+            {
+                if (leftHandHolding && Random.value > 0.5f)
+                {
+                    Release(true);
+                    Debug.Log("Left hand slipped!");
+                }
+                else if (rightHandHolding)
+                {
+                    Release(false);
+                    Debug.Log("Right hand slipped!");
+                }
+            }
+        }
     }
 
     void HandleClimbingInput()
     {
-        // Left hand
         if (Input.GetMouseButtonDown(0))
         {
             TryGrab(true);
@@ -65,7 +127,6 @@ public class PlayerMovement : MonoBehaviour
             Release(true);
         }
 
-        // Right hand
         if (Input.GetMouseButtonDown(1))
         {
             TryGrab(false);
@@ -78,22 +139,40 @@ public class PlayerMovement : MonoBehaviour
 
     void TryGrab(bool isLeftHand)
     {
-        RaycastHit hit;
-        Vector3 rayOrigin = isLeftHand ? leftHandTransform.position : rightHandTransform.position;
+        if (currentStamina <= 0) return;
 
-        if (Physics.Raycast(rayOrigin, cameraTransform.forward, out hit, maxArmReach))
+        // Cast ray from camera center
+        Ray ray = new Ray(cameraTransform.position, cameraTransform.forward);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, maxClimbDistance))
         {
             if (hit.collider.CompareTag(climbableTag))
             {
-                if (isLeftHand)
+                Vector3 handPosition = isLeftHand ? leftHandTransform.position : rightHandTransform.position;
+
+                // Check if hand is within reach of the hit point
+                if (Vector3.Distance(handPosition, hit.point) <= handReachOffset)
                 {
-                    leftHandHolding = true;
-                    leftHandHoldPosition = hit.point;
-                }
-                else
-                {
-                    rightHandHolding = true;
-                    rightHandHoldPosition = hit.point;
+                    // Add stability-based variation to grab point
+                    float stabilityFactor = Mathf.Lerp(handStabilityMultiplier, 1f, currentStamina / maxStamina);
+                    Vector3 randomOffset = Random.insideUnitSphere * (1f - stabilityFactor) * handSwayAmount;
+                    Vector3 finalGrabPoint = hit.point + randomOffset;
+
+                    if (isLeftHand)
+                    {
+                        leftHandHolding = true;
+                        leftHandHoldPosition = finalGrabPoint;
+                    }
+                    else
+                    {
+                        rightHandHolding = true;
+                        rightHandHoldPosition = finalGrabPoint;
+                    }
+
+                    currentStamina -= 5f;
+                    playerStats.DrainStamina(5f);
+                    timeSinceLastGrab = 0f;
                 }
             }
         }
@@ -111,7 +190,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    bool IsHolding()
+    public bool IsHolding()
     {
         return leftHandHolding || rightHandHolding;
     }
@@ -121,13 +200,17 @@ public class PlayerMovement : MonoBehaviour
         float vertical = Input.GetAxis("Vertical");
         float horizontal = Input.GetAxis("Horizontal");
 
+        float staminaFactor = Mathf.Lerp(0.3f, 1f, currentStamina / maxStamina);
         Vector3 climbDirection = (cameraTransform.up * vertical + cameraTransform.right * horizontal).normalized;
-        Vector3 movement = climbDirection * climbSpeed * Time.deltaTime;
+        Vector3 movement = climbDirection * climbSpeed * staminaFactor * Time.deltaTime;
 
-        // Apply movement
+        if (isExhausted)
+        {
+            movement += Random.insideUnitSphere * handSwayAmount * Time.deltaTime;
+        }
+
         controller.Move(movement);
 
-        // Pull towards hold points
         if (leftHandHolding)
         {
             PullTowardsPoint(leftHandHoldPosition);
@@ -167,30 +250,42 @@ public class PlayerMovement : MonoBehaviour
 
     void UpdateHandPositions()
     {
+        float handStability = Mathf.Lerp(0.5f, 1f, currentStamina / maxStamina);
+
         if (leftHandHolding)
         {
-            leftHandTransform.position = leftHandHoldPosition;
+            Vector3 targetPos = leftHandHoldPosition;
+            if (isExhausted)
+            {
+                targetPos += Random.insideUnitSphere * handSwayAmount;
+            }
+            leftHandTransform.position = Vector3.Lerp(leftHandTransform.position, targetPos, handStability);
         }
         else
         {
-            leftHandTransform.localPosition = Vector3.Lerp(leftHandTransform.localPosition, leftHandOriginalLocalPos, Time.deltaTime * 10f);
+            leftHandTransform.localPosition = Vector3.Lerp(leftHandTransform.localPosition, leftHandOriginalLocalPos, Time.deltaTime * handReturnSpeed);
         }
 
         if (rightHandHolding)
         {
-            rightHandTransform.position = rightHandHoldPosition;
+            Vector3 targetPos = rightHandHoldPosition;
+            if (isExhausted)
+            {
+                targetPos += Random.insideUnitSphere * handSwayAmount;
+            }
+            rightHandTransform.position = Vector3.Lerp(rightHandTransform.position, targetPos, handStability);
         }
         else
         {
-            rightHandTransform.localPosition = Vector3.Lerp(rightHandTransform.localPosition, rightHandOriginalLocalPos, Time.deltaTime * 10f);
+            rightHandTransform.localPosition = Vector3.Lerp(rightHandTransform.localPosition, rightHandOriginalLocalPos, Time.deltaTime * handReturnSpeed);
         }
     }
 
-    private void sprint()
+    private void HandleSprint()
     {
-        if (Input.GetKey(KeyCode.LeftShift))
+        if (Input.GetKey(KeyCode.LeftShift) && !IsHolding() && playerStats.CurrentStamina > 10f)
         {
-            walkSpeed = 20f;
+            walkSpeed = sprintSpeed;
             IsSprint = true;
         }
         else
@@ -210,5 +305,20 @@ public class PlayerMovement : MonoBehaviour
         {
             playerStats.OxygenTankRefillRate--;
         }
+    }
+
+    public bool CheckClimbablePoint(Vector3 position, out Vector3 hitPoint)
+    {
+        hitPoint = Vector3.zero;
+        Ray ray = new Ray(cameraTransform.position, cameraTransform.forward);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, maxClimbDistance))
+        {
+            hitPoint = hit.point;
+            return hit.collider.CompareTag(climbableTag) &&
+                   Vector3.Distance(position, hit.point) <= handReachOffset;
+        }
+        return false;
     }
 }

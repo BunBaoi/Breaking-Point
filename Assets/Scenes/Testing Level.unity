@@ -3062,6 +3062,7 @@ GameObject:
   - component: {fileID: 1656980322}
   - component: {fileID: 1656980321}
   - component: {fileID: 1656980323}
+  - component: {fileID: 1656980324}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -3082,17 +3083,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controller: {fileID: 1656980319}
+  leftHandTransform: {fileID: 1028910272}
+  rightHandTransform: {fileID: 1887813046}
+  cameraTransform: {fileID: 892929484}
+  playerHeight: 2
   walkSpeed: 12
   climbSpeed: 5
   gravity: -3
   IsSprint: 0
-  playerHeight: 2
-  maxArmReach: 2
-  pullForce: 20
+  sprintSpeed: 20
+  maxClimbDistance: 5
+  handReachOffset: 2
+  pullForce: 1
+  staminaDrainRate: 2
+  staminaRegenRate: 50
+  maxStamina: 100
+  currentStamina: 0
+  handSlipThreshold: 20
+  slipProbability: 0.1
   climbableTag: Climbable
-  leftHandTransform: {fileID: 1028910272}
-  rightHandTransform: {fileID: 1887813046}
-  cameraTransform: {fileID: 892929484}
+  handSwayAmount: 0.1
+  handReturnSpeed: 10
+  handStabilityMultiplier: 0.5
 --- !u!143 &1656980319
 CharacterController:
   m_ObjectHideFlags: 0
@@ -3204,8 +3216,39 @@ MonoBehaviour:
   OxygenTank: 100
   OxygenDeductionRate: 2
   OxygenTankRefillRate: 2
+  baseOxygenDeductionRate: 2
+  sprintOxygenDeductionRate: 12
+  climbingOxygenMultiplier: 1.5
+  MaxStamina: 100
+  CurrentStamina: 0
+  StaminaRegenRate: 5
+  ClimbingStaminaDrain: 10
+  SprintStaminaDrain: 15
   Atmosphere: 0
   IsAlive: 1
+--- !u!114 &1656980324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1656980317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8b5454ba95701c4ca2e5522460f5d4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  leftHandTransform: {fileID: 1028910272}
+  rightHandTransform: {fileID: 1887813046}
+  cameraTransform: {fileID: 892929484}
+  playerMovement: {fileID: 1656980318}
+  validRaycastColor: {r: 0, g: 1, b: 0, a: 1}
+  invalidRaycastColor: {r: 1, g: 0, b: 0, a: 1}
+  outOfReachColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  showRaycastLines: 1
+  lineWidth: 0.02
+  sphereRadius: 0.05
+  showHandReachSpheres: 1
 --- !u!1 &1688893441
 GameObject:
   m_ObjectHideFlags: 0
