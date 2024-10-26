@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class PlayerStats : MonoBehaviour
 {
@@ -17,9 +18,11 @@ public class PlayerStats : MonoBehaviour
 
     public bool Atmosphere;
     public bool IsAlive = true;
+    public bool PlayerStaticState;
 
     private PlayerMovement playerMovement;
 
+    private Lvl2QTELadderBridge QTELadderBridge;
 
     // Timer
     public const float TickMax = 1;
@@ -43,10 +46,48 @@ public class PlayerStats : MonoBehaviour
     {
         DeadZone();
         PlayerAlive();
+
     }
-    private void DeadZone ()
+
+    public PlayerStatus stateOfPlayer;
+    public enum PlayerStatus
     {
-        if (Atmosphere == true)
+        FreeRoam,
+        QTEBridge,
+        RClimbing,
+        DeadZone,
+    }
+
+    public void STP()
+    {
+        switch (stateOfPlayer)
+        {
+            case PlayerStatus.FreeRoam:
+                Debug.Log("Status: FreeRoam");
+                break;
+
+            case PlayerStatus.QTEBridge:
+                Debug.Log("Status: QTE Bridge");
+                QTELadderBridge.QTEActive();
+
+                break;
+
+            case PlayerStatus.RClimbing:
+                Debug.Log("Status: RClimbing");
+                break;
+
+            case PlayerStatus.DeadZone:
+                Debug.Log("Status: DeadZone");
+                break;
+
+        }
+    }
+
+
+    void DeadZone ()
+    {
+        //if (Atmosphere == true)
+        if (stateOfPlayer == PlayerStatus.DeadZone)
         {
             // Tick Rate
             TickTimer += Time.deltaTime;
@@ -86,14 +127,14 @@ public class PlayerStats : MonoBehaviour
 
     public void OnTriggerEnter(Collider other)
     {
-        Atmosphere = true;
+        stateOfPlayer = PlayerStatus.DeadZone;
         Debug.Log("Atmosphere Danger");
         
         
     }
     public void OnTriggerExit(Collider other)
     {
-        Atmosphere = false;
+        stateOfPlayer = PlayerStatus.FreeRoam;
         Debug.Log("Atmosphere Safe");
     }
 
