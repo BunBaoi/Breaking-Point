@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6aae8174bec24705b4c5b1137a31e2a, type: 3}
+  m_Name: TestingData
+  m_EditorClassIdentifier: 
+  chapterName: 'Chapter 1: The Journey Begins'
+  dialoguesAndAudio:
+  - dialogue: hi
+    fmodAudioEvent:
+      Guid:
+        Data1: -824021375
+        Data2: 1215717741
+        Data3: 1917500314
+        Data4: -1955761802
+      Path: event:/TestingSoundEvent
+  - dialogue: Tehe
+    fmodAudioEvent:
+      Guid:
+        Data1: 1765606322
+        Data2: 1118326076
+        Data3: -1774001520
+        Data4: 1115765450
+      Path: event:/TestingSoundEvent2
+  randomTexts:
+  - Hello 1
+  - Tehe 1
+  pointA: Point A
+  pointB: Point B
+  randomTextPrefab: {fileID: 1868577807128867544, guid: 068a5638994a64419a4469ea43007930, type: 3}

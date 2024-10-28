@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 using System.Collections.Generic;
-using FMODUnity; // FMOD namespace for Unity integration
+using FMODUnity;
 
 [System.Serializable]
 public class DialogueOption
