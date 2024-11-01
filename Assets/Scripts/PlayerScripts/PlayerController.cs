@@ -2,10 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
+    public QTEvent qTEvent;
     public CharacterController controller;
-    private PlayerStats playerStats;
+    public PlayerStats playerStats;
+
 
     public float speed = 12f;
     public float gravity = -9.81f;
@@ -22,6 +24,16 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         playerStats = GetComponent<PlayerStats>();
+        qTEvent = GetComponent<QTEvent>();
+
+        if(qTEvent != null )
+        {
+            qTEvent.FunctionToCall();
+        }
+        else
+        {
+            Debug.Log("QTEvent is not assigned");
+        }
     }
 
     void Update()
@@ -39,6 +51,7 @@ public class PlayerMovement : MonoBehaviour
 
         sprint();
         OxyOuputRate();
+        QTEControl();
     }
 
     private void sprint()
@@ -55,6 +68,25 @@ public class PlayerMovement : MonoBehaviour
         }
         
     }
+
+    public void QTEControl()
+    {
+        if (Input.GetKeyDown(KeyCode.Z))
+        {
+
+            //QTELadderBridge.QTEText.text = "Result Change";
+            //QTEText.text = "FUCK";
+            //displaykey.gameobject.destroy;
+            Debug.Log("Z Key");
+            qTEvent.printcall();
+            //QTETextUpdate.QTEActive();
+        }
+        else
+        {
+
+        }
+    }
+
     public void OxyOuputRate()
     {
         if(Input.GetKeyDown(KeyCode.Q))

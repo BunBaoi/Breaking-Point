@@ -20,9 +20,7 @@ public class PlayerStats : MonoBehaviour
     public bool IsAlive = true;
     public bool PlayerStaticState;
 
-    private PlayerMovement playerMovement;
-
-    private Lvl2QTELadderBridge QTELadderBridge;
+    private PlayerController playerController;
 
     // Timer
     public const float TickMax = 1;
@@ -36,7 +34,7 @@ public class PlayerStats : MonoBehaviour
     void Start()
     {
         controller = GetComponent<CharacterController>();
-        playerMovement = GetComponent<PlayerMovement>();
+        playerController = GetComponent<PlayerController>();
         controller.slopeLimit = 45.0f;
 
     }
@@ -68,7 +66,7 @@ public class PlayerStats : MonoBehaviour
 
             case PlayerStatus.QTEBridge:
                 Debug.Log("Status: QTE Bridge");
-                QTELadderBridge.QTEActive();
+                //QTELadderBridge.QTEActive();
 
                 break;
 
@@ -113,7 +111,7 @@ public class PlayerStats : MonoBehaviour
             }
             
             // PlayerSprint consume more oxygen
-            if (playerMovement.IsSprint == true)
+            if (playerController.IsSprint == true)
             {
                 Debug.Log("Player Consumption Increase");
                 OxygenDeductionRate = 12f;
