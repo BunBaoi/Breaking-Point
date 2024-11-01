@@ -2127,8 +2127,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21879586b0e4ddb42835e3e1eea150f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DisplayKey: {fileID: 0}
+  UIDisplayKey: {fileID: 0}
   TMP_Text: {fileID: 0}
+  Player: {fileID: 0}
+  moveObject: 0
+  moveForward: {x: 0, y: 0, z: 2}
   CountDownTimer: 100
   MaxTimer: 0
 --- !u!4 &858934167
@@ -2191,8 +2194,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21879586b0e4ddb42835e3e1eea150f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DisplayKey: {fileID: 1518108017}
+  UIDisplayKey: {fileID: 1518108017}
   TMP_Text: {fileID: 1819387913}
+  Player: {fileID: 1656980320}
+  moveObject: 0
+  moveForward: {x: 0, y: 0, z: 2}
   CountDownTimer: 100
   MaxTimer: 0
 --- !u!43 &882958098
@@ -4155,7 +4161,7 @@ Transform:
   m_GameObject: {fileID: 1656980317}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.507, z: 0}
+  m_LocalPosition: {x: 0, y: 2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4248,6 +4254,8 @@ MonoBehaviour:
   qTEvent: {fileID: 877724999}
   controller: {fileID: 1656980319}
   playerStats: {fileID: 1656980323}
+  moveDistance: {x: 0, y: 20, z: 0}
+  objectSpeed: 3
   speed: 12
   gravity: -9
   IsSprint: 0

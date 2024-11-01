@@ -8,6 +8,8 @@ public class PlayerController : MonoBehaviour
     public CharacterController controller;
     public PlayerStats playerStats;
 
+    public Vector3 target = new Vector3 (10f, 0, 0);
+    public float objectSpeed = 3;
 
     public float speed = 12f;
     public float gravity = -9.81f;
@@ -23,16 +25,7 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        playerStats = GetComponent<PlayerStats>();
 
-        if(qTEvent != null )
-        {
-            qTEvent.FunctionToCall();
-        }
-        else
-        {
-            Debug.Log("QTEvent is not assigned");
-        }
     }
 
     void Update()
@@ -73,11 +66,18 @@ public class PlayerController : MonoBehaviour
         {
             Debug.Log("Z Key");
             qTEvent.QTEActive();
+            MoveToPosition(target);
+            //transform.position = Vector3.Lerp(transform.position, target, 10);
         }
         else
         {
-
+            Debug.Log("ERROR404");
         }
+    }
+
+    public void MoveToPosition(Vector3 newPosition)
+    {
+        transform.position = newPosition;
     }
 
     public void OxyOuputRate()

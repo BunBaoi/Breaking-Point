@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using JetBrains.Annotations;
 
 public class QTEvent : MonoBehaviour
 {
@@ -10,6 +11,8 @@ public class QTEvent : MonoBehaviour
     public TMP_Text TMP_Text;
 
     public Transform Player;
+    public float moveObject;
+    public Vector3 moveForward = new Vector3(0f, 0f, 2f);
 
     //public int QTEGen;
     //public int WaitingKey;
@@ -24,31 +27,25 @@ public class QTEvent : MonoBehaviour
 
     void Start()
     {
-        //QTEText = GetComponent<TextMeshProUGUI>();
-        //QTEActive();
+
     }
 
     void Update()
     {
-        //if (CountDownTimer >= 0)
-        //{
-        //    updateTimer();
-        //}
+        if (CountDownTimer >= 0)
+        {
+            updateTimer();
+        }
     }
 
-    public void FunctionToCall()
-    {
-        Debug.Log("Function called");
-    }
-
+    // QTE UI
     public void QTEActive()
     {
         TMP_Text.text = "Hello";
-        Debug.Log("Function QTE Active called");
         Destroy(UIDisplayKey);
-        Player.transform.position += 2 * Vector3.forward;
     }
 
+    // QTE Player Timer
     public void updateTimer()
     {
         CountDownTimer -= Time.deltaTime;
