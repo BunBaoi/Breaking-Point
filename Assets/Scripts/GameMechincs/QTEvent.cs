@@ -6,13 +6,15 @@ using TMPro;
 
 public class QTEvent : MonoBehaviour
 {
-    //public PlayerStats playerStats;
-    public GameObject DisplayKey;
+    public GameObject UIDisplayKey;
+    public TMP_Text TMP_Text;
 
-    public int QTEGen;
-    public int WaitingKey;
-    public int CorrectKey;
-    public int KeyCountDownTime;
+    public Transform Player;
+
+    //public int QTEGen;
+    //public int WaitingKey;
+    //public int CorrectKey;
+    //public int KeyCountDownTime;
 
 
 
@@ -28,10 +30,10 @@ public class QTEvent : MonoBehaviour
 
     void Update()
     {
-        if (CountDownTimer >= 0)
-        {
-            updateTimer();
-        }
+        //if (CountDownTimer >= 0)
+        //{
+        //    updateTimer();
+        //}
     }
 
     public void FunctionToCall()
@@ -41,11 +43,10 @@ public class QTEvent : MonoBehaviour
 
     public void QTEActive()
     {
-        //QTEText.text = "Hello";
-        //DisplayKey.GetComponent<TMP_Text.>;
+        TMP_Text.text = "Hello";
         Debug.Log("Function QTE Active called");
-        //Destroy(DisplayKey);
-
+        Destroy(UIDisplayKey);
+        Player.transform.position += 2 * Vector3.forward;
     }
 
     public void updateTimer()
@@ -56,9 +57,5 @@ public class QTEvent : MonoBehaviour
             //playerStats.IsAlive = false;
             Debug.Log("Player Dead");
         }
-    }
-    public void printcall()
-    {
-        print("Print call");
     }
 }

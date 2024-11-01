@@ -928,7 +928,7 @@ GameObject:
   m_Component:
   - component: {fileID: 250155172}
   m_Layer: 0
-  m_Name: Lvl2QTELadderBridge
+  m_Name: QTELadderBridge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2128,10 +2128,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DisplayKey: {fileID: 0}
-  QTEGen: 4
-  WaitingKey: 1
-  CorrectKey: 0
-  KeyCountDownTime: 0
+  TMP_Text: {fileID: 0}
   CountDownTimer: 100
   MaxTimer: 0
 --- !u!4 &858934167
@@ -2195,10 +2192,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DisplayKey: {fileID: 1518108017}
-  QTEGen: 0
-  WaitingKey: 0
-  CorrectKey: 0
-  KeyCountDownTime: 0
+  TMP_Text: {fileID: 1819387913}
   CountDownTimer: 100
   MaxTimer: 0
 --- !u!43 &882958098
@@ -2445,7 +2439,7 @@ Transform:
   m_GameObject: {fileID: 892929481}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.901, z: 0}
+  m_LocalPosition: {x: 0, y: 0.74, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4251,14 +4245,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b30069bedf341c244aaa43a5b48cc242, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  qTEvent: {fileID: 877724999}
   controller: {fileID: 1656980319}
   playerStats: {fileID: 1656980323}
-  qTEvent: {fileID: 877724999}
   speed: 12
-  gravity: -9.81
+  gravity: -9
   IsSprint: 0
   playerHeight: 0
-  maxSlopeAngle: 0
 --- !u!1 &1688893441
 GameObject:
   m_ObjectHideFlags: 0

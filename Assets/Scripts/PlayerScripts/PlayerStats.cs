@@ -9,7 +9,6 @@ public class PlayerStats : MonoBehaviour
 
     public float Oxygen;
     //public float Stamina;
-
     public float OxygenTank;
 
     public float OxygenDeductionRate;
@@ -30,11 +29,11 @@ public class PlayerStats : MonoBehaviour
     // Slope Climb
     CharacterController controller;
 
-
     void Start()
     {
         controller = GetComponent<CharacterController>();
         playerController = GetComponent<PlayerController>();
+
         controller.slopeLimit = 45.0f;
 
     }

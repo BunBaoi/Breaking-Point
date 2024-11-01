@@ -18,13 +18,12 @@ public class PlayerController : MonoBehaviour
     Vector3 velocity;
     Rigidbody rb;
 
-    public float maxSlopeAngle;
-    private RaycastHit slopehit;
+    //public float maxSlopeAngle;
+    //private RaycastHit slopehit;
 
     void Start()
     {
         playerStats = GetComponent<PlayerStats>();
-        qTEvent = GetComponent<QTEvent>();
 
         if(qTEvent != null )
         {
@@ -44,7 +43,6 @@ public class PlayerController : MonoBehaviour
         Vector3 move = transform.right * x + transform.forward * z;
 
         controller.Move(move * speed * Time.deltaTime);
-
         velocity.y += gravity * Time.deltaTime;
 
         controller.Move(velocity * Time.deltaTime);
@@ -73,13 +71,8 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Z))
         {
-
-            //QTELadderBridge.QTEText.text = "Result Change";
-            //QTEText.text = "FUCK";
-            //displaykey.gameobject.destroy;
             Debug.Log("Z Key");
-            qTEvent.printcall();
-            //QTETextUpdate.QTEActive();
+            qTEvent.QTEActive();
         }
         else
         {
@@ -89,15 +82,15 @@ public class PlayerController : MonoBehaviour
 
     public void OxyOuputRate()
     {
-        if(Input.GetKeyDown(KeyCode.Q))
+        if(Input.GetKeyDown(KeyCode.E))
         {
             playerStats.OxygenTankRefillRate++;
-            //Debug.Log(playerStats.OxygenTankRefillRate);
+            //Debug.log("Rate Up");
         }
-        else if (Input.GetKeyDown(KeyCode.E))
+        else if (Input.GetKeyDown(KeyCode.Q))
         {
             playerStats.OxygenTankRefillRate--;
-            //Debug.Log(playerStats.OxygenTankRefillRate);
+            //Debug.log("Rate Down");
         }
     }
 
