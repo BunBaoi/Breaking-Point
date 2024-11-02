@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public QTEvent qTEvent;
+    public QTEventUI qTEvent;
     public CharacterController controller;
     public PlayerStats playerStats;
 

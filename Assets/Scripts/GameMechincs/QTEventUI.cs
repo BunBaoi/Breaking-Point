@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using TMPro;
 using JetBrains.Annotations;
 
-public class QTEvent : MonoBehaviour
+public class QTEventUI : MonoBehaviour
 {
     public GameObject UIDisplayKey;
     public TMP_Text TMP_Text;
