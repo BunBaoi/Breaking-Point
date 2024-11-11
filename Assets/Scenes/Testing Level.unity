@@ -138,7 +138,7 @@ GameObject:
   - component: {fileID: 25571546}
   m_Layer: 0
   m_Name: Prism
-  m_TagString: Climbable
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4492,6 +4492,7 @@ Transform:
   m_Children:
   - {fileID: 1478993460}
   - {fileID: 892929484}
+  - {fileID: 1887813046}
   - {fileID: 1028910272}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -4584,17 +4585,10 @@ MonoBehaviour:
   playerStats: {fileID: 1656980323}
   objectSpeed: 3
   target: {x: 10, y: 2, z: 0}
-  walkSpeed: 8
+  speed: 12
   gravity: -9
-  climbSpeed: 5
   IsSprint: 0
   playerHeight: 0
-  maxArmReach: 2
-  pullForce: 20
-  climbableTag: Climbable
-  leftHandTransform: {fileID: 1028910272}
-  rightHandTransform: {fileID: 1028910272}
-  cameraTransform: {fileID: 892929484}
 --- !u!114 &1656980325
 MonoBehaviour:
   m_ObjectHideFlags: 0

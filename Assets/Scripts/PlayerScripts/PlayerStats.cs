@@ -6,21 +6,26 @@ using UnityEngine.UIElements;
 
 public class PlayerStats : MonoBehaviour
 {
-
-    public float Oxygen;
-    //public float Stamina;
-    public float OxygenTank;
-
+    [Header("Oxygen System")]
+    public float Oxygen = 100f;
+    public float OxygenTank = 100f;
     public float OxygenDeductionRate;
-    //public float StaminaDeduction;
     public float OxygenTankRefillRate;
+    public float baseOxygenDeductionRate = 2f;
+    public float sprintOxygenDeductionRate = 12f;
+    public float climbingOxygenMultiplier = 1.5f;
 
+    [Header("Stamina System")]
+    public float MaxStamina = 100f;
+    public float CurrentStamina;
+    public float StaminaRegenRate = 5f;
+    public float ClimbingStaminaDrain = 10f;
+    public float SprintStaminaDrain = 15f;
+
+    [Header("Status")]
     public bool Atmosphere;
     public bool IsAlive = true;
-    public bool PlayerStaticState;
-
-    private PlayerController playerController;
-    public QTEMechanic qTEMechanic;
+    private PlayerMovement playerMovement;
 
     // Timer
     public const float TickMax = 1;
@@ -33,94 +38,79 @@ public class PlayerStats : MonoBehaviour
     void Start()
     {
         controller = GetComponent<CharacterController>();
-        playerController = GetComponent<PlayerController>();
-
+        playerMovement = GetComponent<PlayerMovement>();
+        CurrentStamina = MaxStamina;
         controller.slopeLimit = 45.0f;
-
     }
 
-    // Update is called once per frame
     void Update()
     {
-        DeadZone();
+        if (IsAlive)
+        {
+            DeadZone();
+            UpdateStamina();
+        }
         PlayerAlive();
 
     }
 
-    public PlayerStatus stateOfPlayer;
-    public enum PlayerStatus
+    public void DrainStamina(float amount)
     {
-        FreeRoam,
-        QTEBridge,
-        RClimbing,
-        DeadZone,
+        CurrentStamina = Mathf.Max(0f, CurrentStamina - amount);
     }
 
-    // PRINT ENUM STATUS//
-
-    //public void STP()
-    //{
-    //    switch (stateOfPlayer)
-    //    {
-    //        case PlayerStatus.FreeRoam:
-    //            Debug.Log("Status: FreeRoam");
-    //            break;
-
-    //        case PlayerStatus.QTEBridge:
-    //            Debug.Log("Status: QTE Bridge");
-                
-
-    //            break;
-
-    //        case PlayerStatus.RClimbing:
-    //            Debug.Log("Status: RClimbing");
-    //            break;
-
-    //        case PlayerStatus.DeadZone:
-    //            Debug.Log("Status: DeadZone");
-    //            break;
-
-    //    }
-    //}
-
-
-    void DeadZone ()
+    public void RegenerateStamina(float amount)
     {
-        //if (Atmosphere == true)
-        if (stateOfPlayer == PlayerStatus.DeadZone)
+        if (!playerMovement.IsHolding() && !playerMovement.IsSprint)
         {
-            // Tick Rate
+            CurrentStamina = Mathf.Min(MaxStamina, CurrentStamina + amount);
+        }
+    }
+
+    private void UpdateStamina()
+    {
+        if (playerMovement.IsHolding())
+        {
+            DrainStamina(ClimbingStaminaDrain * Time.deltaTime);
+        }
+        else if (playerMovement.IsSprint)
+        {
+            DrainStamina(SprintStaminaDrain * Time.deltaTime);
+        }
+        else
+        {
+            RegenerateStamina(StaminaRegenRate * Time.deltaTime);
+        }
+    }
+
+    private void DeadZone()
+    {
+        if (Atmosphere)
+        {
             TickTimer += Time.deltaTime;
-            if (TickTimer >= TickMax && IsAlive == true)
+            if (TickTimer >= TickMax && IsAlive)
             {
                 TickTimer -= TickMax;
                 Tick++;
 
-                //Oxygen Rate deduction
-                Oxygen = Oxygen - OxygenDeductionRate;
+                float currentOxygenRate = playerMovement.IsSprint ? sprintOxygenDeductionRate : baseOxygenDeductionRate;
+                if (playerMovement.IsHolding())
+                {
+                    currentOxygenRate *= climbingOxygenMultiplier;
+                }
 
-                // Tank replanish Oxygen
-                if (OxygenTankRefillRate > OxygenTank) // Step 1: Checks rate enough in tank
+                Oxygen -= currentOxygenRate;
+
+                if (OxygenTankRefillRate > OxygenTank)
                 {
                     OxygenTankRefillRate = OxygenTank;
                 }
-                else if (Oxygen < 100 && OxygenTank > 0) // Step 2: Checks there is oxygen in tank
+                else if (Oxygen < 100 && OxygenTank > 0)
                 {
-                    Oxygen = Oxygen + OxygenTankRefillRate;
-                    OxygenTank = OxygenTank - OxygenTankRefillRate;
+                    float oxygenToAdd = Mathf.Min(OxygenTankRefillRate, 100f - Oxygen);
+                    Oxygen += oxygenToAdd;
+                    OxygenTank -= oxygenToAdd;
                 }
-
-            }
-            
-            // PlayerSprint consume more oxygen
-            if (playerController.IsSprint == true)
-            {
-                Debug.Log("Player Consumption Increase");
-                OxygenDeductionRate = 12f;
-            }
-            else
-            {
-                OxygenDeductionRate = 2f;
             }
         }
     }
@@ -129,9 +119,8 @@ public class PlayerStats : MonoBehaviour
     {
         stateOfPlayer = PlayerStatus.DeadZone;
         Debug.Log("Atmosphere Danger");
-        
-        
     }
+
     public void OnTriggerExit(Collider other)
     {
         stateOfPlayer = PlayerStatus.FreeRoam;
