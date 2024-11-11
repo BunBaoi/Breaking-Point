@@ -7,6 +7,7 @@ public class PlayerControls : MonoBehaviour
     [Header("Character Components")]
     public CharacterController controller;
     private PlayerStats playerStats;
+    public GameObject objectPlayer;
     public Transform leftHandTransform;
     public Transform rightHandTransform;
     public Transform cameraTransform;
@@ -83,6 +84,7 @@ public class PlayerControls : MonoBehaviour
             UpdateHandPositions();
             HandleSprint();
             OxyOuputRate();
+            QTEControl();
         }
 
         //controller.Move(move * QTEMoveSpeed * Time.deltaTime);
@@ -336,11 +338,14 @@ public class PlayerControls : MonoBehaviour
             qTEvent.QTEActive(); // Delete QTE UI
             //MoveToPosition(target);
             //qTEMechanic.MoveBlock();
+            QTEMoveToTarget();
+            //qTEMechanic.QTEMoveToTarget();
             //StartCoroutine(MoveCube(target));
 
             //qTEMechanic.PositionOfPlayer = PlayerPos.Pos2;
 
             //transform.position = Vector3.Lerp(transform.position, target, 10);
+
         }
     }
 
@@ -360,13 +365,24 @@ public class PlayerControls : MonoBehaviour
 
     public void OxyOuputRate()
     {
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (Input.GetKeyDown(KeyCode.E))
         {
             playerStats.OxygenTankRefillRate++;
         }
-        else if (Input.GetKeyDown(KeyCode.E))
+        else if (Input.GetKeyDown(KeyCode.Q))
         {
             playerStats.OxygenTankRefillRate--;
         }
+
+    }
+    public void QTEMoveToTarget()
+    {
+        //if (Pos1 != null)
+        //{
+        //    Vector3 targetPosition = Pos1.position;
+        //    transform.position = Vector3.MoveTowards(transform.position, targetPosition, QTEMoveSpeed * Time.deltaTime);
+        //}
+        transform.position = Vector3.MoveTowards(transform.position, target, QTEMoveSpeed * Time.deltaTime);
+        Debug.Log("QTEMOVE");
     }
 }

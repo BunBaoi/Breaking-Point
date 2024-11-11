@@ -46,13 +46,9 @@ public class PlayerStats : MonoBehaviour
 
     void Update()
     {
-        if (IsAlive)
-        {
-            DeadZone();
-            UpdateStamina();
-        }
+        DeadZone();
         PlayerAlive();
-
+        UpdateStamina();
     }
 
     public PlayerStatus stateOfPlayer;
@@ -119,36 +115,44 @@ public class PlayerStats : MonoBehaviour
         }
     }
 
-    private void DeadZone()
+    void DeadZone()
     {
-        if (Atmosphere)
+        //
+        if (stateOfPlayer == PlayerStatus.DeadZone)
         {
+            // Tick Rate
             TickTimer += Time.deltaTime;
             if (TickTimer >= TickMax && IsAlive)
             {
                 TickTimer -= TickMax;
                 Tick++;
 
-                float currentOxygenRate = playerControls.IsSprint ? sprintOxygenDeductionRate : baseOxygenDeductionRate;
-                if (playerControls.IsHolding())
-                {
-                    currentOxygenRate *= climbingOxygenMultiplier;
-                }
+                // Oxygen Deduction Rate
+                Oxygen = Oxygen - OxygenDeductionRate;
 
-                Oxygen -= currentOxygenRate;
-
-                // PlayerSprint consume more oxygen
-                if (OxygenTankRefillRate > OxygenTank)
+                // Tank Replanish Oxygen
+                if (OxygenTankRefillRate > OxygenTank) // Step 1: Checks rate enough in Tank
                 {
                     OxygenTankRefillRate = OxygenTank;
                 }
-                else if (Oxygen < 100 && OxygenTank > 0)
+                else if (Oxygen < 100 && OxygenTank > 0) //Step 2: Checks there is oxygen in Tank
                 {
-                    float oxygenToAdd = Mathf.Min(OxygenTankRefillRate, 100f - Oxygen);
-                    Oxygen += oxygenToAdd;
-                    OxygenTank -= oxygenToAdd;
+                    Oxygen = Oxygen + OxygenTankRefillRate;
+                    OxygenTank = OxygenTank - OxygenTankRefillRate;
                 }
             }
+
+            // PlayerSprint Consume more Oxygen
+            if (playerControls.IsSprint == true)
+            {
+                Debug.Log("Player Consumption Rate Increase");
+                OxygenDeductionRate = 12f;
+            }
+            else
+            {
+                OxygenDeductionRate = 2f;
+            }
+
         }
     }
 

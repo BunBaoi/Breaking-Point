@@ -10,13 +10,14 @@ public class QTEMechanic : MonoBehaviour
     public GameObject Pos2;
     public GameObject Pos3;
 
-    private float moveDuration = 5f;
+    public float QTEMoveSpeed = 5f;
     public float CHKCounter = 0f;
 
     public GameObject objectPlayer;
     public Vector3 PlayerPos1;
 
     public Vector3 target = new Vector3(0, 2, 2);
+
 
     // Start is called before the first frame update
     void Start()
@@ -43,9 +44,9 @@ public class QTEMechanic : MonoBehaviour
             Vector3 startPosition = transform.position;
             float timeElapsed = 0;
             CHKCounter++;
-            while (timeElapsed < moveDuration)
+            while (timeElapsed < QTEMoveSpeed)
             {
-                transform.position = Vector3.Lerp(startPosition, targetPosition, timeElapsed / moveDuration);
+                transform.position = Vector3.Lerp(startPosition, targetPosition, timeElapsed / QTEMoveSpeed);
                 timeElapsed += Time.deltaTime;
                 yield return null;
             }
@@ -64,17 +65,20 @@ public class QTEMechanic : MonoBehaviour
             {
                 PositionOfPlayer = PlayerPos.Pos2;
                 CHKCounter++;
+                objectPlayer.transform.position = Vector3.MoveTowards(transform.position, target, QTEMoveSpeed * Time.deltaTime);
                 Debug.Log("Player pos -> 2");
             }
         }
     }
 
-
-
-
-    public void QTEMove()
+    public void QTEMoveToTarget()
     {
-        PlayerPos1 = objectPlayer.transform.position;
+        //if (Pos1 != null)
+        //{
+        //    Vector3 targetPosition = Pos1.position;
+        //    transform.position = Vector3.MoveTowards(transform.position, targetPosition, QTEMoveSpeed * Time.deltaTime);
+        //}
+        objectPlayer.transform.position = Vector3.MoveTowards(objectPlayer.transform.position, target, QTEMoveSpeed * Time.deltaTime);
         Debug.Log("QTEMOVE");
     }
 }
