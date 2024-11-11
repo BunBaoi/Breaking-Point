@@ -1,15 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static QTEMechanic;
 
 public class PlayerController : MonoBehaviour
 {
     public QTEventUI qTEvent;
+    public QTEMechanic qTEMechanic;
     public CharacterController controller;
     public PlayerStats playerStats;
 
-    public Vector3 target = new Vector3 (10f, 0, 0);
     public float objectSpeed = 3;
+    private float moveDuration = 5f;
+    public Vector3 target = new Vector3(2, 3, 4);
 
     public float speed = 12f;
     public float gravity = -9.81f;
@@ -65,19 +68,35 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Z))
         {
             Debug.Log("Z Key");
-            qTEvent.QTEActive();
-            MoveToPosition(target);
+            qTEvent.QTEActive(); // Delete QTE UI
+            //MoveToPosition(target);
+            //qTEMechanic.MoveBlock();
+            //StartCoroutine(MoveCube(target));
+
+            qTEMechanic.PositionOfPlayer = PlayerPos.Pos2;
+
             //transform.position = Vector3.Lerp(transform.position, target, 10);
         }
-        else
-        {
-            Debug.Log("ERROR404");
-        }
     }
+
 
     public void MoveToPosition(Vector3 newPosition)
     {
         transform.position = newPosition;
+    }
+
+    IEnumerator MoveCube(Vector3 targetPosition)
+    {
+        Vector3 startPosition = transform.position;
+        float timeElapsed = 0;
+        while (timeElapsed < moveDuration)
+        {
+            transform.position = Vector3.Lerp(startPosition, targetPosition, timeElapsed / moveDuration);
+            timeElapsed += Time.deltaTime;
+            yield return null;
+        }
+        transform.position = targetPosition;
+
     }
 
     public void OxyOuputRate()

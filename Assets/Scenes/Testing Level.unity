@@ -968,7 +968,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f1c783a117fcc2468ececa506cce969, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Pos1: {fileID: 0}
+  Pos2: {fileID: 0}
+  Pos3: {fileID: 0}
+  CHKCounter: 0
+  objectPlayer: {fileID: 0}
+  PlayerPos1: {x: 0, y: 0, z: 0}
   target: {x: 0, y: 0, z: 2}
+  PositionOfPlayer: 0
 --- !u!1 &293405124
 GameObject:
   m_ObjectHideFlags: 0
@@ -4331,6 +4338,7 @@ GameObject:
   - component: {fileID: 1656980321}
   - component: {fileID: 1656980323}
   - component: {fileID: 1656980324}
+  - component: {fileID: 1656980325}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -4373,7 +4381,7 @@ Transform:
   m_GameObject: {fileID: 1656980317}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 2, z: 0}
+  m_LocalPosition: {x: 0, y: 2, z: -7.39}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4450,6 +4458,7 @@ MonoBehaviour:
   Atmosphere: 0
   IsAlive: 1
   PlayerStaticState: 0
+  qTEMechanic: {fileID: 250155173}
   stateOfPlayer: 0
 --- !u!114 &1656980324
 MonoBehaviour:
@@ -4464,14 +4473,35 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   qTEvent: {fileID: 877724999}
+  qTEMechanic: {fileID: 1685720758}
   controller: {fileID: 1656980319}
   playerStats: {fileID: 1656980323}
-  target: {x: 10, y: 0, z: 0}
   objectSpeed: 3
+  target: {x: 10, y: 2, z: 0}
   speed: 12
   gravity: -9
   IsSprint: 0
   playerHeight: 0
+--- !u!114 &1656980325
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1656980317}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f1c783a117fcc2468ececa506cce969, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Pos1: {fileID: 59562490}
+  Pos2: {fileID: 2126617249}
+  Pos3: {fileID: 600759269}
+  CHKCounter: 0
+  objectPlayer: {fileID: 1656980317}
+  PlayerPos1: {x: 10, y: 10, z: 10}
+  target: {x: 0, y: 2, z: 2}
+  PositionOfPlayer: 0
 --- !u!1 &1685720757
 GameObject:
   m_ObjectHideFlags: 0
@@ -4504,7 +4534,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f1c783a117fcc2468ececa506cce969, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {x: 0, y: 0, z: 2}
+  Pos1: {fileID: 0}
+  Pos2: {fileID: 0}
+  Pos3: {fileID: 0}
+  CHKCounter: 0
+  objectPlayer: {fileID: 0}
+  PlayerPos1: {x: 0, y: 0, z: 0}
+  target: {x: 0, y: 2, z: 2}
+  PositionOfPlayer: 0
 --- !u!65 &1685720759
 BoxCollider:
   m_ObjectHideFlags: 0

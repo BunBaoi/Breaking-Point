@@ -20,6 +20,7 @@ public class PlayerStats : MonoBehaviour
     public bool PlayerStaticState;
 
     private PlayerController playerController;
+    public QTEMechanic qTEMechanic;
 
     // Timer
     public const float TickMax = 1;
@@ -55,30 +56,32 @@ public class PlayerStats : MonoBehaviour
         DeadZone,
     }
 
-    public void STP()
-    {
-        switch (stateOfPlayer)
-        {
-            case PlayerStatus.FreeRoam:
-                Debug.Log("Status: FreeRoam");
-                break;
+    // PRINT ENUM STATUS//
 
-            case PlayerStatus.QTEBridge:
-                Debug.Log("Status: QTE Bridge");
-                //QTELadderBridge.QTEActive();
+    //public void STP()
+    //{
+    //    switch (stateOfPlayer)
+    //    {
+    //        case PlayerStatus.FreeRoam:
+    //            Debug.Log("Status: FreeRoam");
+    //            break;
 
-                break;
+    //        case PlayerStatus.QTEBridge:
+    //            Debug.Log("Status: QTE Bridge");
+                
 
-            case PlayerStatus.RClimbing:
-                Debug.Log("Status: RClimbing");
-                break;
+    //            break;
 
-            case PlayerStatus.DeadZone:
-                Debug.Log("Status: DeadZone");
-                break;
+    //        case PlayerStatus.RClimbing:
+    //            Debug.Log("Status: RClimbing");
+    //            break;
 
-        }
-    }
+    //        case PlayerStatus.DeadZone:
+    //            Debug.Log("Status: DeadZone");
+    //            break;
+
+    //    }
+    //}
 
 
     void DeadZone ()
