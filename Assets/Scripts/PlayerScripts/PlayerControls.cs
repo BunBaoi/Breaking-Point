@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerControls : MonoBehaviour
 {
     [Header("Character Components")]
     public CharacterController controller;
@@ -13,7 +13,7 @@ public class PlayerMovement : MonoBehaviour
     public float playerHeight;
 
     [Header("Movement Settings")]
-    public float walkSpeed = 12f;
+    public float walkSpeed;
     public float climbSpeed = 5f;
     public float gravity = -9.81f;
     public bool IsSprint = false;
@@ -46,6 +46,14 @@ public class PlayerMovement : MonoBehaviour
     private float timeSinceLastGrab;
     private bool isExhausted = false;
 
+    [Header("Quick Time Event")]
+    public QTEventUI qTEvent;
+    public QTEMechanic qTEMechanic;
+    public float QTEMoveSpeed = 3;
+    public float move = 12;
+    private float moveDuration = 5f;
+    public Vector3 target = new Vector3(2, 3, 4);
+
     void Start()
     {
         playerStats = GetComponent<PlayerStats>();
@@ -76,6 +84,11 @@ public class PlayerMovement : MonoBehaviour
             HandleSprint();
             OxyOuputRate();
         }
+
+        //controller.Move(move * QTEMoveSpeed * Time.deltaTime);
+        velocity.y += gravity * Time.deltaTime;
+
+        controller.Move(velocity * Time.deltaTime);
     }
 
     void HandleStamina()
@@ -295,18 +308,6 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    public void OxyOuputRate()
-    {
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            playerStats.OxygenTankRefillRate++;
-        }
-        else if (Input.GetKeyDown(KeyCode.E))
-        {
-            playerStats.OxygenTankRefillRate--;
-        }
-    }
-
     public bool CheckClimbablePoint(Vector3 position, out Vector3 hitPoint)
     {
         hitPoint = Vector3.zero;
@@ -320,5 +321,52 @@ public class PlayerMovement : MonoBehaviour
                    Vector3.Distance(position, hit.point) <= handReachOffset;
         }
         return false;
+    }
+
+    public void MoveToPosition(Vector3 newPosition)
+    {
+        transform.position = newPosition;
+    }
+
+    public void QTEControl()
+    {
+        if (Input.GetKeyDown(KeyCode.Z))
+        {
+            Debug.Log("Z Key");
+            qTEvent.QTEActive(); // Delete QTE UI
+            //MoveToPosition(target);
+            //qTEMechanic.MoveBlock();
+            //StartCoroutine(MoveCube(target));
+
+            //qTEMechanic.PositionOfPlayer = PlayerPos.Pos2;
+
+            //transform.position = Vector3.Lerp(transform.position, target, 10);
+        }
+    }
+
+    IEnumerator MoveCube(Vector3 targetPosition)
+    {
+        Vector3 startPosition = transform.position;
+        float timeElapsed = 0;
+        while (timeElapsed < moveDuration)
+        {
+            transform.position = Vector3.Lerp(startPosition, targetPosition, timeElapsed / moveDuration);
+            timeElapsed += Time.deltaTime;
+            yield return null;
+        }
+        transform.position = targetPosition;
+
+    }
+
+    public void OxyOuputRate()
+    {
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            playerStats.OxygenTankRefillRate++;
+        }
+        else if (Input.GetKeyDown(KeyCode.E))
+        {
+            playerStats.OxygenTankRefillRate--;
+        }
     }
 }

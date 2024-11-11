@@ -8,7 +8,7 @@ public class ClimbingRaycastVisualizer : MonoBehaviour
     public Transform leftHandTransform;
     public Transform rightHandTransform;
     public Transform cameraTransform;
-    public PlayerMovement playerMovement;
+    public PlayerControls playerControls;
 
     [Header("Visual Settings")]
     public Color validRaycastColor = Color.green;
@@ -75,15 +75,15 @@ public class ClimbingRaycastVisualizer : MonoBehaviour
 
         centerRayLine.SetPosition(0, ray.origin);
 
-        if (Physics.Raycast(ray, out hit, playerMovement.maxClimbDistance))
+        if (Physics.Raycast(ray, out hit, playerControls.maxClimbDistance))
         {
             centerRayLine.SetPosition(1, hit.point);
             centerPoint.transform.position = hit.point;
             centerPoint.SetActive(true);
 
-            bool isClimbable = hit.collider.CompareTag(playerMovement.climbableTag);
-            bool leftHandInReach = Vector3.Distance(leftHandTransform.position, hit.point) <= playerMovement.handReachOffset;
-            bool rightHandInReach = Vector3.Distance(rightHandTransform.position, hit.point) <= playerMovement.handReachOffset;
+            bool isClimbable = hit.collider.CompareTag(playerControls.climbableTag);
+            bool leftHandInReach = Vector3.Distance(leftHandTransform.position, hit.point) <= playerControls.handReachOffset;
+            bool rightHandInReach = Vector3.Distance(rightHandTransform.position, hit.point) <= playerControls.handReachOffset;
 
             Color rayColor;
             if (isClimbable && (leftHandInReach || rightHandInReach))
@@ -105,7 +105,7 @@ public class ClimbingRaycastVisualizer : MonoBehaviour
         }
         else
         {
-            centerRayLine.SetPosition(1, ray.origin + ray.direction * playerMovement.maxClimbDistance);
+            centerRayLine.SetPosition(1, ray.origin + ray.direction * playerControls.maxClimbDistance);
             centerRayLine.startColor = invalidRaycastColor;
             centerRayLine.endColor = invalidRaycastColor;
             centerPoint.SetActive(false);
@@ -121,7 +121,7 @@ public class ClimbingRaycastVisualizer : MonoBehaviour
     private void UpdateReachSphere(GameObject sphere, Transform handTransform)
     {
         sphere.transform.position = handTransform.position;
-        sphere.transform.localScale = Vector3.one * playerMovement.handReachOffset * 2;
+        sphere.transform.localScale = Vector3.one * playerControls.handReachOffset * 2;
     }
 
     private GameObject CreateReachSphere(string name)

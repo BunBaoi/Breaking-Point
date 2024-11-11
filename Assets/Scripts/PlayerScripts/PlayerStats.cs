@@ -25,7 +25,8 @@ public class PlayerStats : MonoBehaviour
     [Header("Status")]
     public bool Atmosphere;
     public bool IsAlive = true;
-    private PlayerMovement playerMovement;
+    private PlayerControls playerControls;
+    public QTEMechanic qTEMechanic;
 
     // Timer
     public const float TickMax = 1;
@@ -38,7 +39,7 @@ public class PlayerStats : MonoBehaviour
     void Start()
     {
         controller = GetComponent<CharacterController>();
-        playerMovement = GetComponent<PlayerMovement>();
+        playerControls = GetComponent<PlayerControls>();
         CurrentStamina = MaxStamina;
         controller.slopeLimit = 45.0f;
     }
@@ -54,6 +55,41 @@ public class PlayerStats : MonoBehaviour
 
     }
 
+    public PlayerStatus stateOfPlayer;
+    public enum PlayerStatus
+    {
+        FreeRoam,
+        QTEBridge,
+        RClimbing,
+        DeadZone,
+    }
+    // PRINT ENUM STATUS//
+
+    //public void STP()
+    //{
+    //    switch (stateOfPlayer)
+    //    {
+    //        case PlayerStatus.FreeRoam:
+    //            Debug.Log("Status: FreeRoam");
+    //            break;
+
+    //        case PlayerStatus.QTEBridge:
+    //            Debug.Log("Status: QTE Bridge");
+
+
+    //            break;
+
+    //        case PlayerStatus.RClimbing:
+    //            Debug.Log("Status: RClimbing");
+    //            break;
+
+    //        case PlayerStatus.DeadZone:
+    //            Debug.Log("Status: DeadZone");
+    //            break;
+
+    //    }
+    //}
+
     public void DrainStamina(float amount)
     {
         CurrentStamina = Mathf.Max(0f, CurrentStamina - amount);
@@ -61,7 +97,7 @@ public class PlayerStats : MonoBehaviour
 
     public void RegenerateStamina(float amount)
     {
-        if (!playerMovement.IsHolding() && !playerMovement.IsSprint)
+        if (!playerControls.IsHolding() && !playerControls.IsSprint)
         {
             CurrentStamina = Mathf.Min(MaxStamina, CurrentStamina + amount);
         }
@@ -69,11 +105,11 @@ public class PlayerStats : MonoBehaviour
 
     private void UpdateStamina()
     {
-        if (playerMovement.IsHolding())
+        if (playerControls.IsHolding())
         {
             DrainStamina(ClimbingStaminaDrain * Time.deltaTime);
         }
-        else if (playerMovement.IsSprint)
+        else if (playerControls.IsSprint)
         {
             DrainStamina(SprintStaminaDrain * Time.deltaTime);
         }
@@ -93,14 +129,15 @@ public class PlayerStats : MonoBehaviour
                 TickTimer -= TickMax;
                 Tick++;
 
-                float currentOxygenRate = playerMovement.IsSprint ? sprintOxygenDeductionRate : baseOxygenDeductionRate;
-                if (playerMovement.IsHolding())
+                float currentOxygenRate = playerControls.IsSprint ? sprintOxygenDeductionRate : baseOxygenDeductionRate;
+                if (playerControls.IsHolding())
                 {
                     currentOxygenRate *= climbingOxygenMultiplier;
                 }
 
                 Oxygen -= currentOxygenRate;
 
+                // PlayerSprint consume more oxygen
                 if (OxygenTankRefillRate > OxygenTank)
                 {
                     OxygenTankRefillRate = OxygenTank;
