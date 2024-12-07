@@ -6,13 +6,15 @@ public class InventoryManager : MonoBehaviour
     public int defaultSlotCount = 4;  // Default number of inventory slots
     public GameObject inventorySlotPrefab;  // Prefab for the inventory slots
     public Transform inventoryPanel;  // UI panel for inventory display
-    public Transform handPosition;  // Position where the item appears in the player's hand
+    public Transform leftHandPosition;  // Position for left hand item
+    public Transform rightHandPosition;  // Position for right hand item
     public KeyCode dropKey = KeyCode.Q; // Key to drop an item
     public LayerMask groundLayer;
 
     private List<InventorySlot> slots = new List<InventorySlot>();
     private int selectedSlotIndex = 0; // Currently selected inventory slot
-    private GameObject heldItemInstance; // Instance of the item in the player's hand
+    private GameObject heldLeftHandItemInstance; // Instance of the item in the player's left hand
+    private GameObject heldRightHandItemInstance; // Instance of the item in the player's right hand
     private Item currentItem;  // Reference to the currently equipped item
     private bool isSwitchingDisabled = false; // Flag to disable item switching
 
@@ -22,11 +24,14 @@ public class InventoryManager : MonoBehaviour
 
     private GameObject playerController; // CHANGE TO ACTUAL PLAYER MOVEMENT SCRIPT LATER
 
+    private PlayerClimbingState playerClimbingState;
 
     private void Start()
     {
-        playerController = GetComponent<GameObject>(); // CHANGE TO ACTUAL PLAYER MOVEMENT SCRIPT LATER
         CreateSlots(defaultSlotCount);
+
+        // Retrieve the PlayerClimbingState component instead of using GetComponent in the method call
+        playerClimbingState = GetComponent<PlayerClimbingState>();
     }
 
     private void Update()
@@ -51,50 +56,10 @@ public class InventoryManager : MonoBehaviour
         }
 
         // Check for number key presses to select inventory slots
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            SelectSlot(0);
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            SelectSlot(1);
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            SelectSlot(2);
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha4))
-        {
-            SelectSlot(3);
-        }
-
-        // Check total weight and trigger actions
-        float totalWeight = GetTotalWeight();
-
-        if (totalWeight > WeightThreshold2)
-        {
-            if (playerController != null) // ADD MOVEMENT FALLOUTS LATER
-            {
-                // playerController.SetSprintDuration(3f); // Set a new sprint duration
-                // playerController.UpdateMovementSettings(3f, 5f, 0.3f, 3f);
-            }
-        }
-        else if (totalWeight > WeightThreshold1) // ADD MOVEMENT FALLOUTS LATER
-        {
-            if (playerController != null)
-            {
-                // playerController.SetSprintDuration(3f); // Set a new sprint duration
-               // playerController.UpdateMovementSettings(3f, 5f, 0.3f, 3f);
-            }
-        }
-        else
-        {
-            if (playerController != null) // ADD MOVEMENT FALLOUTS LATER
-            {
-                // playerController.SetSprintDuration(5f); // Set a new sprint duration
-                // playerController.UpdateMovementSettings(5f, 7f, 0.5f, 4f);
-            }
-        }
+        if (Input.GetKeyDown(KeyCode.Alpha1)) SelectSlot(0);
+        else if (Input.GetKeyDown(KeyCode.Alpha2)) SelectSlot(1);
+        else if (Input.GetKeyDown(KeyCode.Alpha3)) SelectSlot(2);
+        else if (Input.GetKeyDown(KeyCode.Alpha4)) SelectSlot(3);
     }
 
     // Selects the inventory slot by index
@@ -202,11 +167,32 @@ public class InventoryManager : MonoBehaviour
 
         if (itemToDrop != null)
         {
+            // Clear the slot
             selectedSlot.ClearSlot();
-            Destroy(heldItemInstance); // Destroy the currently held item in hand
-            SpawnDroppedItem(itemToDrop); // Drop the item in the game world
-            currentItem = null; // Clear current item reference after dropping
-            isSwitchingDisabled = false; // Re-enable switching
+
+            // Destroy left hand item
+            if (heldLeftHandItemInstance != null)
+            {
+                Destroy(heldLeftHandItemInstance);
+                heldLeftHandItemInstance = null;
+            }
+
+            // Destroy right hand item
+            if (heldRightHandItemInstance != null)
+            {
+                Destroy(heldRightHandItemInstance);
+                heldRightHandItemInstance = null;
+            }
+
+            // Reset climbing state if exists and component is available
+            if (playerClimbingState != null)
+            {
+                playerClimbingState.ExitClimbingState(); // Use ExitClimbingState() method instead
+            }
+
+            SpawnDroppedItem(itemToDrop);
+            currentItem = null;
+            isSwitchingDisabled = false;
         }
     }
 
@@ -214,7 +200,8 @@ public class InventoryManager : MonoBehaviour
     {
         if (item.itemPrefab != null)  // Check if the item has a prefab
         {
-            Vector3 startPosition = handPosition.position + Vector3.up * 10f;
+            // Use leftHandPosition instead of the removed handPosition
+            Vector3 startPosition = leftHandPosition.position + Vector3.up * 10f;
             RaycastHit hit;
             if (Physics.Raycast(startPosition, Vector3.down, out hit, Mathf.Infinity, groundLayer))
             {
@@ -227,7 +214,8 @@ public class InventoryManager : MonoBehaviour
                     float itemHeight = meshRenderer.bounds.size.y;
                     Vector3 adjustedDropPosition = dropPosition + Vector3.up * (itemHeight / 2);
                     droppedItem.transform.position = adjustedDropPosition;
-                    droppedItem.transform.rotation = Quaternion.Euler(0, handPosition.eulerAngles.y, 0);
+                    // Use leftHandPosition's rotation instead of handPosition
+                    droppedItem.transform.rotation = Quaternion.Euler(0, leftHandPosition.eulerAngles.y, 0);
                 }
                 else
                 {
@@ -239,7 +227,8 @@ public class InventoryManager : MonoBehaviour
             else
             {
                 Debug.LogWarning("No ground detected. Item may drop in mid-air.");
-                Vector3 fallbackPosition = handPosition.position - Vector3.up * 1f;
+                // Use leftHandPosition instead of handPosition
+                Vector3 fallbackPosition = leftHandPosition.position - Vector3.up * 1f;
                 GameObject droppedItem = Instantiate(item.itemPrefab, fallbackPosition, Quaternion.identity);
                 droppedItem.GetComponent<ItemPickUp>().item = item;
             }
@@ -271,35 +260,111 @@ public class InventoryManager : MonoBehaviour
     private void UpdateEquippedItem()
     {
         InventorySlot selectedSlot = slots[selectedSlotIndex];
+
+        // If the selected slot is empty or the item prevents climbing
+        if (selectedSlot.GetItem() == null)
+        {
+            if (playerClimbingState != null)
+            {
+                playerClimbingState.DisableClimbing();
+            }
+        }
+        else
+        {
+            // Re-enable climbing if the new item allows it
+            if (playerClimbingState != null)
+            {
+                playerClimbingState.EnableClimbing();
+            }
+        }
+
         EquipItem(selectedSlot.GetItem());
     }
 
-    // Equips an item to the player's hand
+    // Equips an item to the player's hand(s)
     public void EquipItem(Item item)
     {
-        if (heldItemInstance != null)
+        // Destroy any existing held items
+        if (heldLeftHandItemInstance != null)
         {
-            Destroy(heldItemInstance);
+            Destroy(heldLeftHandItemInstance);
+            heldLeftHandItemInstance = null;
+        }
+
+        if (heldRightHandItemInstance != null)
+        {
+            Destroy(heldRightHandItemInstance);
+            heldRightHandItemInstance = null;
+        }
+
+        // Reset climbing state if exists
+        if (playerClimbingState != null)
+        {
+            playerClimbingState.ExitClimbingState(); // Use ExitClimbingState() method
         }
 
         if (item != null)
         {
+            // Check if the item is too heavy to switch
             if (item.weight > MaxSwitchableWeight)
             {
-                // Switch to the heavy item and disable further switching
-                heldItemInstance = Instantiate(item.itemPrefab, handPosition.position, handPosition.rotation);
-                heldItemInstance.transform.SetParent(handPosition);
-                currentItem = item;
-                isSwitchingDisabled = true; // Disable switching if the item is too heavy
+                // Equip with weight-based switching restrictions
+                EquipItemWithWeightRestrictions(item);
             }
             else
             {
-                heldItemInstance = Instantiate(item.itemPrefab, handPosition.position, handPosition.rotation);
-                heldItemInstance.transform.SetParent(handPosition);
-                currentItem = item;
-                isSwitchingDisabled = false; // Enable switching if the item is light
+                // Normal item equipping
+                EquipNormalItem(item);
             }
         }
+    }
+
+    private void EquipNormalItem(Item item)
+    {
+        // For single-hand items, equip on left hand
+        if (item.handType == Item.HandType.SingleHand)
+        {
+            heldLeftHandItemInstance = Instantiate(item.itemPrefab, leftHandPosition.position, leftHandPosition.rotation);
+            heldLeftHandItemInstance.transform.SetParent(leftHandPosition);
+        }
+        // For double-hand items, equip on both hands
+        else if (item.handType == Item.HandType.DoubleHand)
+        {
+            // Left hand item
+            heldLeftHandItemInstance = Instantiate(item.itemPrefab, leftHandPosition.position, leftHandPosition.rotation);
+            heldLeftHandItemInstance.transform.SetParent(leftHandPosition);
+
+            // Right hand item
+            heldRightHandItemInstance = Instantiate(item.itemPrefab, rightHandPosition.position, rightHandPosition.rotation);
+            heldRightHandItemInstance.transform.SetParent(rightHandPosition);
+        }
+
+        currentItem = item;
+        isSwitchingDisabled = false; // Enable switching if the item is light
+    }
+
+    private void EquipItemWithWeightRestrictions(Item item)
+    {
+        // For single-hand items, equip on left hand
+        if (item.handType == Item.HandType.SingleHand)
+        {
+            heldLeftHandItemInstance = Instantiate(item.itemPrefab, leftHandPosition.position, leftHandPosition.rotation);
+            heldLeftHandItemInstance.transform.SetParent(leftHandPosition);
+        }
+        // For double-hand items, equip on both hands
+        else if (item.handType == Item.HandType.DoubleHand)
+        {
+            // Left hand item
+            heldLeftHandItemInstance = Instantiate(item.itemPrefab, leftHandPosition.position, leftHandPosition.rotation);
+            heldLeftHandItemInstance.transform.SetParent(leftHandPosition);
+
+            // Right hand item
+            heldRightHandItemInstance = Instantiate(item.itemPrefab, rightHandPosition.position, rightHandPosition.rotation);
+            heldRightHandItemInstance.transform.SetParent(rightHandPosition);
+        }
+
+        currentItem = item;
+        isSwitchingDisabled = true; // Disable switching if the item is too heavy
     }
 
     // Method to get the total weight of all items in the inventory

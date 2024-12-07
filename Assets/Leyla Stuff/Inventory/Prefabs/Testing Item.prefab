@@ -66,6 +66,7 @@ GameObject:
   - component: {fileID: 1871463914223378423}
   - component: {fileID: 3407735954489364013}
   - component: {fileID: 778047884948910781}
+  - component: {fileID: 3021718051064668525}
   m_Layer: 15
   m_Name: Testing Item
   m_TagString: Untagged
@@ -186,3 +187,18 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 3, y: 1, z: 3}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &3021718051064668525
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6966494784962024344}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99eedb092e5efef4ab58739cf8398691, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  climbStrength: 1
+  durability: 100
+  isBreakable: 1
