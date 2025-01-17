@@ -9,22 +9,26 @@ public class DialogueManager : MonoBehaviour
 {
     public static DialogueManager Instance;
 
-    public TMP_Text dialogueTextUI;
-    public Canvas dialogueCanvas;
-    public GameObject buttonPrefab;
-    public Transform buttonParent;
+    [SerializeField] private TMP_Text dialogueTextUI;
+    [SerializeField] private TMP_Text npcNameUI;
+    [SerializeField] private Canvas dialogueCanvas;
+    [SerializeField] private GameObject buttonPrefab;
+    [SerializeField] private Transform buttonParent;
+    [SerializeField] private Image nextDialogueIndicatorImage;
+    [SerializeField] private CanvasGroup nextDialogueIndicatorCanvasGroup;
 
     public KeyCode advanceKey = KeyCode.Space;
 
     private DialogueTree currentDialogueTree;
     private int currentIndex = 0;
-    private bool isTextScrolling = false;
-    private bool isFullTextShown = false;
-    private bool optionsAreVisible = false;
+    [SerializeField] private bool isTextScrolling = false;
+    [SerializeField] private bool isFullTextShown = false;
+    [SerializeField] private bool optionsAreVisible = false;
     private Coroutine scrollingCoroutine;
     private List<GameObject> instantiatedButtons = new List<GameObject>();
 
-    private FMOD.Studio.EventInstance currentDialogueEvent; // Store current FMOD event instance
+    private FMOD.Studio.EventInstance currentDialogueEvent;
+    private Coroutine indicatorCoroutine;
 
     private void Awake()
     {
@@ -40,6 +44,16 @@ public class DialogueManager : MonoBehaviour
 
     private void Update()
     {
+        if (isFullTextShown && indicatorCoroutine == null)
+        {
+            indicatorCoroutine = StartCoroutine(FadeInAndOutIndicator());
+        }
+        else if (!isFullTextShown && indicatorCoroutine != null)
+        {
+            StopCoroutine(indicatorCoroutine);
+            indicatorCoroutine = null; // Clear reference
+            nextDialogueIndicatorCanvasGroup.alpha = 0f;
+        }
         if (!optionsAreVisible)
         {
             if (Input.GetKeyDown(advanceKey))
@@ -62,6 +76,7 @@ public class DialogueManager : MonoBehaviour
 
     public void StartDialogue(DialogueTree dialogueTree)
     {
+        nextDialogueIndicatorCanvasGroup.alpha = 0f;
         currentDialogueTree = dialogueTree;
         currentIndex = 0;
         dialogueCanvas.enabled = true;
@@ -70,6 +85,8 @@ public class DialogueManager : MonoBehaviour
 
     public void ShowNextDialogue()
     {
+        StopCoroutine(FadeInAndOutIndicator());
+        nextDialogueIndicatorCanvasGroup.alpha = 0f;
         ClearOptions();
         if (currentDialogueTree != null && currentIndex < currentDialogueTree.dialogueNodes.Count)
         {
@@ -79,6 +96,8 @@ public class DialogueManager : MonoBehaviour
         }
         else
         {
+            nextDialogueIndicatorCanvasGroup.alpha = 0f;
+            nextDialogueIndicatorImage.gameObject.SetActive(false);
             dialogueCanvas.enabled = false;
         }
     }
@@ -92,26 +111,27 @@ public class DialogueManager : MonoBehaviour
 
         scrollingCoroutine = StartCoroutine(ScrollText(node.dialogueText));
 
-        // Stop the previous FMOD event if one is playing
-        if (currentDialogueEvent.isValid())
+        if (npcNameUI != null)
         {
-            currentDialogueEvent.stop(FMOD.Studio.STOP_MODE.IMMEDIATE); // Stop the previous event
-            currentDialogueEvent.release(); // Release the event after stopping it
+            npcNameUI.text = node.npcName;
         }
 
-        // Play FMOD event if available
+        if (currentDialogueEvent.isValid())
+        {
+            currentDialogueEvent.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+            currentDialogueEvent.release();
+        }
+
         if (!node.fmodAudioEvent.IsNull)
         {
             currentDialogueEvent = RuntimeManager.CreateInstance(node.fmodAudioEvent);
             currentDialogueEvent.start();
         }
 
-        // Trigger all Scene-based events using eventIDs
         foreach (var eventId in node.eventIds)
         {
             if (!string.IsNullOrEmpty(eventId))
             {
-                // Trigger the event tied to the eventID
                 DialogueEventManager.Instance?.TriggerDialogueEvent(eventId);
             }
         }
@@ -129,8 +149,32 @@ public class DialogueManager : MonoBehaviour
         }
 
         isTextScrolling = false;
-        isFullTextShown = true;
+        isFullTextShown = true; // Text is fully shown now
         ShowOptions(currentDialogueTree.dialogueNodes[currentIndex - 1]);
+    }
+
+    private IEnumerator FadeInAndOutIndicator()
+    {
+        nextDialogueIndicatorCanvasGroup.alpha = 1f;
+        nextDialogueIndicatorImage.gameObject.SetActive(true);
+
+        while (true) // Infinite loop until coroutine is stopped
+        {
+            yield return FadeCanvasGroup(nextDialogueIndicatorCanvasGroup, 1f, 0f, 1f); // Fade out
+            yield return FadeCanvasGroup(nextDialogueIndicatorCanvasGroup, 0f, 1f, 1f); // Fade in
+        }
+    }
+
+    private IEnumerator FadeCanvasGroup(CanvasGroup canvasGroup, float fromAlpha, float toAlpha, float duration)
+    {
+        float timeElapsed = 0f;
+        while (timeElapsed < duration)
+        {
+            canvasGroup.alpha = Mathf.Lerp(fromAlpha, toAlpha, timeElapsed / duration);
+            timeElapsed += Time.deltaTime;
+            yield return null;
+        }
+        canvasGroup.alpha = toAlpha;
     }
 
     private void ShowOptions(DialogueNode node)
@@ -179,4 +223,3 @@ public class DialogueManager : MonoBehaviour
         optionsAreVisible = false;
     }
 }
-

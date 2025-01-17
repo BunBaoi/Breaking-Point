@@ -18,4 +18,6 @@ public class DialogueNode
 
     public List<string> eventIds = new List<string>(); // List to store multiple eventIDs
     public List<DialogueOption> options;
+
+    public string npcName;
 }

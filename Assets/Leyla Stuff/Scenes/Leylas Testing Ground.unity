@@ -930,7 +930,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 825288afbac9b475889aed2f6f6ed5c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  npcDialogueTree: {fileID: 11400000, guid: fe91b676943764975a6f62dde8871a96, type: 2}
+  npcDialogueTree: {fileID: 11400000, guid: 37f04444dc3034d758514f8a9244c261, type: 2}
   interactKey: 101
   playerInRange: 0
   dialogueKey: DialogueTriggered
@@ -1757,6 +1757,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7890560368363000087, guid: fa2dc2abc62ae44bea1dae2397620132, type: 3}
+      propertyPath: npcNameUI
+      value: 
+      objectReference: {fileID: 6681499419956978983}
+    - target: {fileID: 7890560368363000087, guid: fa2dc2abc62ae44bea1dae2397620132, type: 3}
       propertyPath: buttonParent
       value: 
       objectReference: {fileID: 1169475957}
@@ -1768,6 +1772,14 @@ PrefabInstance:
       propertyPath: dialogueTextUI
       value: 
       objectReference: {fileID: 455748283}
+    - target: {fileID: 7890560368363000087, guid: fa2dc2abc62ae44bea1dae2397620132, type: 3}
+      propertyPath: nextDialogueIndicatorImage
+      value: 
+      objectReference: {fileID: 6681499419956978982}
+    - target: {fileID: 7890560368363000087, guid: fa2dc2abc62ae44bea1dae2397620132, type: 3}
+      propertyPath: nextDialogueIndicatorCanvasGroup
+      value: 
+      objectReference: {fileID: 6681499419956978988}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1988,6 +2000,33 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 059900d7c5a5b492087bfb6603e66ed9, type: 3}
+--- !u!114 &6681499419956978982 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7460236468227720525, guid: 059900d7c5a5b492087bfb6603e66ed9, type: 3}
+  m_PrefabInstance: {fileID: 6681499419956978981}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &6681499419956978983 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2612528254770933733, guid: 059900d7c5a5b492087bfb6603e66ed9, type: 3}
+  m_PrefabInstance: {fileID: 6681499419956978981}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!225 &6681499419956978988 stripped
+CanvasGroup:
+  m_CorrespondingSourceObject: {fileID: 8753717471115227638, guid: 059900d7c5a5b492087bfb6603e66ed9, type: 3}
+  m_PrefabInstance: {fileID: 6681499419956978981}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6922593174979142102
 PrefabInstance:
   m_ObjectHideFlags: 0
