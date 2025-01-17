@@ -124,9 +124,18 @@ public class CinematicSequence : MonoBehaviour
                 Debug.LogWarning($"Random text for dialogue index {i} is null.");
             }
 
-            // Create an FMOD event instance and start the audio
-            FMOD.Studio.EventInstance audioEventInstance = RuntimeManager.CreateInstance(dialogueAudio.fmodAudioEvent);
-            audioEventInstance.start();
+            // Check if there is an FMOD event assigned before playing it
+            FMOD.Studio.EventInstance audioEventInstance;
+            if (!string.IsNullOrEmpty(dialogueAudio.fmodAudioEvent.Path))
+            {
+                audioEventInstance = RuntimeManager.CreateInstance(dialogueAudio.fmodAudioEvent);
+                audioEventInstance.start();
+            }
+            else
+            {
+                Debug.LogWarning($"No FMOD event assigned for dialogue index {i}.");
+                audioEventInstance = new FMOD.Studio.EventInstance(); // Empty instance to avoid null reference
+            }
 
             // Start displaying dialogue
             bool dialogueFinished = false;

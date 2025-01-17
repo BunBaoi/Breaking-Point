@@ -792,6 +792,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!225 &794187115 stripped
+CanvasGroup:
+  m_CorrespondingSourceObject: {fileID: 2501975055765836572, guid: fe3c1bf577aee423a8108a7bab2ba75d, type: 3}
+  m_PrefabInstance: {fileID: 6922593174979142102}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &887406134
 GameObject:
   m_ObjectHideFlags: 0
@@ -1025,6 +1030,11 @@ Transform:
   - {fileID: 2021137446}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!223 &1150922513 stripped
+Canvas:
+  m_CorrespondingSourceObject: {fileID: 8855014881627062778, guid: fe3c1bf577aee423a8108a7bab2ba75d, type: 3}
+  m_PrefabInstance: {fileID: 6922593174979142102}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &1169475957 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6450059729416252953, guid: 059900d7c5a5b492087bfb6603e66ed9, type: 3}
@@ -1299,11 +1309,95 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1509341524 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7982667492354201286, guid: fe3c1bf577aee423a8108a7bab2ba75d, type: 3}
+  m_PrefabInstance: {fileID: 6922593174979142102}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1701451101 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4280877707099770221, guid: fe3c1bf577aee423a8108a7bab2ba75d, type: 3}
+  m_PrefabInstance: {fileID: 6922593174979142102}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &1914232655 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3859812622371921254, guid: eae525995f0d24e51bf1975e1d4f4f04, type: 3}
   m_PrefabInstance: {fileID: 4330306149170769240}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1926888983
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1926888985}
+  - component: {fileID: 1926888984}
+  m_Layer: 0
+  m_Name: Cinematic Test
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1926888984
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1926888983}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5b6e1244c4094e83be9cea13ceeeb51, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cinematicData: {fileID: 11400000, guid: 85f6ed46f665a4899a7aac4260949069, type: 2}
+  chapterText: {fileID: 1509341524}
+  dialogueText: {fileID: 1701451101}
+  canvasGroup: {fileID: 794187115}
+  canvas: {fileID: 1150922513}
+  dialogueSpeedFactor: 0.05
+  randomTextMinDuration: 10
+  randomTextMaxDuration: 15
+  chapterDisplayDuration: 3
+  dialogueDelayDuration: 0.5
+  textFadeOutDuration: 1
+  textFadeInDuration: 1
+  cinematicCameraPrefab: {fileID: 5285160660460005168, guid: 820b5474013ad440e83842618021b16a, type: 3}
+  cameraPanDuration: 2
+  cameraRemovalDelay: 0.5
+  requiredBoolKeysTrue: []
+  requiredBoolKeysFalse: []
+  eventIdsDelay: 0.5
+--- !u!4 &1926888985
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1926888983}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2021137445
 GameObject:
   m_ObjectHideFlags: 0
@@ -2384,3 +2478,4 @@ SceneRoots:
   - {fileID: 2075862359}
   - {fileID: 7540974955213767565}
   - {fileID: 8640078650981295566}
+  - {fileID: 1926888985}
