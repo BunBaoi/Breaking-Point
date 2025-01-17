@@ -16,6 +16,6 @@ public class DialogueNode
     [TextArea] public string dialogueText;
     public EventReference fmodAudioEvent; // FMOD event for audio
 
-    public List<string> eventIDs = new List<string>(); // List to store multiple eventIDs
+    public List<string> eventIds = new List<string>(); // List to store multiple eventIDs
     public List<DialogueOption> options;
 }

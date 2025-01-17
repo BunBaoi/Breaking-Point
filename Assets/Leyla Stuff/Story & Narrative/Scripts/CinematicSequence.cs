@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using System.Collections;
 using FMODUnity;
+using System.Collections.Generic;
 
 public class CinematicSequence : MonoBehaviour
 {
@@ -26,12 +27,79 @@ public class CinematicSequence : MonoBehaviour
     [SerializeField] private float textFadeInDuration = 1f; // Duration for fading in text
 
     [Header("Camera")]
-    [SerializeField] private Camera cinematicCamera;
+    [SerializeField] private Camera cinematicCameraPrefab;
     [SerializeField] private float cameraPanDuration = 2f;
+    [SerializeField] private float cameraRemovalDelay = 0.5f;
+    private Camera instantiatedCamera;
+
+    [Header("Bool Conditions")]
+    [SerializeField] private List<string> requiredBoolKeysTrue = new List<string>(); // List of bool keys that should be true
+    [SerializeField] private List<string> requiredBoolKeysFalse = new List<string>(); // List of bool keys that should be false
+    [SerializeField] private float eventIdsDelay = 0.5f;
 
     private void Start()
     {
-        StartCoroutine(PlayCinematic());
+        // Before starting the cinematic, check the boolean conditions
+        if (AreConditionsMet())
+        {
+            DisableAllCameras();
+            StartCoroutine(PlayCinematic());
+            // Instantiate the cinematic camera at runtime
+            instantiatedCamera = Instantiate(cinematicCameraPrefab, transform.position, transform.rotation);
+            instantiatedCamera.gameObject.SetActive(true);
+        }
+        else
+        {
+            Debug.Log("Conditions not met for cinematic sequence.");
+        }
+    }
+
+    private void DisableAllCameras()
+    {
+        Camera[] allCameras = FindObjectsOfType<Camera>(); // Find all cameras in the scene
+
+        foreach (Camera cam in allCameras)
+        {
+            cam.enabled = false; // Disable each camera
+        }
+
+        Debug.Log("All cameras disabled.");
+    }
+
+    private void EnableAllCameras()
+    {
+        Camera[] allCameras = FindObjectsOfType<Camera>(); // Find all cameras in the scene
+
+        foreach (Camera cam in allCameras)
+        {
+            cam.enabled = true; // Enable each camera
+        }
+
+        Debug.Log("All cameras enabled.");
+    }
+
+    private bool AreConditionsMet()
+    {
+        // Loop through the required bool keys and check their values
+        foreach (string key in requiredBoolKeysTrue)
+        {
+            if (!BoolManager.Instance.GetBool(key))
+            {
+                Debug.Log($"Required bool key '{key}' is false.");
+                return false; // Return false if any required bool is not true
+            }
+        }
+
+        foreach (string key in requiredBoolKeysFalse)
+        {
+            if (BoolManager.Instance.GetBool(key))
+            {
+                Debug.Log($"Required bool key '{key}' is true.");
+                return false; // Return false if any required bool is not false
+            }
+        }
+
+        return true; // All conditions are met
     }
 
     private IEnumerator PlayCinematic()
@@ -261,14 +329,54 @@ public class CinematicSequence : MonoBehaviour
             float t = elapsedTime / panDuration; // Normalise the elapsed time
 
             // Smoothly interpolate between start and end positions and rotations using Lerp and Slerp
-            cinematicCamera.transform.position = Vector3.Lerp(startPosition, endPosition, t);
-            cinematicCamera.transform.rotation = Quaternion.Slerp(startRotation, endRotation, t);
+            instantiatedCamera.transform.position = Vector3.Lerp(startPosition, endPosition, t);
+            instantiatedCamera.transform.rotation = Quaternion.Slerp(startRotation, endRotation, t);
 
             yield return null; // Wait for the next frame
         }
 
         // Ensure the final position and rotation are set
-        cinematicCamera.transform.position = endPosition;
-        cinematicCamera.transform.rotation = endRotation;
+        instantiatedCamera.transform.position = endPosition;
+        instantiatedCamera.transform.rotation = endRotation;
+
+        StartCoroutine(RemoveCameraAfterDelay());
+
+    }
+
+    private IEnumerator RemoveCameraAfterDelay()
+    {
+        // Wait for the specified delay before removing the camera
+        yield return new WaitForSeconds(cameraRemovalDelay);
+
+        // Destroy the camera
+        if (instantiatedCamera != null)
+        {
+            EnableAllCameras();
+            Destroy(instantiatedCamera.gameObject);
+            Debug.Log("Cinematic camera removed.");
+
+            yield return new WaitForSeconds(0.1f);
+            StartCoroutine(TriggerEventIDs());
+        }
+        else
+        {
+            Debug.LogWarning("Cinematic camera is not assigned!");
+        }
+    }
+
+    private IEnumerator TriggerEventIDs()
+    {
+        // Wait for the specified delay before removing the camera
+        yield return new WaitForSeconds(eventIdsDelay);
+
+        // Trigger all Scene-based events using eventIDs
+        foreach (var eventId in cinematicData.eventIds)
+        {
+            if (!string.IsNullOrEmpty(eventId))
+            {
+                // Trigger the event tied to the eventID
+                CinematicEventManager.Instance?.TriggerCinematicEvent(eventId);
+            }
+        }
     }
 }

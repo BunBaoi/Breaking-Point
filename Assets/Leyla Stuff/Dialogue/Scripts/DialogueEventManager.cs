@@ -9,7 +9,7 @@ public class DialogueEventManager : MonoBehaviour
     [System.Serializable]
     public class DialogueEvent
     {
-        public string eventID; // Unique ID for dialogue node
+        public string eventId; // Unique ID for dialogue node
         public UnityEvent onDialogueTriggered; // Scene-based event
     }
 
@@ -27,17 +27,17 @@ public class DialogueEventManager : MonoBehaviour
         }
     }
 
-    public void TriggerDialogueEvent(string eventID)
+    public void TriggerDialogueEvent(string eventId)
     {
         foreach (var dialogueEvent in dialogueEvents)
         {
-            if (dialogueEvent.eventID == eventID)
+            if (dialogueEvent.eventId == eventId)
             {
-                Debug.Log($"Triggering Dialogue Event: {eventID}");
+                Debug.Log($"Triggering Dialogue Event: {eventId}");
                 dialogueEvent.onDialogueTriggered?.Invoke();
                 return;
             }
         }
-        Debug.LogWarning($"No event found for ID: {eventID}");
+        Debug.LogWarning($"No event found for ID: {eventId}");
     }
 }

@@ -1,11 +1,13 @@
 using UnityEngine;
 using FMODUnity;
+using System.Collections.Generic;
 
 [CreateAssetMenu(fileName = "CinematicData", menuName = "Cinematic/CinematicData")]
 public class CinematicData : ScriptableObject
 {
     [Header("Chapter Info")]
     public string chapterName; // Chapter title
+    public List<string> eventIds = new List<string>();
 
     [Header("Dialogue and Audio Events")]
     public CinematicDataDialogueAudio[] dialoguesAndAudio; // Array of dialogue and corresponding FMOD audio events

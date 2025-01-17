@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro; // Import TextMeshPro
+using System.Collections.Generic;
 
 public class NPCDialogue : MonoBehaviour
 {
@@ -15,6 +16,10 @@ public class NPCDialogue : MonoBehaviour
 
     private Transform player; // Reference to the player's transform
 
+    [Header("Bool Conditions")]
+    [SerializeField] private List<string> requiredBoolKeysTrue = new List<string>(); // List of bool keys that should be true
+    [SerializeField] private List<string> requiredBoolKeysFalse = new List<string>(); // List of bool keys that should be false
+
     private void Start()
     {
         isDialoguePressed = PlayerPrefs.GetInt(dialogueKey, 0) == 1;
@@ -29,7 +34,7 @@ public class NPCDialogue : MonoBehaviour
             Debug.Log("Player entered NPC trigger zone. Press " + interactKey + " to interact.");
 
             // Prevent text from appearing if dialogue is already triggered
-            if (!isDialoguePressed && interactTextPrefab != null && interactTextInstance == null)
+            if (!isDialoguePressed && interactTextPrefab != null && interactTextInstance == null && CanStartDialogue())
             {
                 interactTextInstance = Instantiate(interactTextPrefab);
                 interactTextInstance.transform.SetParent(transform, false); // Keep local position
@@ -71,7 +76,7 @@ public class NPCDialogue : MonoBehaviour
             interactTextInstance.transform.forward = -lookDirection.normalized; // Fix backwards issue
         }
 
-        if (playerInRange && Input.GetKeyDown(interactKey) && !isDialoguePressed)
+        if (playerInRange && Input.GetKeyDown(interactKey) && !isDialoguePressed && CanStartDialogue())
         {
             isDialoguePressed = true;
             PlayerPrefs.SetInt(dialogueKey, 1);
@@ -90,6 +95,28 @@ public class NPCDialogue : MonoBehaviour
         {
             ClearPlayerPrefs();
         }
+    }
+
+    private bool CanStartDialogue()
+    {
+        // Check if all required bool conditions are met (true or false based on lists)
+        foreach (string boolKey in requiredBoolKeysTrue)
+        {
+            if (!BoolManager.Instance.GetBool(boolKey))
+            {
+                return false; // If any bool is false when it should be true, return false
+            }
+        }
+
+        foreach (string boolKey in requiredBoolKeysFalse)
+        {
+            if (BoolManager.Instance.GetBool(boolKey))
+            {
+                return false; // If any bool is true when it should be false, return false
+            }
+        }
+
+        return true; // All conditions are met, return true
     }
 
     private void StartDialogue()

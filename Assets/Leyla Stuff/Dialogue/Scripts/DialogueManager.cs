@@ -107,12 +107,12 @@ public class DialogueManager : MonoBehaviour
         }
 
         // Trigger all Scene-based events using eventIDs
-        foreach (var eventID in node.eventIDs)
+        foreach (var eventId in node.eventIds)
         {
-            if (!string.IsNullOrEmpty(eventID))
+            if (!string.IsNullOrEmpty(eventId))
             {
                 // Trigger the event tied to the eventID
-                DialogueEventManager.Instance?.TriggerDialogueEvent(eventID);
+                DialogueEventManager.Instance?.TriggerDialogueEvent(eventId);
             }
         }
     }
