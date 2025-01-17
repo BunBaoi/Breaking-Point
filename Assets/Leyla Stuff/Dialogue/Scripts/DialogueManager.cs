@@ -100,15 +100,20 @@ public class DialogueManager : MonoBehaviour
         }
 
         // Play FMOD event if available
-        if (node.fmodAudioEvent.IsNull == false)
+        if (!node.fmodAudioEvent.IsNull)
         {
             currentDialogueEvent = RuntimeManager.CreateInstance(node.fmodAudioEvent);
             currentDialogueEvent.start();
         }
 
-        if (node.onDialogueEvent != null)
+        // Trigger all Scene-based events using eventIDs
+        foreach (var eventID in node.eventIDs)
         {
-            node.onDialogueEvent.Invoke();
+            if (!string.IsNullOrEmpty(eventID))
+            {
+                // Trigger the event tied to the eventID
+                DialogueEventManager.Instance?.TriggerDialogueEvent(eventID);
+            }
         }
     }
 
@@ -174,3 +179,4 @@ public class DialogueManager : MonoBehaviour
         optionsAreVisible = false;
     }
 }
+
