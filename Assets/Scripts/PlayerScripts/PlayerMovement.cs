@@ -14,6 +14,7 @@ public class PlayerMovement : MonoBehaviour
     public float gravity = -9.81f;
     public bool IsSprint = false;
     public float playerHeight;
+    [SerializeField] private bool canMove = true;
 
     Vector3 velocity;
 
@@ -24,9 +25,12 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        HandleGroundMovement();
+        if (canMove)
+        {
+            HandleGroundMovement();
+            sprint();
+        }
         ApplyGravity();
-        sprint();
         OxyOuputRate();
     }
 
@@ -68,5 +72,11 @@ public class PlayerMovement : MonoBehaviour
         {
             playerStats.OxygenTankRefillRate--;
         }
+    }
+
+    // Enable or disable movement
+    public void SetMovementState(bool state)
+    {
+        canMove = state;
     }
 }

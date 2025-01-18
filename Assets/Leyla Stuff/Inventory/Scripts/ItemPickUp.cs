@@ -70,15 +70,21 @@ public class ItemPickUp : MonoBehaviour
                                 return;
                             }
 
-                            isPickingUp = true;
-
+                            // Prevent pickup if the player already has this item in the inventory
                             GameObject player = GameObject.FindGameObjectWithTag(playerTag);
                             InventoryManager inventory = player.GetComponent<InventoryManager>();
 
                             if (inventory != null)
                             {
+                                if (inventory.HasItem(item)) // Check if player already has the item
+                                {
+                                    Debug.Log("Player already has this item.");
+                                    return;
+                                }
+
                                 bool added = inventory.AddItem(item);
                                 Debug.Log("Item pickup attempt: " + (added ? "Success" : "Failed"));
+
                                 if (added)
                                 {
                                     Destroy(gameObject); // Destroy the item in the world after picking it up

@@ -16,6 +16,7 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private Transform buttonParent;
     [SerializeField] private Image nextDialogueIndicatorImage;
     [SerializeField] private CanvasGroup nextDialogueIndicatorCanvasGroup;
+    [SerializeField] private Camera mainCamera;  // Player camera
 
     public KeyCode advanceKey = KeyCode.Space;
 
@@ -29,6 +30,14 @@ public class DialogueManager : MonoBehaviour
 
     private FMOD.Studio.EventInstance currentDialogueEvent;
     private Coroutine indicatorCoroutine;
+
+    private DialogueTree originalDialogueTree;
+    private int originalIndex;
+    private bool returningToOriginal = false;
+
+    private PlayerMovement playerMovement;
+    [SerializeField] private InventoryManager inventoryManager;
+    [SerializeField] private Canvas inventoryCanvas;
 
     private void Awake()
     {
@@ -76,6 +85,33 @@ public class DialogueManager : MonoBehaviour
 
     public void StartDialogue(DialogueTree dialogueTree)
     {
+        // Disable the InventoryManager when dialogue starts
+        if (inventoryManager != null)
+        {
+            inventoryManager.enabled = false;
+            inventoryCanvas.gameObject.SetActive(false);
+        }
+        // Find the Player object by tag
+        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+        if (playerObject != null)
+        {
+            playerMovement = playerObject.GetComponent<PlayerMovement>();
+
+            // Disable player movement when dialogue starts
+            if (playerMovement != null)
+            {
+                Debug.Log("Disabling movement");
+                playerMovement.SetMovementState(false);
+            }
+            else
+            {
+                Debug.LogWarning("PlayerMovement component not found on Player object.");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Player object not found with tag 'Player'.");
+        }
         nextDialogueIndicatorCanvasGroup.alpha = 0f;
         currentDialogueTree = dialogueTree;
         currentIndex = 0;
@@ -88,17 +124,51 @@ public class DialogueManager : MonoBehaviour
         StopCoroutine(FadeInAndOutIndicator());
         nextDialogueIndicatorCanvasGroup.alpha = 0f;
         ClearOptions();
+
+        // Ensure we trigger events from the previous node before moving to the next
+        if (currentIndex > 0 && currentIndex <= currentDialogueTree.dialogueNodes.Count)
+        {
+            DialogueNode previousNode = currentDialogueTree.dialogueNodes[currentIndex - 1];
+            foreach (var eventId in previousNode.eventIds)
+            {
+                if (!string.IsNullOrEmpty(eventId))
+                {
+                    DialogueEventManager.Instance?.TriggerDialogueEvent(eventId);
+                }
+            }
+        }
+
         if (currentDialogueTree != null && currentIndex < currentDialogueTree.dialogueNodes.Count)
         {
             isFullTextShown = false;
             DisplayDialogue(currentDialogueTree.dialogueNodes[currentIndex]);
             currentIndex++;
         }
+        else if (returningToOriginal && originalDialogueTree != null && originalIndex < originalDialogueTree.dialogueNodes.Count)
+        {
+            // Return to the original dialogue tree if there's more dialogue
+            currentDialogueTree = originalDialogueTree;
+            currentIndex = originalIndex;
+            returningToOriginal = false;
+
+            ShowNextDialogue(); // Continue where it left off
+        }
         else
         {
+            // No more dialogue, end conversation
             nextDialogueIndicatorCanvasGroup.alpha = 0f;
             nextDialogueIndicatorImage.gameObject.SetActive(false);
             dialogueCanvas.enabled = false;
+            if (playerMovement != null)
+            {
+                playerMovement.SetMovementState(true);
+            }
+            // Enable the InventoryManager when dialogue ends
+            if (inventoryManager != null)
+            {
+                inventoryManager.enabled = true;
+                inventoryCanvas.gameObject.SetActive(true);
+            }
         }
     }
 
@@ -128,12 +198,100 @@ public class DialogueManager : MonoBehaviour
             currentDialogueEvent.start();
         }
 
-        foreach (var eventId in node.eventIds)
+        // Trigger the camera look at the NPC if npcTag is provided
+        TriggerCameraLookAtNpc(node);
+
+        //foreach (var eventId in node.eventIds)
+        //{
+        //    if (!string.IsNullOrEmpty(eventId))
+        //    {
+        //        DialogueEventManager.Instance?.TriggerDialogueEvent(eventId);
+        //    }
+        //}
+    }
+
+    private void TriggerCameraLookAtNpc(DialogueNode node)
+    {
+        if (!string.IsNullOrEmpty(node.npcTag))
         {
-            if (!string.IsNullOrEmpty(eventId))
+            // Find all NPCs with the given tag
+            GameObject[] npcs = GameObject.FindGameObjectsWithTag(node.npcTag);
+            if (npcs.Length > 0)
             {
-                DialogueEventManager.Instance?.TriggerDialogueEvent(eventId);
+                GameObject closestNpc = null;
+                float closestDistance = Mathf.Infinity; // Start with a very large distance
+
+                // Find the closest NPC
+                GameObject player = GameObject.FindGameObjectWithTag("Player");
+                foreach (GameObject npc in npcs)
+                {
+                    if (npc != null && player != null)
+                    {
+                        // Calculate the distance from the player to the center of the NPC
+                        Vector3 npcCenter = npc.transform.position;
+                        float distance = Vector3.Distance(player.transform.position, npcCenter);
+
+                        if (distance < closestDistance)
+                        {
+                            closestDistance = distance;
+                            closestNpc = npc;
+                        }
+                    }
+                }
+
+                // If we found the closest NPC, start the camera smooth look-at
+                if (closestNpc != null)
+                {
+                    StartCoroutine(SmoothLookAtNpc(closestNpc));
+                }
             }
+        }
+    }
+
+    private IEnumerator SmoothLookAtNpc(GameObject npc)
+    {
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (npc != null && mainCamera != null && player != null)
+        {
+            // Get the position of the NPC
+            Vector3 npcPosition = npc.transform.position;
+
+            // Calculate the direction vector from the camera to the NPC
+            Vector3 targetDirection = npcPosition - mainCamera.transform.position;
+
+            // Calculate the target rotation based on the direction (this will affect both yaw and pitch)
+            Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
+
+            CameraController cameraController = mainCamera.GetComponent<CameraController>();
+
+            // Smoothly rotate the camera to the target rotation
+            while (Quaternion.Angle(mainCamera.transform.rotation, targetRotation) > 0.1f)
+            {
+                // Smoothly rotate the camera horizontally (yaw) and vertically (pitch)
+                Quaternion currentRotation = mainCamera.transform.rotation;
+                currentRotation = Quaternion.Slerp(currentRotation, targetRotation, Time.deltaTime * 2f);
+
+                // Smoothly adjust the pitch (xRotation) towards the target pitch
+                float targetPitch = Mathf.LerpAngle(cameraController.xRotation, targetRotation.eulerAngles.x, Time.deltaTime * 2f);
+
+                // Apply the smooth pitch (vertical) and yaw (horizontal) to the camera
+                mainCamera.transform.rotation = Quaternion.Euler(targetPitch, currentRotation.eulerAngles.y, 0);
+
+                // Also rotate the player (body) to face the NPC (yaw only)
+                player.transform.rotation = Quaternion.Euler(0, currentRotation.eulerAngles.y, 0);
+
+                // Update the camera's xRotation to reflect the smooth pitch (vertical rotation)
+                cameraController.xRotation = targetPitch;
+
+                // Adjust the mouseY position in the CameraController to match the xRotation for consistency
+                cameraController.xRotation = targetPitch;
+
+                yield return null;
+            }
+
+            // Final alignment with the NPC (ensure no overshooting)
+            mainCamera.transform.rotation = targetRotation;
+            player.transform.rotation = Quaternion.Euler(0, targetRotation.eulerAngles.y, 0);
         }
     }
 
@@ -191,8 +349,14 @@ public class DialogueManager : MonoBehaviour
                 buttonObj.GetComponent<Button>().onClick.AddListener(() =>
                 {
                     optionsAreVisible = false;
+
                     if (option.nextDialogueTree != null)
                     {
+                        // Store the original tree and index before switching
+                        originalDialogueTree = currentDialogueTree;
+                        originalIndex = currentIndex;
+                        returningToOriginal = true;
+
                         StartDialogue(option.nextDialogueTree);
                     }
                     else

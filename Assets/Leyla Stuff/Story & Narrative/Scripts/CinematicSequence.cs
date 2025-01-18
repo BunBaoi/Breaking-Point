@@ -31,6 +31,7 @@ public class CinematicSequence : MonoBehaviour
     [SerializeField] private float cameraPanDuration = 2f;
     [SerializeField] private float cameraRemovalDelay = 0.5f;
     private Camera instantiatedCamera;
+    private List<Camera> disabledCameras = new List<Camera>();
 
     [Header("Bool Conditions")]
     [SerializeField] private List<string> requiredBoolKeysTrue = new List<string>(); // List of bool keys that should be true
@@ -44,8 +45,21 @@ public class CinematicSequence : MonoBehaviour
         {
             DisableAllCameras();
             StartCoroutine(PlayCinematic());
-            // Instantiate the cinematic camera at runtime
-            instantiatedCamera = Instantiate(cinematicCameraPrefab, transform.position, transform.rotation);
+            // Instantiate the cinematic camera
+            instantiatedCamera = Instantiate(cinematicCameraPrefab);
+
+            Transform pointATransform = GameObject.Find(cinematicData.pointA)?.transform;
+
+            if (pointATransform != null)
+            {
+                instantiatedCamera.transform.position = pointATransform.position;
+                instantiatedCamera.transform.rotation = pointATransform.rotation;
+            }
+            else
+            {
+                Debug.LogWarning("Point A GameObject not found! Camera will use default position.");
+            }
+
             instantiatedCamera.gameObject.SetActive(true);
         }
         else
@@ -56,26 +70,33 @@ public class CinematicSequence : MonoBehaviour
 
     private void DisableAllCameras()
     {
-        Camera[] allCameras = FindObjectsOfType<Camera>(); // Find all cameras in the scene
+        Camera[] allCameras = FindObjectsOfType<Camera>(true); // Include inactive cameras
 
         foreach (Camera cam in allCameras)
         {
-            cam.enabled = false; // Disable each camera
+            if (cam != instantiatedCamera) // Exclude the cinematic camera
+            {
+                cam.enabled = false; // Disable the camera
+                disabledCameras.Add(cam); // Store the disabled camera
+            }
         }
 
-        Debug.Log("All cameras disabled.");
+        Debug.Log("All non-cinematic cameras disabled.");
     }
 
     private void EnableAllCameras()
     {
-        Camera[] allCameras = FindObjectsOfType<Camera>(); // Find all cameras in the scene
-
-        foreach (Camera cam in allCameras)
+        foreach (Camera cam in disabledCameras)
         {
-            cam.enabled = true; // Enable each camera
+            if (cam != null)
+            {
+                cam.enabled = true; // Re-enable the camera
+            }
         }
 
-        Debug.Log("All cameras enabled.");
+        disabledCameras.Clear(); // Clear the list after re-enabling cameras
+
+        Debug.Log("All disabled cameras re-enabled.");
     }
 
     private bool AreConditionsMet()

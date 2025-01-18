@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: Chapter 1
   m_EditorClassIdentifier: 
   chapterName: Chapter 1 - The Journey Begins
-  eventIds: []
+  eventIds:
+  - Chapter1CinematicTriggered
   dialoguesAndAudio:
   - dialogue: Dear Diary, we finally made it. Base Camp.
     fmodAudioEvent:
@@ -142,6 +143,6 @@ MonoBehaviour:
   - a dream
   - promise
   - '- Alice'
-  pointA: Point A
-  pointB: Point B
+  pointA: Base Camp - Point A
+  pointB: Base Camp - Point B
   randomTextPrefab: {fileID: 1868577807128867544, guid: 068a5638994a64419a4469ea43007930, type: 3}

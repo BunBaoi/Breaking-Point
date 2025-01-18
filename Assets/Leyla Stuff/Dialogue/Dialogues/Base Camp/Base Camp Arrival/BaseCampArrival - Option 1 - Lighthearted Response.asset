@@ -10,11 +10,22 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 49d908a81e1ab4345bdb9ed5793418b1, type: 3}
-  m_Name: Tenzing - After Start Dialogue
+  m_Name: BaseCampArrival - Option 1 - Lighthearted Response
   m_EditorClassIdentifier: 
   dialogueNodes:
-  - dialogueText: "Respect the mountain Al. And maybe don\u2019t trip over your crampons
-      during the examination, yeah? "
+  - dialogueText: Oh absolutely. The real challenge here is surviving your ego.
+    fmodAudioEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+    eventIds: []
+    options: []
+    npcName: Alice
+  - dialogueText: "A burden I must bear. But in all seriousness, you\u2019re going
+      to be fine, Al. You\u2019ve prepared for this."
     fmodAudioEvent:
       Guid:
         Data1: 0
@@ -25,18 +36,3 @@ MonoBehaviour:
     eventIds: []
     options: []
     npcName: Phillip
-    npcTag: 
-  - dialogueText: "One of these days, I\u2019ll learn to tune you out. But not today
-      it seems. Sad."
-    fmodAudioEvent:
-      Guid:
-        Data1: 0
-        Data2: 0
-        Data3: 0
-        Data4: 0
-      Path: 
-    eventIds:
-    - EntranceWelcomeDialogueFinished
-    options: []
-    npcName: Alice
-    npcTag: 

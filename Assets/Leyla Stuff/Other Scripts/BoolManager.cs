@@ -21,7 +21,7 @@ public class BoolManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            // LoadBools();
+            LoadBools();
         }
         else
         {

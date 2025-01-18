@@ -1,7 +1,7 @@
 using UnityEngine;
-using UnityEngine.Events;
 using System.Collections.Generic;
 using FMODUnity;
+using System.Collections;
 
 [System.Serializable]
 public class DialogueOption
@@ -19,5 +19,6 @@ public class DialogueNode
     public List<string> eventIds = new List<string>(); // List to store multiple eventIDs
     public List<DialogueOption> options;
 
-    public string npcName;
+    public string npcName; // Name of the NPC in the dialogue
+    public string npcTag; // Optional tag to search for the NPC in the scene
 }

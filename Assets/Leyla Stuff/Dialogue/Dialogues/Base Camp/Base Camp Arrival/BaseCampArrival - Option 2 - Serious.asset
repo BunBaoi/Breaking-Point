@@ -10,11 +10,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 49d908a81e1ab4345bdb9ed5793418b1, type: 3}
-  m_Name: Tenzing - After Start Dialogue
+  m_Name: BaseCampArrival - Option 2 - Serious
   m_EditorClassIdentifier: 
   dialogueNodes:
-  - dialogueText: "Respect the mountain Al. And maybe don\u2019t trip over your crampons
-      during the examination, yeah? "
+  - dialogueText: "You joke, but I mean it, Phillip. This is real. And I don\u2019t
+      know if I\u2019m ready."
+    fmodAudioEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+    eventIds: []
+    options: []
+    npcName: Alice
+  - dialogueText: "Hey, you are ready. You wouldn\u2019t be here if you weren\u2019t.
+      Trust yourself a little, yeah?"
     fmodAudioEvent:
       Guid:
         Data1: 0
@@ -25,18 +37,3 @@ MonoBehaviour:
     eventIds: []
     options: []
     npcName: Phillip
-    npcTag: 
-  - dialogueText: "One of these days, I\u2019ll learn to tune you out. But not today
-      it seems. Sad."
-    fmodAudioEvent:
-      Guid:
-        Data1: 0
-        Data2: 0
-        Data3: 0
-        Data4: 0
-      Path: 
-    eventIds:
-    - EntranceWelcomeDialogueFinished
-    options: []
-    npcName: Alice
-    npcTag: 

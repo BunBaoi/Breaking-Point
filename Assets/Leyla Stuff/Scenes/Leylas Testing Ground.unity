@@ -399,6 +399,17 @@ RectTransform:
   m_AnchoredPosition: {x: 0.01, y: 1.72}
   m_SizeDelta: {x: 8.5493, y: 2.0362}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &399364637 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1300195702366156244, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
+  m_PrefabInstance: {fileID: 8154610454004403675}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e96ce123db5e74c9c93b01997898a950, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &431700538
 GameObject:
   m_ObjectHideFlags: 0
@@ -690,7 +701,7 @@ GameObject:
   - component: {fileID: 727361789}
   m_Layer: 0
   m_Name: Cube
-  m_TagString: Untagged
+  m_TagString: Test
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -775,7 +786,7 @@ Transform:
   m_GameObject: {fileID: 727361788}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.1, y: 2.771, z: 6.11}
+  m_LocalPosition: {x: 4.22, y: 1.94, z: -0.21}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -796,6 +807,11 @@ MonoBehaviour:
 CanvasGroup:
   m_CorrespondingSourceObject: {fileID: 2501975055765836572, guid: fe3c1bf577aee423a8108a7bab2ba75d, type: 3}
   m_PrefabInstance: {fileID: 6922593174979142102}
+  m_PrefabAsset: {fileID: 0}
+--- !u!20 &826478716 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 2206885108856580092, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
+  m_PrefabInstance: {fileID: 8154610454004403675}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &887406134
 GameObject:
@@ -903,6 +919,11 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 887406134}
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!223 &1061719022 stripped
+Canvas:
+  m_CorrespondingSourceObject: {fileID: 168108584712270667, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
+  m_PrefabInstance: {fileID: 8154610454004403675}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1121246632
 GameObject:
   m_ObjectHideFlags: 0
@@ -918,7 +939,7 @@ GameObject:
   - component: {fileID: 1121246633}
   m_Layer: 0
   m_Name: Test NPC Dialogue
-  m_TagString: Untagged
+  m_TagString: Test
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -935,7 +956,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 825288afbac9b475889aed2f6f6ed5c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  npcDialogueTree: {fileID: 11400000, guid: 37f04444dc3034d758514f8a9244c261, type: 2}
+  npcDialogueTree: {fileID: 11400000, guid: fe91b676943764975a6f62dde8871a96, type: 2}
   interactKey: 101
   playerInRange: 0
   dialogueKey: DialogueTriggered
@@ -1352,7 +1373,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1926888984
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1855,6 +1876,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 6681499419956978983}
     - target: {fileID: 7890560368363000087, guid: fa2dc2abc62ae44bea1dae2397620132, type: 3}
+      propertyPath: mainCamera
+      value: 
+      objectReference: {fileID: 826478716}
+    - target: {fileID: 7890560368363000087, guid: fa2dc2abc62ae44bea1dae2397620132, type: 3}
       propertyPath: buttonParent
       value: 
       objectReference: {fileID: 1169475957}
@@ -1866,6 +1891,14 @@ PrefabInstance:
       propertyPath: dialogueTextUI
       value: 
       objectReference: {fileID: 455748283}
+    - target: {fileID: 7890560368363000087, guid: fa2dc2abc62ae44bea1dae2397620132, type: 3}
+      propertyPath: inventoryCanvas
+      value: 
+      objectReference: {fileID: 1061719022}
+    - target: {fileID: 7890560368363000087, guid: fa2dc2abc62ae44bea1dae2397620132, type: 3}
+      propertyPath: inventoryManager
+      value: 
+      objectReference: {fileID: 399364637}
     - target: {fileID: 7890560368363000087, guid: fa2dc2abc62ae44bea1dae2397620132, type: 3}
       propertyPath: nextDialogueIndicatorImage
       value: 

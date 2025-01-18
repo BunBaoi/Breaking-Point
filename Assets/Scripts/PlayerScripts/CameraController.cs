@@ -9,7 +9,7 @@ public class CameraController : MonoBehaviour
 
     public Transform playerBody;
 
-    float xRotation = 0f;
+    public float xRotation = 0f;
 
 
     void Start()

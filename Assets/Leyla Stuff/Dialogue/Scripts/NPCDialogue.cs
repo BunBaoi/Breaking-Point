@@ -38,7 +38,7 @@ public class NPCDialogue : MonoBehaviour
             {
                 interactTextInstance = Instantiate(interactTextPrefab);
                 interactTextInstance.transform.SetParent(transform, false); // Keep local position
-                interactTextInstance.transform.localPosition = new Vector3(0, 0.1f, 0); // Position 0.1 above NPC
+                interactTextInstance.transform.localPosition = new Vector3(0, 0.5f, 0); // Position 0.5 above NPC
 
                 // Update text dynamically to match the interact key
                 TextMeshPro textMesh = interactTextInstance.GetComponent<TextMeshPro>();
