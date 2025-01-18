@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using UnityEngine;
 
 public class QTEMechanic : MonoBehaviour
@@ -10,71 +9,116 @@ public class QTEMechanic : MonoBehaviour
     public GameObject Pos2;
     public GameObject Pos3;
 
-    private float moveDuration = 5f;
+    private float MoTSpeed = 2f; // Player Move Speed
     public float CHKCounter = 0f;
 
+    public QTEvent qTEvent;
     public GameObject objectPlayer;
-    public Vector3 PlayerPos1;
-
-    public Vector3 target = new Vector3(0, 2, 2);
-
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
 
     public PlayerPos PositionOfPlayer;
-    public enum PlayerPos
+    public bool QTEMechanicScriptActive;
+
+    public void Start()
     {
-        Pos1,
-        Pos2,
-        Pos3
+        PositionOfPlayer = PlayerPos.PlayerPosIdle;
     }
 
-    public void MoveBlock()
+
+    public enum PlayerPos
     {
-        StartCoroutine(MoveCube(target));
+        PlayerPosIdle,
+        PlayerPos1,
+        PlayerPos2,
+        PlayerPos3
+    }
 
+    public bool CHKPos1;
+    public bool CHKPos2;
+    public bool CHKPos3;
 
+    public void QTEMove()
+    {
+        switch (PositionOfPlayer)
+        {
+            case PlayerPos.PlayerPosIdle:
+                {
+                //Debug.Log("Player Position 1");
+                if(CHKPos1 == false) // 
+                    {
+                        // Player move to Target position
+                        Vector3 target = Pos1.transform.position;
+
+                        PositionOfPlayer = PlayerPos.PlayerPos1; // Update Switch
+                        CHKCounter++;
+                        StartCoroutine(MoveCube(target));
+                        CHKPos1 = true;
+                    
+                    }
+                break;
+                }
+            case PlayerPos.PlayerPos1:
+                //Debug.Log("Player Position 1");
+                if(CHKPos2 == false) // 
+                    {
+                        // Player move to Target position
+                        Vector3 target = Pos2.transform.position;
+
+                        PositionOfPlayer = PlayerPos.PlayerPos2; // Update Switch
+                        CHKCounter++;
+                        StartCoroutine(MoveCube(target));
+                        CHKPos1 = true;
+                    }
+                break;
+
+            case PlayerPos.PlayerPos2:
+                //Debug.Log("Player Position 2");
+                if (CHKPos3 == false) 
+                    {
+                        // Player move to Target position
+                        Vector3 target = Pos3.transform.position;
+
+                        PositionOfPlayer = PlayerPos.PlayerPos3;
+                        CHKCounter++;
+                        StartCoroutine(MoveCube(target));
+
+                        CHKPos2 = true;
+                    }
+                break;
+
+            case PlayerPos.PlayerPos3:
+                //Debug.Log("Player Position 3");
+                if (CHKPos3 == false)
+                    {
+                        // Player move to Target position
+                        Vector3 target = Pos3.transform.position;
+
+                        PositionOfPlayer = PlayerPos.PlayerPos3;
+                        CHKCounter++;
+                        StartCoroutine(MoveCube(target));
+
+                        CHKPos3 = true;
+                    }
+                break;
+                    
+        }
 
         IEnumerator MoveCube(Vector3 targetPosition)
         {
             Vector3 startPosition = transform.position;
             float timeElapsed = 0;
-            CHKCounter++;
-            while (timeElapsed < moveDuration)
+            while (timeElapsed < MoTSpeed)
             {
-                transform.position = Vector3.Lerp(startPosition, targetPosition, timeElapsed / moveDuration);
+                transform.position = Vector3.Lerp(startPosition, targetPosition, timeElapsed / MoTSpeed);
                 timeElapsed += Time.deltaTime;
                 yield return null;
             }
             transform.position = targetPosition;
-            PositionOfPlayer = PlayerPos.Pos2;
-            
+            //Debug.Log("Position arrived");
+            qTEvent.OpenreloadUI(); // PLAYING TWICE UPON QTE COMPLETION AND MOVE COMPLETION
+            QTEMechanicScriptActive = true; // KEY TO ACTIVATINE TIMER ASODNAFSJNJAFNSONJFOSNJOSJFNONAJFSNJFSNJ
         }
 
-    }
 
-    public void PlayerCHKP()
-    {
-        if (PositionOfPlayer == PlayerPos.Pos1)
-        {
-            if (Input.GetKeyDown(KeyCode.Z))
-            {
-                PositionOfPlayer = PlayerPos.Pos2;
-                CHKCounter++;
-                Debug.Log("Player pos -> 2");
-            }
-        }
-    }
-
-
-
-
-    public void QTEMove()
-    {
-        PlayerPos1 = objectPlayer.transform.position;
-        Debug.Log("QTEMOVE");
+        Debug.Log("QTEMOVE Active");
     }
 }

@@ -5,14 +5,17 @@ using static QTEMechanic;
 
 public class PlayerController : MonoBehaviour
 {
-    public QTEventUI qTEvent;
+    public QTEvent qTEvent;
     public QTEMechanic qTEMechanic;
     public CharacterController controller;
     public PlayerStats playerStats;
 
     public float objectSpeed = 3;
-    private float moveDuration = 5f;
-    public Vector3 target = new Vector3(2, 3, 4);
+    // private float moveDuration = 5f;
+    public GameObject targetPos;
+    public GameObject playerPos;
+    
+
 
     public float speed = 12f;
     public float gravity = -9.81f;
@@ -26,9 +29,12 @@ public class PlayerController : MonoBehaviour
     //public float maxSlopeAngle;
     //private RaycastHit slopehit;
 
+
+
+
     void Start()
     {
-
+        Vector3 target = targetPos.transform.position;
     }
 
     void Update()
@@ -46,6 +52,12 @@ public class PlayerController : MonoBehaviour
         sprint();
         OxyOuputRate();
         QTEControl();
+
+
+        if (qTEMechanic.QTEMechanicScriptActive == true)
+        {
+            //Debug.Log("Movement Lock");
+        }
     }
 
     private void sprint()
@@ -65,40 +77,20 @@ public class PlayerController : MonoBehaviour
 
     public void QTEControl()
     {
-        if (Input.GetKeyDown(KeyCode.Z))
+        if (Input.GetKeyDown(KeyCode.F))
         {
-            Debug.Log("Z Key");
-            qTEvent.QTEActive(); // Delete QTE UI
-            //MoveToPosition(target);
-            //qTEMechanic.MoveBlock();
-            //StartCoroutine(MoveCube(target));
-
-            qTEMechanic.PositionOfPlayer = PlayerPos.Pos2;
-
-            //transform.position = Vector3.Lerp(transform.position, target, 10);
+            qTEMechanic.QTEMove();
+            
+            //qTEMechanic.PositionOfPlayer = PlayerPos.PlayerPos2;
+            //Vector3 target = targetPos.transform.position;
+            CharacterController characterController = GetComponent<CharacterController>();
+            if (characterController != null) 
+            {
+                characterController.enabled = false;
+            }
         }
     }
-
-
-    public void MoveToPosition(Vector3 newPosition)
-    {
-        transform.position = newPosition;
-    }
-
-    IEnumerator MoveCube(Vector3 targetPosition)
-    {
-        Vector3 startPosition = transform.position;
-        float timeElapsed = 0;
-        while (timeElapsed < moveDuration)
-        {
-            transform.position = Vector3.Lerp(startPosition, targetPosition, timeElapsed / moveDuration);
-            timeElapsed += Time.deltaTime;
-            yield return null;
-        }
-        transform.position = targetPosition;
-
-    }
-
+    
     public void OxyOuputRate()
     {
         if(Input.GetKeyDown(KeyCode.E))
