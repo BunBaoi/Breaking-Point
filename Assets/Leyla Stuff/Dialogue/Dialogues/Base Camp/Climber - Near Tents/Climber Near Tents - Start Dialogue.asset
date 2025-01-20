@@ -25,6 +25,7 @@ MonoBehaviour:
     eventIds: []
     options: []
     npcName: Climber
+    npcTag: 
   - dialogueText: What makes you say that?
     fmodAudioEvent:
       Guid:
@@ -36,6 +37,7 @@ MonoBehaviour:
     eventIds: []
     options: []
     npcName: Alice
+    npcTag: 
   - dialogueText: Just by looking at you. You look like a lost puppy who wandered
       off too far from home.
     fmodAudioEvent:
@@ -48,6 +50,7 @@ MonoBehaviour:
     eventIds: []
     options: []
     npcName: Climber
+    npcTag: 
   - dialogueText: "Lost puppy? That\u2019s one bold assumption. I\u2019ve climbed
       more mountains than you probably have seen in your lifetime."
     fmodAudioEvent:
@@ -60,6 +63,7 @@ MonoBehaviour:
     eventIds: []
     options: []
     npcName: Alice
+    npcTag: 
   - dialogueText: "Confidence huh? That\u2019s good. But confidence can only get
       you so far. It won\u2019t stop the frostbite or avalanches."
     fmodAudioEvent:
@@ -72,6 +76,7 @@ MonoBehaviour:
     eventIds: []
     options: []
     npcName: Climber
+    npcTag: 
   - dialogueText: "And pessimism doesn\u2019t get you to the summit. Your point?"
     fmodAudioEvent:
       Guid:
@@ -83,6 +88,7 @@ MonoBehaviour:
     eventIds: []
     options: []
     npcName: Alice
+    npcTag: 
   - dialogueText: "I\u2019m just sayin\u2019, this mountain doesn\u2019t care who
       you are or how many peaks you have bagged."
     fmodAudioEvent:
@@ -95,6 +101,7 @@ MonoBehaviour:
     eventIds: []
     options: []
     npcName: Climber
+    npcTag: 
   - dialogueText: "Everyone\u2019s a rookie here until they prove otherwise."
     fmodAudioEvent:
       Guid:
@@ -106,6 +113,7 @@ MonoBehaviour:
     eventIds: []
     options: []
     npcName: Climber
+    npcTag: 
   - dialogueText: "Then I guess I will just have to prove otherwise, won\u2019t I?"
     fmodAudioEvent:
       Guid:
@@ -117,6 +125,7 @@ MonoBehaviour:
     eventIds: []
     options: []
     npcName: Alice
+    npcTag: 
   - dialogueText: "I\u2019d like to see you try with your head up in the clouds.
       You have more than just snowstorms on your mind."
     fmodAudioEvent:
@@ -129,6 +138,7 @@ MonoBehaviour:
     eventIds: []
     options: []
     npcName: Climber
+    npcTag: 
   - dialogueText: "Maybe. But that\u2019s just none of your business, is it?"
     fmodAudioEvent:
       Guid:
@@ -140,6 +150,7 @@ MonoBehaviour:
     eventIds: []
     options: []
     npcName: Alice
+    npcTag: 
   - dialogueText: "Hey, I\u2019m just trying to give some friendly advice here."
     fmodAudioEvent:
       Guid:
@@ -151,6 +162,7 @@ MonoBehaviour:
     eventIds: []
     options: []
     npcName: Climber
+    npcTag: 
   - dialogueText: "\u201CFriendly.\u201D Sure."
     fmodAudioEvent:
       Guid:
@@ -162,6 +174,7 @@ MonoBehaviour:
     eventIds: []
     options: []
     npcName: Alice
+    npcTag: 
   - dialogueText: "No matter what is weighing on you, the mountain doesn\u2019t care.
       You either climb, or you get distracted and you don\u2019t. No do overs. Just
       gone."
@@ -175,6 +188,7 @@ MonoBehaviour:
     eventIds: []
     options: []
     npcName: Climber
+    npcTag: 
   - dialogueText: Solid advice, though I prefer the 'just wing it and hope for the
       best' method. Worked for us, right, Al?
     fmodAudioEvent:
@@ -187,6 +201,7 @@ MonoBehaviour:
     eventIds: []
     options: []
     npcName: Phillip
+    npcTag: 
   - dialogueText: "Look, I didn\u2019t want to be mean here, just trying to save
       your life but you just don\u2019t look built for this sweetheart. "
     fmodAudioEvent:
@@ -199,6 +214,7 @@ MonoBehaviour:
     eventIds: []
     options: []
     npcName: Climber
+    npcTag: 
   - dialogueText: Maybe try a smaller mountain. One in your comfort zone.
     fmodAudioEvent:
       Guid:
@@ -210,6 +226,7 @@ MonoBehaviour:
     eventIds: []
     options: []
     npcName: Climber
+    npcTag: 
   - dialogueText: "\u2026 I-"
     fmodAudioEvent:
       Guid:
@@ -221,6 +238,7 @@ MonoBehaviour:
     eventIds: []
     options: []
     npcName: Alice
+    npcTag: 
   - dialogueText: I can do this.
     fmodAudioEvent:
       Guid:
@@ -232,6 +250,7 @@ MonoBehaviour:
     eventIds: []
     options: []
     npcName: Alice
+    npcTag: 
   - dialogueText: Do you even believe your own words?
     fmodAudioEvent:
       Guid:
@@ -243,6 +262,7 @@ MonoBehaviour:
     eventIds: []
     options: []
     npcName: Climber
+    npcTag: 
   - dialogueText: "Good luck out there, Rookie. Seems like you\u2019ll need it."
     fmodAudioEvent:
       Guid:
@@ -251,6 +271,8 @@ MonoBehaviour:
         Data3: 0
         Data4: 0
       Path: 
-    eventIds: []
+    eventIds:
+    - BaseCampClimberNearTentDialogueCompleted
     options: []
     npcName: Climber
+    npcTag: 

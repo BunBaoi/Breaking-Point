@@ -25,9 +25,11 @@ public class InventoryManager : MonoBehaviour
     private GameObject playerController; // CHANGE TO ACTUAL PLAYER MOVEMENT SCRIPT LATER
 
     private PlayerClimbingState playerClimbingState;
+    [SerializeField] private LayerMask itemLayer;
 
     private void Start()
     {
+        DisableScriptsOnInventoryItems();
         CreateSlots(defaultSlotCount);
 
         // Retrieve the PlayerClimbingState component instead of using GetComponent in the method call
@@ -136,6 +138,7 @@ public class InventoryManager : MonoBehaviour
         {
             slots[selectedSlotIndex].AddItem(item);
             EquipItem(item);
+            DisableItemPickup(item);
             return true;
         }
 
@@ -151,12 +154,97 @@ public class InventoryManager : MonoBehaviour
 
                 // Equip the item if added to the selected slot
                 EquipItem(item);
+                DisableItemPickup(item);
                 return true;
             }
         }
 
         Debug.Log("Inventory is full!");
         return false;
+    }
+
+    public void DisableItemPickup(Item item)
+    {
+        GameObject itemObject = FindItemInScene(item);
+
+        if (itemObject == null)
+        {
+            Debug.LogWarning("Item instance not found in the scene: " + item.itemPrefab.name);
+            return;
+        }
+
+        Debug.Log("Disabling ItemPickUp on item: " + itemObject.name);
+
+        ItemPickUp itemPickUpScript = itemObject.GetComponent<ItemPickUp>();
+        if (itemPickUpScript != null)
+        {
+            Debug.Log("ItemPickUp script found. Disabling it.");
+            itemPickUpScript.enabled = false;
+        }
+        else
+        {
+            Debug.Log("No ItemPickUp script attached to item.");
+        }
+
+        // Enable all other components
+        MonoBehaviour[] components = itemObject.GetComponents<MonoBehaviour>();
+        foreach (var component in components)
+        {
+            if (component is ItemPickUp) continue;
+            Debug.Log("Enabling script: " + component.GetType().Name);
+            component.enabled = true;
+        }
+    }
+
+    public void EnableItemPickup(Item item)
+    {
+        GameObject itemObject = FindItemInScene(item);
+
+        if (itemObject == null)
+        {
+            Debug.LogWarning("Item instance not found in the scene: " + item.itemPrefab.name);
+            return;
+        }
+
+        Debug.Log("Enabling ItemPickUp on item: " + itemObject.name);
+
+        Component[] itemComponents = itemObject.GetComponents<Component>();
+        foreach (Component component in itemComponents)
+        {
+            if (component is ItemPickUp == false)
+            {
+                Debug.Log("Disabling component: " + component.GetType().Name);
+                Behaviour behaviour = component as Behaviour;
+                if (behaviour != null)
+                {
+                    behaviour.enabled = false;
+                }
+            }
+            else
+            {
+                Debug.Log("Enabling ItemPickUp component.");
+                ItemPickUp itemPickUp = component as ItemPickUp;
+                if (itemPickUp != null)
+                {
+                    itemPickUp.enabled = true;
+                }
+            }
+        }
+    }
+
+    private GameObject FindItemInScene(Item item)
+    {
+        GameObject[] sceneObjects = GameObject.FindObjectsOfType<GameObject>();
+
+        foreach (GameObject obj in sceneObjects)
+        {
+            if (obj.name == item.itemPrefab.name || obj.name == item.itemPrefab.name + "(Clone)")
+            {
+                return obj;
+            }
+        }
+
+        return null;
     }
 
     // Drops the currently selected item
@@ -232,6 +320,7 @@ public class InventoryManager : MonoBehaviour
                 GameObject droppedItem = Instantiate(item.itemPrefab, fallbackPosition, Quaternion.identity);
                 droppedItem.GetComponent<ItemPickUp>().item = item;
             }
+            EnableItemPickup(item);
         }
         else
         {
@@ -383,5 +472,43 @@ public class InventoryManager : MonoBehaviour
         }
 
         return totalWeight;
+    }
+
+    private void DisableScriptsOnInventoryItems()
+    {
+        // Find all objects in the specified itemLayer
+        GameObject[] inventoryItems = FindObjectsInLayer(itemLayer);
+
+        foreach (GameObject item in inventoryItems)
+        {
+            MonoBehaviour[] scripts = item.GetComponents<MonoBehaviour>();
+            foreach (MonoBehaviour script in scripts)
+            {
+                // Disable all scripts except the ItemPickUp script
+                if (script.GetType() != typeof(ItemPickUp))
+                {
+                    script.enabled = false;
+                }
+            }
+        }
+    }
+
+    // Utility function to find all objects in a specific layer
+    private GameObject[] FindObjectsInLayer(LayerMask layerMask)
+    {
+        // Get all objects in the scene
+        GameObject[] allObjects = GameObject.FindObjectsOfType<GameObject>();
+
+        // Filter the objects based on the specified layer
+        List<GameObject> objectsInLayer = new List<GameObject>();
+        foreach (GameObject obj in allObjects)
+        {
+            if (((1 << obj.layer) & layerMask) != 0)
+            {
+                objectsInLayer.Add(obj);
+            }
+        }
+
+        return objectsInLayer.ToArray();
     }
 }

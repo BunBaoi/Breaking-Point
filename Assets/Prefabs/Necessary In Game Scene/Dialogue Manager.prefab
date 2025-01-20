@@ -46,10 +46,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dialogueTextUI: {fileID: 0}
+  npcNameUI: {fileID: 0}
   dialogueCanvas: {fileID: 0}
   buttonPrefab: {fileID: 4874534168391408099, guid: bda328d86a65949e1b8467b0141043c9, type: 3}
   buttonParent: {fileID: 0}
+  nextDialogueIndicatorImage: {fileID: 0}
+  nextDialogueIndicatorCanvasGroup: {fileID: 0}
+  mainCamera: {fileID: 0}
   advanceKey: 323
+  isTextScrolling: 0
+  isFullTextShown: 0
+  optionsAreVisible: 0
+  inventoryManager: {fileID: 0}
+  inventoryCanvas: {fileID: 0}
+  isDialogueActive: 0
+  playerHands:
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!114 &4547731984460702873
 MonoBehaviour:
   m_ObjectHideFlags: 0

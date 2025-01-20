@@ -24,6 +24,7 @@ MonoBehaviour:
     eventIds: []
     options: []
     npcName: Phillip
+    npcTag: 
   - dialogueText: "You\u2019re being ridiculous. I love you, remember?"
     fmodAudioEvent:
       Guid:
@@ -35,6 +36,7 @@ MonoBehaviour:
     eventIds: []
     options: []
     npcName: Alice
+    npcTag: 
   - dialogueText: "Just keeping things interesting. You\u2019ll thank me later."
     fmodAudioEvent:
       Guid:
@@ -46,6 +48,7 @@ MonoBehaviour:
     eventIds: []
     options: []
     npcName: Phillip
+    npcTag: 
   - dialogueText: "I\u2019m climbing the mountain with an overgrown child..."
     fmodAudioEvent:
       Guid:
@@ -54,6 +57,8 @@ MonoBehaviour:
         Data3: 0
         Data4: 0
       Path: 
-    eventIds: []
+    eventIds:
+    - BaseCampAfterOliverDialogueCompleted
     options: []
     npcName: Alice
+    npcTag: 

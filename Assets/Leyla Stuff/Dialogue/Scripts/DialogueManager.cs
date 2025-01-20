@@ -38,6 +38,8 @@ public class DialogueManager : MonoBehaviour
     private PlayerMovement playerMovement;
     [SerializeField] private InventoryManager inventoryManager;
     [SerializeField] private Canvas inventoryCanvas;
+    [SerializeField] private bool isDialogueActive = false;
+    [SerializeField] private GameObject[] playerHands;
 
     private void Awake()
     {
@@ -65,7 +67,7 @@ public class DialogueManager : MonoBehaviour
         }
         if (!optionsAreVisible)
         {
-            if (Input.GetKeyDown(advanceKey))
+            if (Input.GetKeyDown(advanceKey) && isDialogueActive)
             {
                 if (isTextScrolling)
                 {
@@ -91,6 +93,15 @@ public class DialogueManager : MonoBehaviour
             inventoryManager.enabled = false;
             inventoryCanvas.gameObject.SetActive(false);
         }
+
+        if (playerHands != null)
+        {
+            // Disable all GameObjects in the playerHands array
+            foreach (GameObject hand in playerHands)
+            {
+                hand.SetActive(false);
+            }
+        }
         // Find the Player object by tag
         GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
         if (playerObject != null)
@@ -112,6 +123,7 @@ public class DialogueManager : MonoBehaviour
         {
             Debug.LogWarning("Player object not found with tag 'Player'.");
         }
+        isDialogueActive = true;
         nextDialogueIndicatorCanvasGroup.alpha = 0f;
         currentDialogueTree = dialogueTree;
         currentIndex = 0;
@@ -156,6 +168,7 @@ public class DialogueManager : MonoBehaviour
         else
         {
             // No more dialogue, end conversation
+            isDialogueActive = false;
             nextDialogueIndicatorCanvasGroup.alpha = 0f;
             nextDialogueIndicatorImage.gameObject.SetActive(false);
             dialogueCanvas.enabled = false;
@@ -168,6 +181,14 @@ public class DialogueManager : MonoBehaviour
             {
                 inventoryManager.enabled = true;
                 inventoryCanvas.gameObject.SetActive(true);
+            }
+            if (playerHands != null)
+            {
+                // Enable all GameObjects in the playerHands array
+                foreach (GameObject hand in playerHands)
+                {
+                    hand.SetActive(true);
+                }
             }
         }
     }

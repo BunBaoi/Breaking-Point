@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class ItemPickUp : MonoBehaviour
 {
@@ -87,6 +88,7 @@ public class ItemPickUp : MonoBehaviour
 
                                 if (added)
                                 {
+                                    inventory.DisableItemPickup(item);
                                     Destroy(gameObject); // Destroy the item in the world after picking it up
                                 }
                             }

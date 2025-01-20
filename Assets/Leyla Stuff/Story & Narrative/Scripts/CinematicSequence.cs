@@ -21,6 +21,7 @@ public class CinematicSequence : MonoBehaviour
     [SerializeField] private float randomTextMaxDuration = 10f; // Max duration for random text
     [SerializeField] private float chapterDisplayDuration = 3f; // Duration to show the chapter title
     [SerializeField] private float dialogueDelayDuration = 1.5f; // Duration to wait after displaying current dialogue
+    private List<RectTransform> activeRandomTexts = new List<RectTransform>();
 
     [Header("Fade Settings")]
     [SerializeField] private float textFadeOutDuration = 1f; // Duration for fading out text
@@ -38,11 +39,47 @@ public class CinematicSequence : MonoBehaviour
     [SerializeField] private List<string> requiredBoolKeysFalse = new List<string>(); // List of bool keys that should be false
     [SerializeField] private float eventIdsDelay = 0.5f;
 
-    private void Start()
+    private PlayerMovement playerMovement;
+    [SerializeField] private InventoryManager inventoryManager;
+    [SerializeField] private Canvas inventoryCanvas;
+    [SerializeField] private DayNightCycle dayNightCycle;
+
+    public void StartCinematic()
     {
         // Before starting the cinematic, check the boolean conditions
         if (AreConditionsMet())
         {
+            // Disable the InventoryManager when dialogue starts
+            if (inventoryManager != null)
+            {
+                inventoryManager.enabled = false;
+                inventoryCanvas.gameObject.SetActive(false);
+            }
+            // Find the Player object by tag
+            GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+            if (playerObject != null)
+            {
+                playerMovement = playerObject.GetComponent<PlayerMovement>();
+
+                // Disable player movement when dialogue starts
+                if (playerMovement != null)
+                {
+                    Debug.Log("Disabling movement");
+                    playerMovement.SetMovementState(false);
+                }
+                else
+                {
+                    Debug.LogWarning("PlayerMovement component not found on Player object.");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("Player object not found with tag 'Player'.");
+            }
+            if (dayNightCycle != null)
+            {
+                dayNightCycle.StopTime();
+            }
             DisableAllCameras();
             StartCoroutine(PlayCinematic());
             // Instantiate the cinematic camera
@@ -253,9 +290,28 @@ public class CinematicSequence : MonoBehaviour
         TMP_Text randomText = randomTextObject.GetComponent<TMP_Text>();
         randomText.text = text;
 
-        // Set random position on the canvas
         RectTransform rectTransform = randomTextObject.GetComponent<RectTransform>();
-        rectTransform.anchoredPosition = new Vector2(Random.Range(-300, 300), Random.Range(-200, 200)); // Random position
+
+        // Try to find a non-overlapping position
+        Vector2 newPosition;
+        int maxAttempts = 10;
+        int attempts = 0;
+        bool positionFound = false;
+
+        do
+        {
+            newPosition = new Vector2(Random.Range(-300, 300), Random.Range(-200, 200));
+            positionFound = !IsOverlapping(newPosition, rectTransform.sizeDelta);
+            attempts++;
+        } while (!positionFound && attempts < maxAttempts);
+
+        rectTransform.anchoredPosition = newPosition;
+
+        // Set a random rotation between -40 and 40 degrees on the Z-axis
+        rectTransform.localRotation = Quaternion.Euler(0, 0, Random.Range(-40f, 40f));
+
+        // Add to active texts
+        activeRandomTexts.Add(rectTransform);
 
         // Fade in
         StartCoroutine(FadeText(randomText, 1f, 1f));
@@ -267,6 +323,21 @@ public class CinematicSequence : MonoBehaviour
         StartCoroutine(HideRandomTextAfterDelay(randomTextObject, randomDuration));
     }
 
+    private bool IsOverlapping(Vector2 position, Vector2 size)
+    {
+        Rect newRect = new Rect(position, size);
+
+        foreach (RectTransform existingText in activeRandomTexts)
+        {
+            Rect existingRect = new Rect(existingText.anchoredPosition, existingText.sizeDelta);
+            if (newRect.Overlaps(existingRect))
+            {
+                return true; // Overlapping detected
+            }
+        }
+        return false; // No overlap
+    }
+
     private IEnumerator HideRandomTextAfterDelay(GameObject randomTextObject, float duration)
     {
         yield return new WaitForSeconds(duration); // Wait for the specified duration
@@ -274,6 +345,9 @@ public class CinematicSequence : MonoBehaviour
         // Fade out random text after waiting
         TMP_Text randomText = randomTextObject.GetComponent<TMP_Text>();
         StartCoroutine(FadeText(randomText, 1f, 0f));
+
+        // Remove from active list
+        activeRandomTexts.Remove(randomTextObject.GetComponent<RectTransform>());
 
         // Destroy the random text object after fading out
         Destroy(randomTextObject, 1f); // Delay destruction until after fading out
@@ -407,6 +481,16 @@ public class CinematicSequence : MonoBehaviour
                 // Trigger the event tied to the eventID
                 CinematicEventManager.Instance?.TriggerCinematicEvent(eventId);
             }
+        }
+        if (playerMovement != null)
+        {
+            playerMovement.SetMovementState(true);
+        }
+        // Enable the InventoryManager when dialogue ends
+        if (inventoryManager != null)
+        {
+            inventoryManager.enabled = true;
+            inventoryCanvas.gameObject.SetActive(true);
         }
     }
 }

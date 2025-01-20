@@ -242,6 +242,9 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 131072
+  itemLayer:
+    serializedVersion: 2
+    m_Bits: 32768
 --- !u!54 &8519684001432960098
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -312,6 +315,7 @@ MonoBehaviour:
   gravity: -9.81
   IsSprint: 0
   playerHeight: 0
+  canMove: 1
 --- !u!1 &3619808905300106697
 GameObject:
   m_ObjectHideFlags: 0
@@ -575,6 +579,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mouseSensitivity: 300
   playerBody: {fileID: 1694757373622639524}
+  xRotation: 0
 --- !u!114 &2435927527163000300
 MonoBehaviour:
   m_ObjectHideFlags: 0
