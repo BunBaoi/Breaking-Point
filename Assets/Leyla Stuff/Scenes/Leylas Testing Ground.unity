@@ -122,6 +122,11 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!224 &103520262 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 8967944408355415721, guid: 059900d7c5a5b492087bfb6603e66ed9, type: 3}
+  m_PrefabInstance: {fileID: 6681499419956978981}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &171742230
 GameObject:
   m_ObjectHideFlags: 0
@@ -814,6 +819,11 @@ Camera:
   m_CorrespondingSourceObject: {fileID: 2206885108856580092, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
   m_PrefabInstance: {fileID: 8154610454004403675}
   m_PrefabAsset: {fileID: 0}
+--- !u!224 &831463490 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 5123990375986266323, guid: 059900d7c5a5b492087bfb6603e66ed9, type: 3}
+  m_PrefabInstance: {fileID: 6681499419956978981}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &887406134
 GameObject:
   m_ObjectHideFlags: 0
@@ -920,6 +930,11 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 887406134}
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &902210347 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3727002403780506984, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
+  m_PrefabInstance: {fileID: 8154610454004403675}
+  m_PrefabAsset: {fileID: 0}
 --- !u!223 &1061719022 stripped
 Canvas:
   m_CorrespondingSourceObject: {fileID: 168108584712270667, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
@@ -958,9 +973,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   npcDialogueTree: {fileID: 11400000, guid: fe91b676943764975a6f62dde8871a96, type: 2}
-  interactKey: 101
-  playerInRange: 0
   dialogueKey: DialogueTriggered
+  playerInRange: 0
+  isDialoguePressed: 0
+  interactKey: 101
   clearPlayerPrefs: 99
   interactTextPrefab: {fileID: 95194169440117963, guid: 15891119156aa4ae388994054e96a4c5, type: 3}
   requiredBoolKeysTrue: []
@@ -1409,8 +1425,6 @@ MonoBehaviour:
   inventoryManager: {fileID: 0}
   inventoryCanvas: {fileID: 0}
   dayNightCycle: {fileID: 0}
-  journalPageAdder: {fileID: 0}
-  newJournalPage: {fileID: 0}
 --- !u!4 &1926888985
 Transform:
   m_ObjectHideFlags: 0
@@ -1672,6 +1686,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2076587496 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5291443422802714608, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
+  m_PrefabInstance: {fileID: 8154610454004403675}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &740530334605638597
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1879,10 +1898,6 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7890560368363000087, guid: fa2dc2abc62ae44bea1dae2397620132, type: 3}
-      propertyPath: npcNameUI
-      value: 
-      objectReference: {fileID: 6681499419956978983}
-    - target: {fileID: 7890560368363000087, guid: fa2dc2abc62ae44bea1dae2397620132, type: 3}
       propertyPath: mainCamera
       value: 
       objectReference: {fileID: 826478716}
@@ -1907,9 +1922,25 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 399364637}
     - target: {fileID: 7890560368363000087, guid: fa2dc2abc62ae44bea1dae2397620132, type: 3}
+      propertyPath: optionIndicatorParent
+      value: 
+      objectReference: {fileID: 831463490}
+    - target: {fileID: 7890560368363000087, guid: fa2dc2abc62ae44bea1dae2397620132, type: 3}
+      propertyPath: playerHands.Array.data[0]
+      value: 
+      objectReference: {fileID: 2076587496}
+    - target: {fileID: 7890560368363000087, guid: fa2dc2abc62ae44bea1dae2397620132, type: 3}
+      propertyPath: playerHands.Array.data[1]
+      value: 
+      objectReference: {fileID: 902210347}
+    - target: {fileID: 7890560368363000087, guid: fa2dc2abc62ae44bea1dae2397620132, type: 3}
       propertyPath: nextDialogueIndicatorImage
       value: 
       objectReference: {fileID: 6681499419956978982}
+    - target: {fileID: 7890560368363000087, guid: fa2dc2abc62ae44bea1dae2397620132, type: 3}
+      propertyPath: switchOptionsIndicatorParent
+      value: 
+      objectReference: {fileID: 103520262}
     - target: {fileID: 7890560368363000087, guid: fa2dc2abc62ae44bea1dae2397620132, type: 3}
       propertyPath: nextDialogueIndicatorCanvasGroup
       value: 
@@ -2198,6 +2229,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8967944408355415721, guid: 059900d7c5a5b492087bfb6603e66ed9, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 120
+      objectReference: {fileID: 0}
+    - target: {fileID: 8967944408355415721, guid: 059900d7c5a5b492087bfb6603e66ed9, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -270
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2212,17 +2251,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &6681499419956978983 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2612528254770933733, guid: 059900d7c5a5b492087bfb6603e66ed9, type: 3}
-  m_PrefabInstance: {fileID: 6681499419956978981}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!225 &6681499419956978988 stripped

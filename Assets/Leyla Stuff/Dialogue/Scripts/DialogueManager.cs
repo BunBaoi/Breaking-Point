@@ -9,8 +9,9 @@ public class DialogueManager : MonoBehaviour
 {
     public static DialogueManager Instance;
 
+    [Header("Dialogue UI Settings")]
     [SerializeField] private TMP_Text dialogueTextUI;
-    [SerializeField] private TMP_Text npcNameUI;
+    // [SerializeField] private TMP_Text npcNameUI;
     [SerializeField] private Canvas dialogueCanvas;
     [SerializeField] private GameObject buttonPrefab;
     [SerializeField] private Transform buttonParent;
@@ -18,28 +19,60 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private CanvasGroup nextDialogueIndicatorCanvasGroup;
     [SerializeField] private Camera mainCamera;  // Player camera
 
-    public KeyCode advanceKey = KeyCode.Space;
+    [Header("Colour Settings")]
+    [SerializeField] private string npcNameColorHex = "#D95959"; // Default colour
+    [SerializeField] private string dialogueTextColorHex = "#4DB7C0"; // Default colour
 
-    private DialogueTree currentDialogueTree;
-    private int currentIndex = 0;
+    [Header("Option Button Settings")]
+    [SerializeField] private Color originalColor = Color.white;
+    [SerializeField] private Color hoverColor = Color.yellow;
+    [SerializeField] private Color pressedColor = Color.red;
+    [SerializeField] private float hoverScaleMultiplier = 1.2f;  // Scale multiplier when hovering
+    [SerializeField] private Transform optionIndicatorParent;
+    [SerializeField] private Transform switchOptionsIndicatorParent;
+    [SerializeField] private float optionIndicatorOffset = 0f;
+    [SerializeField] private bool hasScrolled = false;
+    [SerializeField] private float lastScrollTime = 0f;  // Track the time of the last scroll action
+    [SerializeField] private float scrollCooldown = 0.3f;  // Cooldown duration
+    [SerializeField] private bool canScroll = true;  // Flag to control scrolling behavior
+
+    private bool isOptionKeyPressed = false;
+
+    [Header("Keybinds")]
+    public KeyCode advanceKey = KeyCode.Mouse0;
+    [SerializeField] private KeyCode selectOptionKey = KeyCode.F;
+
+    private int selectedOptionIndex = 0;
+    [SerializeField] private GameObject scrollWheelIndicatorPrefab;
+    [SerializeField] private GameObject selectKeybindIndicatorPrefab;
+    private GameObject instantiatedScrollWheelIndicator;
+    private GameObject instantiatedSelectKeybindIndicator;
+
+    [Header("Testing Purposes")]
     [SerializeField] private bool isTextScrolling = false;
     [SerializeField] private bool isFullTextShown = false;
     [SerializeField] private bool optionsAreVisible = false;
+    [SerializeField] private bool isDialogueActive = false;
+
+    [Header("Inventory Setups")]
+    [SerializeField] private InventoryManager inventoryManager;
+    [SerializeField] private Canvas inventoryCanvas;
+    [SerializeField] private GameObject[] playerHands;
+
     private Coroutine scrollingCoroutine;
+    private Coroutine indicatorCoroutine;
+
     private List<GameObject> instantiatedButtons = new List<GameObject>();
 
     private FMOD.Studio.EventInstance currentDialogueEvent;
-    private Coroutine indicatorCoroutine;
 
     private DialogueTree originalDialogueTree;
     private int originalIndex;
     private bool returningToOriginal = false;
+    private DialogueTree currentDialogueTree;
+    private int currentIndex = 0;
 
     private PlayerMovement playerMovement;
-    [SerializeField] private InventoryManager inventoryManager;
-    [SerializeField] private Canvas inventoryCanvas;
-    [SerializeField] private bool isDialogueActive = false;
-    [SerializeField] private GameObject[] playerHands;
 
     private void Awake()
     {
@@ -65,6 +98,10 @@ public class DialogueManager : MonoBehaviour
             indicatorCoroutine = null; // Clear reference
             nextDialogueIndicatorCanvasGroup.alpha = 0f;
         }
+        if (optionsAreVisible)
+        {
+            HandleOptionSelection();
+        }
         if (!optionsAreVisible)
         {
             if (Input.GetKeyDown(advanceKey) && isDialogueActive)
@@ -72,7 +109,7 @@ public class DialogueManager : MonoBehaviour
                 if (isTextScrolling)
                 {
                     StopCoroutine(scrollingCoroutine);
-                    dialogueTextUI.text = currentDialogueTree.dialogueNodes[currentIndex - 1].dialogueText;
+                    dialogueTextUI.text = $"<color={npcNameColorHex}>{currentDialogueTree.dialogueNodes[currentIndex - 1].npcName}:</color> <color={dialogueTextColorHex}>{currentDialogueTree.dialogueNodes[currentIndex - 1].dialogueText}</color>";
                     isTextScrolling = false;
                     isFullTextShown = true;
                     ShowOptions(currentDialogueTree.dialogueNodes[currentIndex - 1]);
@@ -82,6 +119,171 @@ public class DialogueManager : MonoBehaviour
                     ShowNextDialogue();
                 }
             }
+        }
+    }
+
+    private void HandleOptionSelection()
+    {
+        if (instantiatedButtons.Count == 0) return;
+
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+
+        // Debug.Log("Scroll value: " + scroll);
+
+        // Use a threshold to ensure only meaningful scroll actions are detected
+        float scrollThreshold = 0.1f;
+
+        // Check if scroll input is detected and cooldown has passed
+        if (Mathf.Abs(scroll) >= scrollThreshold && canScroll)  // If the scroll value exceeds the threshold
+        {
+            canScroll = false;  // Disable further scrolling until cooldown has passed
+            lastScrollTime = Time.time;  // Record the time of this scroll action
+
+            // Handle scroll direction
+            if (scroll > 0f)  // Scroll up
+            {
+                selectedOptionIndex = (selectedOptionIndex - 1 + instantiatedButtons.Count) % instantiatedButtons.Count;
+                UpdateHighlightedOption();
+            }
+            else if (scroll < 0f)  // Scroll down
+            {
+                selectedOptionIndex = (selectedOptionIndex + 1) % instantiatedButtons.Count;
+                UpdateHighlightedOption();
+            }
+        }
+        else
+        {
+            // If no scroll input is detected or cooldown period hasn't passed, reset scroll value
+            if (Mathf.Abs(scroll) < scrollThreshold)
+            {
+                scroll = 0f;  // Explicitly reset the scroll value to zero if no scroll input
+            }
+        }
+
+        // Check if cooldown is finished, allow scrolling again
+        if (!canScroll && Time.time - lastScrollTime >= scrollCooldown)
+        {
+            canScroll = true;  // Allow scroll again after cooldown
+        }
+
+        // Detect key press for selecting option
+        if (Input.GetKeyDown(selectOptionKey))
+        {
+            isOptionKeyPressed = true;  // Track key press
+            TMP_Text buttonText = instantiatedButtons[selectedOptionIndex].GetComponentInChildren<TMP_Text>();
+            buttonText.color = pressedColor;
+
+            // Instantiate select keybind indicator
+            InstantiateSelectKeybindIndicator();
+        }
+        else if (Input.GetKeyUp(selectOptionKey) && isOptionKeyPressed)
+        {
+            // Trigger selection only when key is released
+            instantiatedButtons[selectedOptionIndex].GetComponent<Button>().onClick.Invoke();
+            isOptionKeyPressed = false;  // Reset press state
+
+            // Destroy all indicator children after selection
+            DestroyAllIndicatorChildren();
+
+            // Reset button colour to hoverColor or original color
+            UpdateHighlightedOption();
+        }
+    }
+
+    private void UpdateHighlightedOption()
+    {
+        // If no options are available, return early
+        if (instantiatedButtons.Count == 0) return;
+
+        for (int i = 0; i < instantiatedButtons.Count; i++)
+        {
+            TMP_Text buttonText = instantiatedButtons[i].GetComponentInChildren<TMP_Text>();
+            RectTransform buttonRectTransform = instantiatedButtons[i].GetComponent<RectTransform>();
+
+            if (i == selectedOptionIndex)
+            {
+                if (!isOptionKeyPressed)  // Only apply hover colour if the key is not pressed
+                {
+                    buttonText.color = hoverColor;
+
+                    // Scale the button when it is highlighted
+                    buttonRectTransform.localScale = Vector3.one * hoverScaleMultiplier;
+
+                    // Instantiate the select keybind indicator when the option is highlighted (hovered)
+                    if (instantiatedSelectKeybindIndicator == null)  // Only instantiate if not already done
+                    {
+                        InstantiateSelectKeybindIndicator();
+                    }
+                    else
+                    {
+                        // Update the indicator's position if it already exists
+                        UpdateSelectKeybindIndicatorPosition();
+                    }
+                }
+                else  // If the key is pressed, use pressed color
+                {
+                    buttonText.color = pressedColor;
+                    buttonRectTransform.localScale = Vector3.one * hoverScaleMultiplier; // Maintain scale when pressed
+                }
+            }
+            else
+            {
+                buttonText.color = originalColor;
+
+                // Reset scale for buttons that are not highlighted
+                buttonRectTransform.localScale = Vector3.one;
+            }
+        }
+    }
+
+    private void InstantiateSelectKeybindIndicator()
+    {
+        RectTransform buttonRectTransform = instantiatedButtons[selectedOptionIndex].GetComponent<RectTransform>();
+
+        Vector3 indicatorPosition = new Vector3(buttonRectTransform.localPosition.x + optionIndicatorOffset, buttonRectTransform.localPosition.y, buttonRectTransform.localPosition.z);
+
+        instantiatedSelectKeybindIndicator = Instantiate(selectKeybindIndicatorPrefab, indicatorPosition, Quaternion.identity);
+
+        instantiatedSelectKeybindIndicator.transform.SetParent(optionIndicatorParent, true);
+    }
+
+    private void UpdateSelectKeybindIndicatorPosition()
+    {
+        // Get the position of the currently highlighted button
+        RectTransform buttonRectTransform = instantiatedButtons[selectedOptionIndex].GetComponent<RectTransform>();
+
+        // Calculate the new position
+        Vector3 newPosition = new Vector3(buttonRectTransform.localPosition.x + optionIndicatorOffset, buttonRectTransform.localPosition.y, buttonRectTransform.localPosition.z);
+
+        // Update the position of the existing indicator
+        instantiatedSelectKeybindIndicator.transform.localPosition = newPosition;
+    }
+
+    public void OnButtonHover(int index)
+    {
+        selectedOptionIndex = index;
+        UpdateHighlightedOption();
+    }
+
+    public void OnButtonPressed()
+    {
+        if (selectedOptionIndex >= 0 && selectedOptionIndex < instantiatedButtons.Count)
+        {
+            TMP_Text buttonText = instantiatedButtons[selectedOptionIndex].GetComponentInChildren<TMP_Text>();
+            buttonText.color = pressedColor;
+        }
+    }
+
+    private void DestroyAllIndicatorChildren()
+    {
+        // Destroy children of option indicators
+        foreach (Transform child in optionIndicatorParent)
+        {
+            Destroy(child.gameObject);
+        }
+        foreach (Transform child in switchOptionsIndicatorParent)
+        {
+            Destroy(child.gameObject);
         }
     }
 
@@ -116,7 +318,7 @@ public class DialogueManager : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning("PlayerMovement component not found on Player object.");
+                Debug.LogWarning("PlayerMovement component not found on Player.");
             }
         }
         else
@@ -137,7 +339,7 @@ public class DialogueManager : MonoBehaviour
         nextDialogueIndicatorCanvasGroup.alpha = 0f;
         ClearOptions();
 
-        // Ensure we trigger events from the previous node before moving to the next
+        // Trigger events from the previous node before moving to the next
         if (currentIndex > 0 && currentIndex <= currentDialogueTree.dialogueNodes.Count)
         {
             DialogueNode previousNode = currentDialogueTree.dialogueNodes[currentIndex - 1];
@@ -184,7 +386,7 @@ public class DialogueManager : MonoBehaviour
             }
             if (playerHands != null)
             {
-                // Enable all GameObjects in the playerHands array
+                // Enable all game objects in the playerHands array
                 foreach (GameObject hand in playerHands)
                 {
                     hand.SetActive(true);
@@ -200,12 +402,26 @@ public class DialogueManager : MonoBehaviour
             StopCoroutine(scrollingCoroutine);
         }
 
-        scrollingCoroutine = StartCoroutine(ScrollText(node.dialogueText));
+        // THIS IS OLD COROUTINE, KEEPING IN CASE: scrollingCoroutine = StartCoroutine(ScrollText(node.dialogueText));
 
-        if (npcNameUI != null)
+        scrollingCoroutine = StartCoroutine(ScrollText(node));
+
+        // Apply the NPC name colour
+        if (ColorUtility.TryParseHtmlString(npcNameColorHex, out Color npcColor))
+        {
+            dialogueTextUI.color = npcColor;
+        }
+
+        // Apply the dialogue text colour
+        if (ColorUtility.TryParseHtmlString(dialogueTextColorHex, out Color textColor))
+        {
+            dialogueTextUI.color = textColor;
+        }
+
+        /*if (npcNameUI != null)
         {
             npcNameUI.text = node.npcName;
-        }
+        }*/
 
         if (currentDialogueEvent.isValid())
         {
@@ -222,13 +438,13 @@ public class DialogueManager : MonoBehaviour
         // Trigger the camera look at the NPC if npcTag is provided
         TriggerCameraLookAtNpc(node);
 
-        //foreach (var eventId in node.eventIds)
-        //{
-        //    if (!string.IsNullOrEmpty(eventId))
-        //    {
-        //        DialogueEventManager.Instance?.TriggerDialogueEvent(eventId);
-        //    }
-        //}
+        /*foreach (var eventId in node.eventIds)
+        {
+            if (!string.IsNullOrEmpty(eventId))
+            {
+                DialogueEventManager.Instance?.TriggerDialogueEvent(eventId);
+            }
+        }*/
     }
 
     private void TriggerCameraLookAtNpc(DialogueNode node)
@@ -260,7 +476,7 @@ public class DialogueManager : MonoBehaviour
                     }
                 }
 
-                // If we found the closest NPC, start the camera smooth look-at
+                // If closest NPC found, start the look at NPC process
                 if (closestNpc != null)
                 {
                     StartCoroutine(SmoothLookAtNpc(closestNpc));
@@ -316,19 +532,59 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    private IEnumerator ScrollText(string fullText)
+    private IEnumerator ScrollText(DialogueNode node)
     {
         isTextScrolling = true;
-        dialogueTextUI.text = "";
+        dialogueTextUI.text = ""; // Clear the text field
 
-        for (int i = 0; i < fullText.Length; i++)
+        string fullTextWithRichText = $"<color={npcNameColorHex}>{node.npcName}:</color> {node.dialogueText}";
+
+        // For counting characters in text
+        string rawFullText = $"{node.npcName}: {node.dialogueText}";
+
+        // Set text and force update for TMP calculations
+        dialogueTextUI.text = fullTextWithRichText;
+        dialogueTextUI.ForceMeshUpdate();
+
+        if (dialogueTextUI.textInfo.lineCount == 1) // Only center single-line text
         {
-            dialogueTextUI.text += fullText[i];
+            TMP_TextInfo textInfo = dialogueTextUI.textInfo;
+            int totalChars = rawFullText.Length + 2; // Add 2 extra characters
+
+            if (totalChars > 0)
+            {
+                int middleIndex = totalChars / 2; // Get middle character index
+
+                // Ensure middle index is valid within TMP's character count
+                middleIndex = Mathf.Clamp(middleIndex, 0, textInfo.characterCount - 1);
+
+                // Get the x-position of the middle character
+                float middleCharX = textInfo.characterInfo[middleIndex].origin;
+
+                // Apply position adjustment to center the middle character at x = 0
+                RectTransform rt = dialogueTextUI.GetComponent<RectTransform>();
+                rt.localPosition = new Vector3(-middleCharX, rt.localPosition.y, rt.localPosition.z);
+            }
+        }
+        else
+        {
+            // Reset position for multi-line text
+            RectTransform rt = dialogueTextUI.GetComponent<RectTransform>();
+            rt.localPosition = new Vector3(0, rt.localPosition.y, rt.localPosition.z);
+        }
+
+        // Scroll the dialogue text
+        for (int i = 0; i < node.dialogueText.Length; i++)
+        {
+            dialogueTextUI.text = $"<color={npcNameColorHex}>{node.npcName}:</color> {node.dialogueText.Substring(0, i + 1)}";
             yield return new WaitForSeconds(0.05f);
         }
 
+        // After scrolling, display the full formatted text
+        dialogueTextUI.text = fullTextWithRichText;
+
         isTextScrolling = false;
-        isFullTextShown = true; // Text is fully shown now
+        isFullTextShown = true;
         ShowOptions(currentDialogueTree.dialogueNodes[currentIndex - 1]);
     }
 
@@ -389,8 +645,16 @@ public class DialogueManager : MonoBehaviour
                 instantiatedButtons.Add(buttonObj);
             }
 
-            Cursor.visible = true;
-            Cursor.lockState = CursorLockMode.None;
+            GameObject indicator = Instantiate(scrollWheelIndicatorPrefab, Vector3.zero, Quaternion.identity);
+
+            indicator.transform.SetParent(switchOptionsIndicatorParent, false);
+
+            indicator.transform.localPosition = Vector3.zero;
+
+            UpdateHighlightedOption();
+
+            /*Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;*/
         }
     }
 
@@ -402,8 +666,8 @@ public class DialogueManager : MonoBehaviour
         }
         instantiatedButtons.Clear();
 
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
+        /*Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;*/
 
         optionsAreVisible = false;
     }

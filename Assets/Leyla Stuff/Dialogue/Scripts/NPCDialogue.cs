@@ -4,14 +4,19 @@ using System.Collections.Generic;
 
 public class NPCDialogue : MonoBehaviour
 {
+    [Header("Dialogue Settings")]
     [SerializeField] private DialogueTree npcDialogueTree; // NPC's dialogue tree reference
-    [SerializeField] private KeyCode interactKey = KeyCode.E; // Interaction key
-    [SerializeField] private bool playerInRange = false; // Is player in range?
     [SerializeField] private string dialogueKey = "DialogueTriggered";
-    private bool isDialoguePressed;
 
+    [Header("Testing Purposes")]
+    [SerializeField] private bool playerInRange = false; // Is player in range?
+    [SerializeField] private bool isDialoguePressed;
+
+    [Header("Keybinds")]
+    [SerializeField] private KeyCode interactKey = KeyCode.E; // Interaction key
     [SerializeField] private KeyCode clearPlayerPrefs = KeyCode.C;
     [SerializeField] private GameObject interactTextPrefab; // Prefab for interaction text
+
     private GameObject interactTextInstance; // Reference to instantiated text
 
     private Transform player; // Reference to the player's transform

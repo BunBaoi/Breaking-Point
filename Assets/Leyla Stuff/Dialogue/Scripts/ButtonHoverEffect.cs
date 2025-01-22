@@ -6,11 +6,13 @@ public class ButtonHoverEffect : MonoBehaviour, IPointerEnterHandler, IPointerEx
 {
     private Vector3 originalScale;
     private TextMeshProUGUI buttonText;
-    private Color originalColor;
+    public Color originalColor;
 
     [SerializeField] private float hoverScaleMultiplier = 1.2f;  // Scale multiplier when hovering
-    [SerializeField] private Color hoverColor;                   // Color when hovering
-    [SerializeField] private Color pressedColor;                 // Color when pressing
+    public Color hoverColor;                   // Color when hovering
+    public Color pressedColor;                 // Color when pressing
+
+    public bool isHovered = false;
 
     void Start()
     {
@@ -26,12 +28,17 @@ public class ButtonHoverEffect : MonoBehaviour, IPointerEnterHandler, IPointerEx
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        // Change scale and text color on hover
-        transform.localScale = originalScale * hoverScaleMultiplier;
-
-        if (buttonText != null)
+        if (!isHovered)  // Only apply scale if not already scaled
         {
-            buttonText.color = hoverColor;
+            // Change scale and text color on hover
+            transform.localScale = originalScale * hoverScaleMultiplier;
+
+            if (buttonText != null)
+            {
+                buttonText.color = hoverColor;
+            }
+
+            isHovered = true;
         }
     }
 
@@ -44,6 +51,8 @@ public class ButtonHoverEffect : MonoBehaviour, IPointerEnterHandler, IPointerEx
         {
             buttonText.color = originalColor;
         }
+
+        isHovered = false;
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -64,4 +73,5 @@ public class ButtonHoverEffect : MonoBehaviour, IPointerEnterHandler, IPointerEx
         }
     }
 }
+
 
