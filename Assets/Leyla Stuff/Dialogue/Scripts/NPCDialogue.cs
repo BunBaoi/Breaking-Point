@@ -82,11 +82,11 @@ public class NPCDialogue : MonoBehaviour
                         // If the sprite exists, display it next to the text
                         if (icon != null)
                         {
-                            // Create a GameObject for the sprite and set it next to the text
+                            // Create a object for the sprite and set it next to the text
                             GameObject iconObject = new GameObject("KeybindIcon");
                             iconObject.transform.SetParent(interactTextInstance.transform); // Make it a child of the text
 
-                            // Position the sprite to the left of the text and adjust the Y-axis to 0.7
+                            // Position sprite to left of text
                             // Increase the horizontal space by adjusting the x-position further
                             float horizontalOffset = -textMesh.preferredWidth / 2 - 0.3f; // Increased offset to add more space
                             iconObject.transform.localPosition = new Vector3(horizontalOffset, 0.7f, 0);

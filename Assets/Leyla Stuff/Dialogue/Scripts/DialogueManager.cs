@@ -32,10 +32,6 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private Transform optionIndicatorParent;
     [SerializeField] private Transform switchOptionsIndicatorParent;
     [SerializeField] private float optionIndicatorOffset = 0f;
-    [SerializeField] private bool hasScrolled = false;
-    [SerializeField] private float lastScrollTime = 0f;  // Track the time of the last scroll action
-    [SerializeField] private float scrollCooldown = 0.3f;  // Cooldown duration
-    [SerializeField] private bool canScroll = true;  // Flag to control scrolling behavior
 
     private bool isOptionKeyPressed = false;
 
@@ -43,11 +39,13 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private InputActionAsset inputActions;
     [SerializeField] private string advanceDialogueName = "Advance Dialogue";
     [SerializeField] private string selectOptionName = "Select Option";
-    // [SerializeField] private string scrollUpName = "Scroll Up";
-    // [SerializeField] private string scrollDownName = "Scroll Down";
     [SerializeField] private string scrollName = "Scroll";
-    // public KeyCode advanceKey = KeyCode.Mouse0;
-    // [SerializeField] private KeyCode selectOptionKey = KeyCode.F;
+
+    // OLD KEYBINDS
+    /* [SerializeField] private string scrollUpName = "Scroll Up";
+    // [SerializeField] private string scrollDownName = "Scroll Down";*/
+    /* public KeyCode advanceKey = KeyCode.Mouse0;
+    [SerializeField] private KeyCode selectOptionKey = KeyCode.F;*/
 
     private InputAction advanceDialogue;
     private InputAction selectOption;
@@ -92,8 +90,6 @@ public class DialogueManager : MonoBehaviour
         // Find the action dynamically using the interactActionName string
         advanceDialogue = inputActions.FindAction(advanceDialogueName);
         selectOption = inputActions.FindAction(selectOptionName);
-        /*scrollUp = inputActions.FindAction(scrollUpName);
-        scrollDown = inputActions.FindAction(scrollDownName);*/
         scroll = inputActions.FindAction(scrollName);
 
         if (advanceDialogue != null)
@@ -112,22 +108,6 @@ public class DialogueManager : MonoBehaviour
         {
             Debug.LogError($"Input action '{selectOptionName}' not found in Input Action Asset!");
         }
-        /*if (scrollUp != null)
-        {
-            scrollUp.Enable(); // Enable the action
-        }
-        else
-        {
-            Debug.LogError($"Input action '{scrollUpName}' not found in Input Action Asset!");
-        }
-        if (scrollDown != null)
-        {
-            scrollDown.Enable(); // Enable the action
-        }
-        else
-        {
-            Debug.LogError($"Input action '{scrollDownName}' not found in Input Action Asset!");
-        }*/
         if (scroll != null)
         {
             scroll.Enable(); // Enable the action
@@ -178,6 +158,10 @@ public class DialogueManager : MonoBehaviour
         if (optionsAreVisible)
         {
             HandleOptionSelection();
+            if (!isOptionKeyPressed)
+                {
+                UpdateSelectOptionIndicatorPosition();
+            }
         }
         if (!optionsAreVisible)
         {
@@ -234,11 +218,9 @@ public class DialogueManager : MonoBehaviour
         KeyBinding binding = KeyBindingManager.Instance.GetKeybinding(selectOptionName);
         if (binding == null) return;
 
-        // Get the Image component from the instantiated indicator
         Image indicatorImage = instantiatedSelectOptionIndicator.GetComponent<Image>();
         if (indicatorImage == null) return;
 
-        // Choose the correct sprite based on input device
         indicatorImage.sprite = KeyBindingManager.Instance.IsUsingController() ?
                                 binding.controllerSprite : binding.keySprite;
     }
@@ -315,10 +297,10 @@ public class DialogueManager : MonoBehaviour
                 {
                     buttonText.color = hoverColor;
 
-                    // Scale the button when it is highlighted
+                    // Scale the button when hovered
                     buttonRectTransform.localScale = Vector3.one * hoverScaleMultiplier;
 
-                    // Instantiate the select keybind indicator when the option is highlighted (hovered)
+                    // Instantiate the select option indicator when the option is hovered
                     if (instantiatedSelectOptionIndicator == null)  // Only instantiate if not already done
                     {
                         InstantiateSelectOptionIndicator();
@@ -329,7 +311,7 @@ public class DialogueManager : MonoBehaviour
                         UpdateSelectOptionIndicatorPosition();
                     }
                 }
-                else  // If the key is pressed, use pressed color
+                else  // If the key is pressed, use pressed colour
                 {
                     buttonText.color = pressedColor;
                     buttonRectTransform.localScale = Vector3.one * hoverScaleMultiplier; // Maintain scale when pressed
@@ -373,6 +355,13 @@ public class DialogueManager : MonoBehaviour
 
     private void UpdateSelectOptionIndicatorPosition()
     {
+        // Check if the selectedOptionIndex is within the valid range
+        if (selectedOptionIndex < 0 || selectedOptionIndex >= instantiatedButtons.Count)
+        {
+            // Debug.LogError($"Selected option index {selectedOptionIndex} is out of range. Valid range is 0 to {instantiatedButtons.Count - 1}.");
+            return; // Exit the method if the index is invalid
+        }
+
         // Get the position of the currently highlighted button
         RectTransform buttonRectTransform = instantiatedButtons[selectedOptionIndex].GetComponent<RectTransform>();
 
@@ -784,6 +773,7 @@ public class DialogueManager : MonoBehaviour
             // **Ensure the first option is highlighted**
             selectedOptionIndex = 0;
             UpdateHighlightedOption();
+            UpdateSelectOptionIndicatorPosition();
 
             /*Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;*/
