@@ -59,15 +59,20 @@ MonoBehaviour:
   pressedColor: {r: 0.32156864, g: 0.2509804, b: 0.40392157, a: 1}
   hoverScaleMultiplier: 1.2
   optionIndicatorParent: {fileID: 0}
+  switchOptionsIndicatorParent: {fileID: 0}
   optionIndicatorOffset: -20
   hasScrolled: 0
   lastScrollTime: 0
   scrollCooldown: 0.8
   canScroll: 1
-  advanceKey: 323
-  selectOptionKey: 102
-  scrollWheelIndicatorPrefab: {fileID: 7772815416724902588, guid: eb7c8cae4bfbd4df7be293910d1aa1ef, type: 3}
-  selectKeybindIndicatorPrefab: {fileID: 7772815416724902588, guid: eb7c8cae4bfbd4df7be293910d1aa1ef, type: 3}
+  inputActions: {fileID: -944628639613478452, guid: 5ec57af691e024f5495721c1aec07891, type: 3}
+  advanceDialogueName: Advance Dialogue
+  selectOptionName: Select Option
+  scrollUpName: Scroll Up
+  scrollDownName: Scroll Down
+  scrollName: Scroll
+  scrollIndicatorPrefab: {fileID: 7772815416724902588, guid: eb7c8cae4bfbd4df7be293910d1aa1ef, type: 3}
+  selectOptionIndicatorPrefab: {fileID: 7772815416724902588, guid: eb7c8cae4bfbd4df7be293910d1aa1ef, type: 3}
   isTextScrolling: 0
   isFullTextShown: 0
   optionsAreVisible: 0

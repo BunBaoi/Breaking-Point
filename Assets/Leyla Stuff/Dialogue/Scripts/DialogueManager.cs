@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using FMODUnity;
+using UnityEngine.InputSystem;
 
 public class DialogueManager : MonoBehaviour
 {
@@ -39,14 +40,26 @@ public class DialogueManager : MonoBehaviour
     private bool isOptionKeyPressed = false;
 
     [Header("Keybinds")]
-    public KeyCode advanceKey = KeyCode.Mouse0;
-    [SerializeField] private KeyCode selectOptionKey = KeyCode.F;
+    [SerializeField] private InputActionAsset inputActions;
+    [SerializeField] private string advanceDialogueName = "Advance Dialogue";
+    [SerializeField] private string selectOptionName = "Select Option";
+    // [SerializeField] private string scrollUpName = "Scroll Up";
+    // [SerializeField] private string scrollDownName = "Scroll Down";
+    [SerializeField] private string scrollName = "Scroll";
+    // public KeyCode advanceKey = KeyCode.Mouse0;
+    // [SerializeField] private KeyCode selectOptionKey = KeyCode.F;
+
+    private InputAction advanceDialogue;
+    private InputAction selectOption;
+    private InputAction scrollUp;
+    private InputAction scrollDown;
+    private InputAction scroll;
 
     private int selectedOptionIndex = 0;
-    [SerializeField] private GameObject scrollWheelIndicatorPrefab;
-    [SerializeField] private GameObject selectKeybindIndicatorPrefab;
-    private GameObject instantiatedScrollWheelIndicator;
-    private GameObject instantiatedSelectKeybindIndicator;
+    [SerializeField] private GameObject scrollIndicatorPrefab;
+    [SerializeField] private GameObject selectOptionIndicatorPrefab;
+    private GameObject instantiatedScrollIndicator;
+    private GameObject instantiatedSelectOptionIndicator;
 
     [Header("Testing Purposes")]
     [SerializeField] private bool isTextScrolling = false;
@@ -76,6 +89,53 @@ public class DialogueManager : MonoBehaviour
 
     private void Awake()
     {
+        // Find the action dynamically using the interactActionName string
+        advanceDialogue = inputActions.FindAction(advanceDialogueName);
+        selectOption = inputActions.FindAction(selectOptionName);
+        /*scrollUp = inputActions.FindAction(scrollUpName);
+        scrollDown = inputActions.FindAction(scrollDownName);*/
+        scroll = inputActions.FindAction(scrollName);
+
+        if (advanceDialogue != null)
+        {
+            advanceDialogue.Enable(); // Enable the action
+        }
+        else
+        {
+            Debug.LogError($"Input action '{advanceDialogueName}' not found in Input Action Asset!");
+        }
+        if (selectOption != null)
+        {
+            selectOption.Enable(); // Enable the action
+        }
+        else
+        {
+            Debug.LogError($"Input action '{selectOptionName}' not found in Input Action Asset!");
+        }
+        /*if (scrollUp != null)
+        {
+            scrollUp.Enable(); // Enable the action
+        }
+        else
+        {
+            Debug.LogError($"Input action '{scrollUpName}' not found in Input Action Asset!");
+        }
+        if (scrollDown != null)
+        {
+            scrollDown.Enable(); // Enable the action
+        }
+        else
+        {
+            Debug.LogError($"Input action '{scrollDownName}' not found in Input Action Asset!");
+        }*/
+        if (scroll != null)
+        {
+            scroll.Enable(); // Enable the action
+        }
+        else
+        {
+            Debug.LogError($"Input action '{scrollName}' not found in Input Action Asset!");
+        }
         if (Instance == null)
         {
             Instance = this;
@@ -104,7 +164,7 @@ public class DialogueManager : MonoBehaviour
         }
         if (!optionsAreVisible)
         {
-            if (Input.GetKeyDown(advanceKey) && isDialogueActive)
+            if (advanceDialogue.WasPressedThisFrame() && isDialogueActive)
             {
                 if (isTextScrolling)
                 {
@@ -122,70 +182,102 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
+    private void UpdateAdvanceDialogueIndicatorSprite()
+    {
+        if (KeyBindingManager.Instance == null) return;
+
+        KeyBinding binding = KeyBindingManager.Instance.GetKeybinding(advanceDialogueName);
+        if (binding == null) return;
+
+        // Choose the correct sprite based on input device
+        nextDialogueIndicatorImage.sprite = KeyBindingManager.Instance.IsUsingController() ?
+                                            binding.controllerSprite : binding.keySprite;
+    }
+
+    private void UpdateScrollIndicatorSprite()
+    {
+        if (KeyBindingManager.Instance == null || instantiatedScrollIndicator == null) return;
+
+        KeyBinding binding = KeyBindingManager.Instance.GetKeybinding(scrollName);
+        if (binding == null) return;
+
+        // Get the Image component from the instantiated indicator
+        Image indicatorImage = instantiatedScrollIndicator.GetComponent<Image>();
+        if (indicatorImage == null) return;
+
+        // Choose the correct sprite based on input device
+        indicatorImage.sprite = KeyBindingManager.Instance.IsUsingController() ?
+                                binding.controllerSprite : binding.keySprite;
+    }
+
+    private void UpdateSelectOptionIndicatorSprite()
+    {
+        if (KeyBindingManager.Instance == null || instantiatedSelectOptionIndicator == null) return;
+
+        KeyBinding binding = KeyBindingManager.Instance.GetKeybinding(selectOptionName);
+        if (binding == null) return;
+
+        // Get the Image component from the instantiated indicator
+        Image indicatorImage = instantiatedSelectOptionIndicator.GetComponent<Image>();
+        if (indicatorImage == null) return;
+
+        // Choose the correct sprite based on input device
+        indicatorImage.sprite = KeyBindingManager.Instance.IsUsingController() ?
+                                binding.controllerSprite : binding.keySprite;
+    }
+
     private void HandleOptionSelection()
     {
         if (instantiatedButtons.Count == 0) return;
 
-        float scroll = Input.GetAxis("Mouse ScrollWheel");
+        int previousIndex = selectedOptionIndex; // Store previous index for debugging
 
-        // Debug.Log("Scroll value: " + scroll);
+        // --- Read Axis-Based Scroll Input ---
+        float scrollValue = scroll.ReadValue<float>(); // Use float for single-axis input
 
-        // Use a threshold to ensure only meaningful scroll actions are detected
-        float scrollThreshold = 0.1f;
-
-        // Check if scroll input is detected and cooldown has passed
-        if (Mathf.Abs(scroll) >= scrollThreshold && canScroll)  // If the scroll value exceeds the threshold
+        if (Mathf.Abs(scrollValue) > 0.1f) // Deadzone threshold
         {
-            canScroll = false;  // Disable further scrolling until cooldown has passed
-            lastScrollTime = Time.time;  // Record the time of this scroll action
-
-            // Handle scroll direction
-            if (scroll > 0f)  // Scroll up
+            if (scrollValue > 0) // Scroll Up
             {
-                selectedOptionIndex = (selectedOptionIndex - 1 + instantiatedButtons.Count) % instantiatedButtons.Count;
-                UpdateHighlightedOption();
+                if (selectedOptionIndex > 0)
+                {
+                    selectedOptionIndex--;
+                    Debug.Log($"Scroll Up! New Index: {selectedOptionIndex}");
+                    UpdateHighlightedOption();
+                }
             }
-            else if (scroll < 0f)  // Scroll down
+            else if (scrollValue < 0) // Scroll Down
             {
-                selectedOptionIndex = (selectedOptionIndex + 1) % instantiatedButtons.Count;
-                UpdateHighlightedOption();
-            }
-        }
-        else
-        {
-            // If no scroll input is detected or cooldown period hasn't passed, reset scroll value
-            if (Mathf.Abs(scroll) < scrollThreshold)
-            {
-                scroll = 0f;  // Explicitly reset the scroll value to zero if no scroll input
+                if (selectedOptionIndex < instantiatedButtons.Count - 1)
+                {
+                    selectedOptionIndex++;
+                    Debug.Log($"Scroll Down! New Index: {selectedOptionIndex}");
+                    UpdateHighlightedOption();
+                }
             }
         }
 
-        // Check if cooldown is finished, allow scrolling again
-        if (!canScroll && Time.time - lastScrollTime >= scrollCooldown)
+        // --- FIXED BUTTON PRESS DETECTION ---
+        if (selectOption.WasPressedThisFrame())
         {
-            canScroll = true;  // Allow scroll again after cooldown
-        }
-
-        // Detect key press for selecting option
-        if (Input.GetKeyDown(selectOptionKey))
-        {
-            isOptionKeyPressed = true;  // Track key press
+            isOptionKeyPressed = true;
             TMP_Text buttonText = instantiatedButtons[selectedOptionIndex].GetComponentInChildren<TMP_Text>();
             buttonText.color = pressedColor;
 
-            // Instantiate select keybind indicator
-            InstantiateSelectKeybindIndicator();
+            InstantiateSelectOptionIndicator();
         }
-        else if (Input.GetKeyUp(selectOptionKey) && isOptionKeyPressed)
-        {
-            // Trigger selection only when key is released
-            instantiatedButtons[selectedOptionIndex].GetComponent<Button>().onClick.Invoke();
-            isOptionKeyPressed = false;  // Reset press state
 
-            // Destroy all indicator children after selection
+        if (isOptionKeyPressed && selectOption.WasReleasedThisFrame())
+        {
+            if (selectedOptionIndex >= 0 && selectedOptionIndex < instantiatedButtons.Count)
+            {
+                instantiatedButtons[selectedOptionIndex].GetComponent<Button>().onClick.Invoke();
+            }
+
+            isOptionKeyPressed = false;
+
             DestroyAllIndicatorChildren();
 
-            // Reset button colour to hoverColor or original color
             UpdateHighlightedOption();
         }
     }
@@ -210,14 +302,14 @@ public class DialogueManager : MonoBehaviour
                     buttonRectTransform.localScale = Vector3.one * hoverScaleMultiplier;
 
                     // Instantiate the select keybind indicator when the option is highlighted (hovered)
-                    if (instantiatedSelectKeybindIndicator == null)  // Only instantiate if not already done
+                    if (instantiatedSelectOptionIndicator == null)  // Only instantiate if not already done
                     {
-                        InstantiateSelectKeybindIndicator();
+                        InstantiateSelectOptionIndicator();
                     }
                     else
                     {
                         // Update the indicator's position if it already exists
-                        UpdateSelectKeybindIndicatorPosition();
+                        UpdateSelectOptionIndicatorPosition();
                     }
                 }
                 else  // If the key is pressed, use pressed color
@@ -236,18 +328,33 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    private void InstantiateSelectKeybindIndicator()
+    private void InstantiateSelectOptionIndicator()
     {
+        // Destroy the previous indicator if it exists
+        if (instantiatedSelectOptionIndicator != null)
+        {
+            Destroy(instantiatedSelectOptionIndicator);
+        }
+
         RectTransform buttonRectTransform = instantiatedButtons[selectedOptionIndex].GetComponent<RectTransform>();
 
-        Vector3 indicatorPosition = new Vector3(buttonRectTransform.localPosition.x + optionIndicatorOffset, buttonRectTransform.localPosition.y, buttonRectTransform.localPosition.z);
+        Vector3 indicatorPosition = new Vector3(
+            buttonRectTransform.localPosition.x + optionIndicatorOffset,
+            buttonRectTransform.localPosition.y,
+            buttonRectTransform.localPosition.z
+        );
 
-        instantiatedSelectKeybindIndicator = Instantiate(selectKeybindIndicatorPrefab, indicatorPosition, Quaternion.identity);
+        // Instantiate the indicator prefab
+        instantiatedSelectOptionIndicator = Instantiate(selectOptionIndicatorPrefab, indicatorPosition, Quaternion.identity);
 
-        instantiatedSelectKeybindIndicator.transform.SetParent(optionIndicatorParent, true);
+        // Set its parent
+        instantiatedSelectOptionIndicator.transform.SetParent(optionIndicatorParent, true);
+
+        // Set the correct sprite based on input device
+        UpdateSelectOptionIndicatorSprite();
     }
 
-    private void UpdateSelectKeybindIndicatorPosition()
+    private void UpdateSelectOptionIndicatorPosition()
     {
         // Get the position of the currently highlighted button
         RectTransform buttonRectTransform = instantiatedButtons[selectedOptionIndex].GetComponent<RectTransform>();
@@ -256,7 +363,7 @@ public class DialogueManager : MonoBehaviour
         Vector3 newPosition = new Vector3(buttonRectTransform.localPosition.x + optionIndicatorOffset, buttonRectTransform.localPosition.y, buttonRectTransform.localPosition.z);
 
         // Update the position of the existing indicator
-        instantiatedSelectKeybindIndicator.transform.localPosition = newPosition;
+        instantiatedSelectOptionIndicator.transform.localPosition = newPosition;
     }
 
     public void OnButtonHover(int index)
@@ -593,6 +700,8 @@ public class DialogueManager : MonoBehaviour
         nextDialogueIndicatorCanvasGroup.alpha = 1f;
         nextDialogueIndicatorImage.gameObject.SetActive(true);
 
+        UpdateAdvanceDialogueIndicatorSprite();
+
         while (true) // Infinite loop until coroutine is stopped
         {
             yield return FadeCanvasGroup(nextDialogueIndicatorCanvasGroup, 1f, 0f, 1f); // Fade out
@@ -645,12 +754,18 @@ public class DialogueManager : MonoBehaviour
                 instantiatedButtons.Add(buttonObj);
             }
 
-            GameObject indicator = Instantiate(scrollWheelIndicatorPrefab, Vector3.zero, Quaternion.identity);
+            GameObject indicator = Instantiate(scrollIndicatorPrefab, Vector3.zero, Quaternion.identity);
 
             indicator.transform.SetParent(switchOptionsIndicatorParent, false);
 
             indicator.transform.localPosition = Vector3.zero;
 
+            instantiatedScrollIndicator = indicator;
+
+            UpdateScrollIndicatorSprite();
+
+            // **Ensure the first option is highlighted**
+            selectedOptionIndex = 0;
             UpdateHighlightedOption();
 
             /*Cursor.visible = true;

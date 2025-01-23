@@ -12,6 +12,8 @@ public class KeyBindingManager : MonoBehaviour
 
     private string lastDeviceUsed = "Keyboard"; // Default to keyboard
 
+    public static event System.Action OnInputDeviceChanged;
+
     private void Awake()
     {
         if (Instance == null)
@@ -24,6 +26,15 @@ public class KeyBindingManager : MonoBehaviour
     {
         // Detect the last button pressed
         DetectLastInputDevice();
+
+        string previousDevice = lastDeviceUsed;
+        DetectLastInputDevice();
+
+        if (previousDevice != lastDeviceUsed)
+        {
+            OnInputDeviceChanged?.Invoke(); // Notify listeners (like UI elements) of the change
+        }
+
         var gamepad = Gamepad.current;
         if (gamepad != null)
         {
