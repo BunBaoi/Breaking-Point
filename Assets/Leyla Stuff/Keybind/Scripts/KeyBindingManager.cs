@@ -10,9 +10,11 @@ public class KeyBindingManager : MonoBehaviour
     [SerializeField] private KeyBindingData keyBindingData;
     public InputActionAsset inputActionAsset;
 
-    private string lastDeviceUsed = "Keyboard"; // Default to keyboard
+    private string lastDeviceUsed = "Keyboard & Mouse"; // Default to keyboard & mouse
 
     public static event System.Action OnInputDeviceChanged;
+
+    private Vector2 lastMousePosition;
 
     private void Awake()
     {
@@ -47,9 +49,13 @@ public class KeyBindingManager : MonoBehaviour
         {
             Debug.Log("Controller is detected and in use.");
         }
+        else if (lastDeviceUsed == "Keyboard & Mouse")
+        {
+            Debug.Log("Keyboard & Mouse are in use.");
+        }
         else
         {
-            Debug.Log("Keyboard is in use.");
+            Debug.Log("Unknown device in use.");
         }
     }
 
@@ -106,10 +112,18 @@ public class KeyBindingManager : MonoBehaviour
         {
             lastDeviceUsed = "Gamepad";
         }
-        // Detect if a keyboard key is pressed
-        else if (Keyboard.current != null && Keyboard.current.allControls.OfType<ButtonControl>().Any(control => control.wasPressedThisFrame))
+        // Detect if a keyboard key is pressed or mouse movement or any mouse button is pressed
+        else if ((Keyboard.current != null && Keyboard.current.allControls.OfType<ButtonControl>().Any(control => control.wasPressedThisFrame)) ||
+                 (Mouse.current != null && (
+                     Mouse.current.position.ReadValue() != lastMousePosition ||  // Detect mouse movement
+                     Mouse.current.leftButton.wasPressedThisFrame ||         // Detect left mouse button press
+                     Mouse.current.rightButton.wasPressedThisFrame ||        // Detect right mouse button press
+                     Mouse.current.middleButton.wasPressedThisFrame ||       // Detect middle mouse button press
+                     Mouse.current.forwardButton.wasPressedThisFrame ||            // Detect button 4 press
+                     Mouse.current.backButton.wasPressedThisFrame)))            // Detect button 5 press
         {
-            lastDeviceUsed = "Keyboard";
+            lastMousePosition = Mouse.current.position.ReadValue(); // Update last mouse position
+            lastDeviceUsed = "Keyboard & Mouse";
         }
 
         // If the device changed, trigger event
@@ -119,4 +133,3 @@ public class KeyBindingManager : MonoBehaviour
         }
     }
 }
-
