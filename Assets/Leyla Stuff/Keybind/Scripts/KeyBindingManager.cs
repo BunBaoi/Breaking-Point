@@ -24,9 +24,6 @@ public class KeyBindingManager : MonoBehaviour
 
     private void Update()
     {
-        // Detect the last button pressed
-        DetectLastInputDevice();
-
         string previousDevice = lastDeviceUsed;
         DetectLastInputDevice();
 
@@ -102,16 +99,23 @@ public class KeyBindingManager : MonoBehaviour
 
     private void DetectLastInputDevice()
     {
-        // Detect if the controller is being used
+        string previousDevice = lastDeviceUsed; // Store the previous device used
+
+        // Detect if a controller button is pressed
         if (Gamepad.current != null && Gamepad.current.allControls.OfType<ButtonControl>().Any(control => control.wasPressedThisFrame))
         {
-            lastDeviceUsed = "Gamepad";  // Update to Gamepad if any button was pressed
+            lastDeviceUsed = "Gamepad";
+        }
+        // Detect if a keyboard key is pressed
+        else if (Keyboard.current != null && Keyboard.current.allControls.OfType<ButtonControl>().Any(control => control.wasPressedThisFrame))
+        {
+            lastDeviceUsed = "Keyboard";
         }
 
-        // Detect if the keyboard is being used
-        if (Keyboard.current != null && Keyboard.current.allControls.OfType<ButtonControl>().Any(control => control.wasPressedThisFrame))
+        // If the device changed, trigger event
+        if (previousDevice != lastDeviceUsed)
         {
-            lastDeviceUsed = "Keyboard";  // Update to Keyboard if any key was pressed
+            OnInputDeviceChanged?.Invoke();
         }
     }
 }
