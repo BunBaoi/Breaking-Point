@@ -112,15 +112,16 @@ public class KeyBindingManager : MonoBehaviour
         {
             lastDeviceUsed = "Gamepad";
         }
-        // Detect if a keyboard key is pressed or mouse movement or any mouse button is pressed
+        // Detect if a keyboard key is pressed, mouse movement, mouse buttons, or mouse scroll
         else if ((Keyboard.current != null && Keyboard.current.allControls.OfType<ButtonControl>().Any(control => control.wasPressedThisFrame)) ||
                  (Mouse.current != null && (
                      Mouse.current.position.ReadValue() != lastMousePosition ||  // Detect mouse movement
                      Mouse.current.leftButton.wasPressedThisFrame ||         // Detect left mouse button press
                      Mouse.current.rightButton.wasPressedThisFrame ||        // Detect right mouse button press
                      Mouse.current.middleButton.wasPressedThisFrame ||       // Detect middle mouse button press
-                     Mouse.current.forwardButton.wasPressedThisFrame ||            // Detect button 4 press
-                     Mouse.current.backButton.wasPressedThisFrame)))            // Detect button 5 press
+                     Mouse.current.forwardButton.wasPressedThisFrame ||      // Detect button 4 press
+                     Mouse.current.backButton.wasPressedThisFrame ||         // Detect button 5 press
+                     Mouse.current.scroll.ReadValue().y != 0)))              // Detect mouse scroll movement (Y-axis)
         {
             lastMousePosition = Mouse.current.position.ReadValue(); // Update last mouse position
             lastDeviceUsed = "Keyboard & Mouse";
