@@ -1510,7 +1510,8 @@ MonoBehaviour:
   dialogueKey: OliverStartDialogue
   playerInRange: 0
   isDialoguePressed: 0
-  interactKey: 101
+  inputActions: {fileID: -944628639613478452, guid: 5ec57af691e024f5495721c1aec07891, type: 3}
+  interactActionName: Interact
   clearPlayerPrefs: 99
   interactTextPrefab: {fileID: 95194169440117963, guid: 15891119156aa4ae388994054e96a4c5, type: 3}
   requiredBoolKeysTrue:
@@ -1700,7 +1701,8 @@ MonoBehaviour:
   dialogueKey: TenzingStartDialogue
   playerInRange: 0
   isDialoguePressed: 0
-  interactKey: 101
+  inputActions: {fileID: -944628639613478452, guid: 5ec57af691e024f5495721c1aec07891, type: 3}
+  interactActionName: Interact
   clearPlayerPrefs: 99
   interactTextPrefab: {fileID: 95194169440117963, guid: 15891119156aa4ae388994054e96a4c5, type: 3}
   requiredBoolKeysTrue:
@@ -2819,6 +2821,68 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1751339099}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1790242222
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1790242225}
+  - component: {fileID: 1790242224}
+  - component: {fileID: 1790242223}
+  m_Layer: 0
+  m_Name: Keybind Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1790242223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1790242222}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 871e66dd410fa42969a886853d742cbd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actionName: 
+  keyImage: {fileID: 0}
+  actionText: {fileID: 0}
+--- !u!114 &1790242224
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1790242222}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77913ef320bf0477c8693704b05bd5b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  keyBindingData: {fileID: 11400000, guid: 28b02da58bee84e899682eb06fb44af1, type: 2}
+  inputActionAsset: {fileID: -944628639613478452, guid: 5ec57af691e024f5495721c1aec07891, type: 3}
+--- !u!4 &1790242225
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1790242222}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1793118626
 GameObject:
   m_ObjectHideFlags: 0
@@ -3114,7 +3178,8 @@ MonoBehaviour:
   dialogueKey: ClimberNearExplorationStartDialogue
   playerInRange: 0
   isDialoguePressed: 0
-  interactKey: 101
+  inputActions: {fileID: -944628639613478452, guid: 5ec57af691e024f5495721c1aec07891, type: 3}
+  interactActionName: Interact
   clearPlayerPrefs: 99
   interactTextPrefab: {fileID: 95194169440117963, guid: 15891119156aa4ae388994054e96a4c5, type: 3}
   requiredBoolKeysTrue:
@@ -3495,7 +3560,8 @@ MonoBehaviour:
   dialogueKey: ClimberNearTentsStartDialogue
   playerInRange: 0
   isDialoguePressed: 0
-  interactKey: 101
+  inputActions: {fileID: -944628639613478452, guid: 5ec57af691e024f5495721c1aec07891, type: 3}
+  interactActionName: Interact
   clearPlayerPrefs: 99
   interactTextPrefab: {fileID: 95194169440117963, guid: 15891119156aa4ae388994054e96a4c5, type: 3}
   requiredBoolKeysTrue:
@@ -3606,3 +3672,4 @@ SceneRoots:
   - {fileID: 834841989}
   - {fileID: 4700592353528353405}
   - {fileID: 1303588825}
+  - {fileID: 1790242225}
