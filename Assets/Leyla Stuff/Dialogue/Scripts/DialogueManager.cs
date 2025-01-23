@@ -146,6 +146,23 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        KeyBindingManager.OnInputDeviceChanged += UpdateAllIndicatorSprites;
+    }
+
+    private void OnDisable()
+    {
+        KeyBindingManager.OnInputDeviceChanged -= UpdateAllIndicatorSprites;
+    }
+
+    private void UpdateAllIndicatorSprites()
+    {
+        UpdateAdvanceDialogueIndicatorSprite();
+        UpdateScrollIndicatorSprite();
+        UpdateSelectOptionIndicatorSprite();
+    }
+
     private void Update()
     {
         if (isFullTextShown && indicatorCoroutine == null)
