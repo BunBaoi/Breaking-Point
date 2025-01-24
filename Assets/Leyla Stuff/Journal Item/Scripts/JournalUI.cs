@@ -121,6 +121,8 @@ public class JournalUI : MonoBehaviour
 
                 currentPageIndex = PageTracker.Instance != null ? PageTracker.Instance.CurrentPageIndex : 0;
                 UpdateJournalUI();
+                UpdateNextPrevPageImage(nextPageImage.gameObject, nextPageName);
+                UpdateNextPrevPageImage(prevPageImage.gameObject, previousPageName);
 
                 var pages = PageTracker.Instance.Pages;
 
