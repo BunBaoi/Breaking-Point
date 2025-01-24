@@ -32,6 +32,7 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private Transform optionIndicatorParent;
     [SerializeField] private Transform switchOptionsIndicatorParent;
     [SerializeField] private float optionIndicatorOffset = 0f;
+    [SerializeField] private float scrollIndicatorOffset = 0f;
 
     private bool isOptionKeyPressed = false;
 
@@ -173,6 +174,7 @@ public class DialogueManager : MonoBehaviour
             if (!isOptionKeyPressed)
                 {
                 UpdateSelectOptionIndicatorPosition();
+                UpdateScrollIndicatorPosition();
             }
         }
         if (!optionsAreVisible)
@@ -786,10 +788,29 @@ public class DialogueManager : MonoBehaviour
             selectedOptionIndex = 0;
             UpdateHighlightedOption();
             UpdateSelectOptionIndicatorPosition();
+            UpdateScrollIndicatorPosition();
 
             /*Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;*/
         }
+    }
+
+    private void UpdateScrollIndicatorPosition()
+    {
+        // Check if the selectedOptionIndex is within the valid range
+        if (selectedOptionIndex < 0 || selectedOptionIndex >= instantiatedButtons.Count)
+        {
+            return; // Exit the method if the index is invalid
+        }
+
+        // Get the position of the currently highlighted button
+        RectTransform buttonRectTransform = instantiatedButtons[selectedOptionIndex].GetComponent<RectTransform>();
+
+        // Calculate the new position
+        Vector3 newPosition = new Vector3(buttonRectTransform.localPosition.x + scrollIndicatorOffset, buttonRectTransform.localPosition.y, buttonRectTransform.localPosition.z);
+
+        // Update the position of the existing indicator
+        instantiatedScrollIndicator.transform.localPosition = newPosition;
     }
 
     private void ClearOptions()
