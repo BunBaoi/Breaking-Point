@@ -69,6 +69,21 @@ public class KeyBindingManager : MonoBehaviour
         return null;
     }
 
+    public string GetSanitisedKeyName(string keyName)
+    {
+        return keyName
+            .Replace("<Keyboard>/", "")
+            .Replace("<Gamepad>/", "")
+            .Replace("<XInputController>/", "")
+            .Replace("<Mouse>/", "")
+            .Replace("leftButton", "LeftClick")
+            .Replace("rightButton", "RightClick")
+            .Replace("middleButton", "MiddleClick")
+            .Replace("scroll/y", "ScrollUpDown")
+            .Replace("dpad/y", "dpadUpDown")
+            .Replace("dpad/x", "dpadLeftRight");
+    }
+
     public string GetBindingDisplayName(string actionName)
     {
         // Get the action from the InputActionAsset

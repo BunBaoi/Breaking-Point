@@ -177,6 +177,69 @@ public class JournalUI : MonoBehaviour
         }
     }
 
+    private void UpdateNextPrevPageImage(GameObject imageObject, string actionName)
+    {
+        if (KeyBindingManager.Instance == null || imageObject == null || inputActions == null) return;
+
+        KeyBinding binding = KeyBindingManager.Instance.GetKeybinding(actionName);
+        if (binding == null) return;
+
+        bool isUsingController = KeyBindingManager.Instance.IsUsingController();
+        Image indicatorImage = imageObject.GetComponent<Image>();
+
+        if (indicatorImage == null) return;
+
+        string boundKeyOrButton = GetBoundKeyOrButton(actionName);
+
+        if (string.IsNullOrEmpty(boundKeyOrButton))
+        {
+            Debug.LogWarning($"No key binding found for action: {actionName}");
+            return;
+        }
+
+        indicatorImage.sprite = isUsingController ? binding.controllerSprite : binding.keySprite;
+
+        Animator animator = imageObject.GetComponent<Animator>();
+        if (animator == null)
+        {
+            animator = imageObject.AddComponent<Animator>();
+        }
+
+        animator.enabled = true; 
+
+        string folderPath = isUsingController ? "UI/Controller/" : "UI/Keyboard/";
+        string animatorName = KeyBindingManager.Instance.GetSanitisedKeyName(boundKeyOrButton);
+        RuntimeAnimatorController assignedAnimator = Resources.Load<RuntimeAnimatorController>(folderPath + animatorName);
+
+        if (assignedAnimator != null)
+        {
+            animator.runtimeAnimatorController = assignedAnimator;
+            Debug.Log($"Assigned animator '{animatorName}' to {imageObject.name}");
+        }
+        else
+        {
+            Debug.LogError($"Animator '{animatorName}' not found in {folderPath}");
+        }
+    }
+
+    private string GetBoundKeyOrButton(string actionName)
+    {
+        if (inputActions == null) return null;
+
+        InputAction action = inputActions.FindAction(actionName);
+
+        if (action == null || action.bindings.Count == 0) return null;
+
+        foreach (var binding in action.bindings)
+        {
+            if (binding.isPartOfComposite) continue;
+
+            return KeyBindingManager.Instance.GetSanitisedKeyName(binding.effectivePath);
+        }
+
+        return null;
+    }
+
     private void ToggleJournal()
     {
         isJournalOpen = !isJournalOpen;
@@ -199,6 +262,9 @@ public class JournalUI : MonoBehaviour
             // Disable movement and camera when journal is open
             if (playerMovement != null) playerMovement.SetMovementState(false);
             if (cameraController != null) cameraController.enabled = false;
+
+            UpdateNextPrevPageImage(nextPageImage.gameObject, nextPageName);
+            UpdateNextPrevPageImage(prevPageImage.gameObject, previousPageName);
 
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;

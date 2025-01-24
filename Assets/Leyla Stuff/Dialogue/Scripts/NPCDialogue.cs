@@ -22,6 +22,7 @@ public class NPCDialogue : MonoBehaviour
 
     private GameObject interactTextInstance; // Reference to instantiated text
     private Transform player; // Reference to the player's transform
+    private GameObject iconObject; // Declare it at the class level
 
     [Header("Bool Conditions")]
     [SerializeField] private List<string> requiredBoolKeysTrue = new List<string>(); // List of bool keys that should be true
@@ -80,7 +81,7 @@ public class NPCDialogue : MonoBehaviour
                 string interactText = "to Interact"; // Default text
 
                 // Get the keybinding data for "Interact"
-                KeyBinding keyBinding = KeyBindingManager.Instance.GetKeybinding("Interact");
+                KeyBinding keyBinding = KeyBindingManager.Instance.GetKeybinding(interactActionName);
 
                 // Update text dynamically to match the correct keybinding based on input device
                 TextMeshPro textMesh = interactTextInstance.GetComponent<TextMeshPro>();
@@ -98,12 +99,12 @@ public class NPCDialogue : MonoBehaviour
                         if (icon != null)
                         {
                             // Create a object for the sprite and set it next to the text
-                            GameObject iconObject = new GameObject("KeybindIcon");
+                            iconObject = new GameObject("KeybindIcon");
                             iconObject.transform.SetParent(interactTextInstance.transform); // Make it a child of the text
 
                             // Position sprite to left of text
                             // Increase the horizontal space by adjusting the x-position further
-                            float horizontalOffset = -textMesh.preferredWidth / 2 - 0.3f; // Increased offset to add more space
+                            float horizontalOffset = -textMesh.preferredWidth / 2 - 0.5f; // Increased offset to add more space
                             iconObject.transform.localPosition = new Vector3(horizontalOffset, 0.7f, 0);
 
                             // Add a SpriteRenderer to display the icon
@@ -111,8 +112,9 @@ public class NPCDialogue : MonoBehaviour
                             spriteRenderer.sprite = icon;
                             spriteRenderer.sortingOrder = 1; // Ensure the sprite is above the text
 
-                            // Scale sprite with factor of 2
-                            spriteRenderer.transform.localScale = new Vector3(2, 2, 2); // Scale sprite to 2x size
+                            spriteRenderer.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+
+                            UpdateSprite(iconObject.gameObject, interactActionName);
                         }
                         else
                         {
@@ -151,6 +153,71 @@ public class NPCDialogue : MonoBehaviour
                     }
                 }
             }
+        }
+    }
+
+    private void UpdateSprite(GameObject iconObject, string actionName)
+    {
+        if (KeyBindingManager.Instance == null || iconObject == null || inputActions == null) return;
+
+        KeyBinding binding = KeyBindingManager.Instance.GetKeybinding(actionName);
+        if (binding == null) return;
+
+        bool isUsingController = KeyBindingManager.Instance.IsUsingController();
+
+        // Ensure the GameObject has a SpriteRenderer
+        SpriteRenderer spriteRenderer = iconObject.GetComponent<SpriteRenderer>();
+
+        // Assign sprite based on input type
+        spriteRenderer.sprite = isUsingController ? binding.controllerSprite : binding.keySprite;
+
+        // Check for an animator and assign one if needed
+        Animator animator = iconObject.GetComponent<Animator>();
+        if (animator == null)
+        {
+            animator = iconObject.AddComponent<Animator>();
+        }
+
+        animator.enabled = true; // Ensure animator is enabled
+
+        string folderPath = isUsingController ? "UI/Controller/" : "UI/Keyboard/";
+        string animatorName = KeyBindingManager.Instance.GetSanitisedKeyName(GetBoundKeyOrButton(actionName)) + ".sprite";
+        RuntimeAnimatorController assignedAnimator = Resources.Load<RuntimeAnimatorController>(folderPath + animatorName);
+
+        if (assignedAnimator != null)
+        {
+            animator.runtimeAnimatorController = assignedAnimator;
+            Debug.Log($"Assigned animator '{animatorName}' to {iconObject.name}");
+        }
+        else
+        {
+            Debug.LogError($"Animator '{animatorName}' not found in {folderPath}");
+        }
+    }
+
+    private string GetBoundKeyOrButton(string actionName)
+    {
+        if (inputActions == null) return null;
+
+        InputAction action = inputActions.FindAction(actionName);
+
+        if (action == null || action.bindings.Count == 0) return null;
+
+        foreach (var binding in action.bindings)
+        {
+            if (binding.isPartOfComposite) continue;
+
+            return KeyBindingManager.Instance.GetSanitisedKeyName(binding.effectivePath);
+        }
+
+        return null;
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            UpdateSprite(iconObject.gameObject, interactActionName);
         }
     }
 

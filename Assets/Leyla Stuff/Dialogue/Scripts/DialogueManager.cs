@@ -197,46 +197,86 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
-    private void UpdateAdvanceDialogueIndicatorSprite()
+    private void UpdateIndicator(GameObject indicatorObject, string actionName)
     {
-        if (KeyBindingManager.Instance == null) return;
+        if (KeyBindingManager.Instance == null || indicatorObject == null || inputActions == null) return;
 
-        KeyBinding binding = KeyBindingManager.Instance.GetKeybinding(advanceDialogueName);
+        KeyBinding binding = KeyBindingManager.Instance.GetKeybinding(actionName);
         if (binding == null) return;
 
-        // Choose the correct sprite based on input device
-        nextDialogueIndicatorImage.sprite = KeyBindingManager.Instance.IsUsingController() ?
-                                            binding.controllerSprite : binding.keySprite;
+        bool isUsingController = KeyBindingManager.Instance.IsUsingController();
+        Image indicatorImage = indicatorObject.GetComponent<Image>();
+
+        if (indicatorImage == null) return;
+
+        // **Step 1: Get the actual bound key/button from PlayerInput**
+        string boundKeyOrButton = GetBoundKeyOrButton(actionName);
+
+        if (string.IsNullOrEmpty(boundKeyOrButton))
+        {
+            Debug.LogWarning($"No key binding found for action: {actionName}");
+            return;
+        }
+
+        // **Step 2: Set the correct sprite**
+        indicatorImage.sprite = isUsingController ? binding.controllerSprite : binding.keySprite;
+
+        // **Step 3: Get or add Animator component**
+        Animator animator = indicatorObject.GetComponent<Animator>();
+        if (animator == null)
+        {
+            animator = indicatorObject.AddComponent<Animator>();
+        }
+
+        animator.enabled = true; // Ensure animator is enabled
+
+        // **Step 4: Load the correct Animator dynamically**
+        string folderPath = isUsingController ? "UI/Controller/" : "UI/Keyboard/";
+        string animatorName = KeyBindingManager.Instance.GetSanitisedKeyName(boundKeyOrButton);
+        RuntimeAnimatorController assignedAnimator = Resources.Load<RuntimeAnimatorController>(folderPath + animatorName);
+
+        if (assignedAnimator != null)
+        {
+            animator.runtimeAnimatorController = assignedAnimator;
+            Debug.Log($"Assigned animator '{animatorName}' to {indicatorObject.name}");
+        }
+        else
+        {
+            Debug.LogError($"Animator '{animatorName}' not found in {folderPath}");
+        }
+    }
+
+    private string GetBoundKeyOrButton(string actionName)
+    {
+        if (inputActions == null) return null;
+
+        InputAction action = inputActions.FindAction(actionName);
+
+        if (action == null || action.bindings.Count == 0) return null;
+
+        foreach (var binding in action.bindings)
+        {
+            if (binding.isPartOfComposite) continue;
+
+            return KeyBindingManager.Instance.GetSanitisedKeyName(binding.effectivePath);
+        }
+
+        return null;
+    }
+
+    private void UpdateAdvanceDialogueIndicatorSprite()
+    {
+        UpdateIndicator(nextDialogueIndicatorImage.gameObject, advanceDialogueName);
     }
 
     private void UpdateScrollIndicatorSprite()
     {
-        if (KeyBindingManager.Instance == null || instantiatedScrollIndicator == null) return;
-
-        KeyBinding binding = KeyBindingManager.Instance.GetKeybinding(scrollName);
-        if (binding == null) return;
-
-        // Get the Image component from the instantiated indicator
-        Image indicatorImage = instantiatedScrollIndicator.GetComponent<Image>();
-        if (indicatorImage == null) return;
-
-        // Choose the correct sprite based on input device
-        indicatorImage.sprite = KeyBindingManager.Instance.IsUsingController() ?
-                                binding.controllerSprite : binding.keySprite;
+        UpdateIndicator(instantiatedScrollIndicator, scrollName);
     }
 
     private void UpdateSelectOptionIndicatorSprite()
     {
-        if (KeyBindingManager.Instance == null || instantiatedSelectOptionIndicator == null) return;
-
-        KeyBinding binding = KeyBindingManager.Instance.GetKeybinding(selectOptionName);
-        if (binding == null) return;
-
-        Image indicatorImage = instantiatedSelectOptionIndicator.GetComponent<Image>();
-        if (indicatorImage == null) return;
-
-        indicatorImage.sprite = KeyBindingManager.Instance.IsUsingController() ?
-                                binding.controllerSprite : binding.keySprite;
+        UpdateIndicator(instantiatedSelectOptionIndicator, selectOptionName);
     }
 
     private void HandleOptionSelection()
