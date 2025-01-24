@@ -1,26 +1,71 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
+    [Header("Player")]
     public CharacterController controller;
     private PlayerStats playerStats;
+
+    [Header("Settings")]
     public float walkSpeed = 12f;
+    public float sprintSpeed = 20f;
     public float gravity = -9.81f;
     public bool IsSprint = false;
-    public float playerHeight;
+
+    [Header("Testing Purposes")]
     [SerializeField] private bool canMove = true;
 
-    Vector3 velocity;
+    [Header("Keybinds")]
+    [SerializeField] private InputActionAsset inputActions;
+    [SerializeField] private string movementName = "Move";
+    [SerializeField] private string sprintName = "Sprint";
+
+    private InputAction movement;
+    private InputAction sprint;
+
+    private Vector3 velocity;
+    private Vector2 moveInput;
+
+    void Awake()
+    {
+        // If inputActions is not assigned via the inspector, load it from the Resources/Keybinds folder
+        if (inputActions == null)
+        {
+            // Load from the "Keybinds" folder in Resources
+            inputActions = Resources.Load<InputActionAsset>("Keybinds/PlayerInputs");
+
+            if (inputActions == null)
+            {
+                Debug.LogError("PlayerInputs asset not found in Resources/Keybinds folder!");
+            }
+        }
+    }
 
     void Start()
     {
         playerStats = GetComponent<PlayerStats>();
+
+        movement = inputActions.FindAction(movementName);
+        sprint = inputActions.FindAction(sprintName);
+
+        if (movement != null)
+        {
+            movement.Enable(); // Enable the action
+        }
+        else
+        {
+            Debug.LogError($"Input action '{movementName}' not found in Input Action Asset!");
+        }
+
+        if (sprint != null)
+        {
+            sprint.Enable(); // Enable the action
+        }
+        else
+        {
+            Debug.LogError($"Input action '{sprintName}' not found in Input Action Asset!");
+        }
     }
 
     void Update()
@@ -28,17 +73,19 @@ public class PlayerMovement : MonoBehaviour
         if (canMove)
         {
             HandleGroundMovement();
-            sprint();
+            HandleSprint();
         }
+
         ApplyGravity();
-        OxyOuputRate();
+        OxyOutputRate();
     }
 
     void HandleGroundMovement()
     {
-        float x = Input.GetAxis("Horizontal");
-        float z = Input.GetAxis("Vertical");
-        Vector3 move = transform.right * x + transform.forward * z;
+        // Read movement input from InputActionAsset
+        moveInput = movement.ReadValue<Vector2>();
+
+        Vector3 move = transform.right * moveInput.x + transform.forward * moveInput.y;
         controller.Move(move * walkSpeed * Time.deltaTime);
     }
 
@@ -48,11 +95,11 @@ public class PlayerMovement : MonoBehaviour
         controller.Move(velocity * Time.deltaTime);
     }
 
-    private void sprint()
+    private void HandleSprint()
     {
-        if (Input.GetKey(KeyCode.LeftShift))
+        if (sprint.IsPressed())
         {
-            walkSpeed = 20f;
+            walkSpeed = sprintSpeed;
             IsSprint = true;
         }
         else
@@ -62,7 +109,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    public void OxyOuputRate()
+    public void OxyOutputRate()
     {
         if (Input.GetKeyDown(KeyCode.Q))
         {
@@ -74,7 +121,6 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    // Enable or disable movement
     public void SetMovementState(bool state)
     {
         canMove = state;

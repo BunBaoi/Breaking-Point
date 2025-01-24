@@ -1,11 +1,10 @@
 using UnityEngine;
-using System.Collections.Generic;
+using UnityEngine.InputSystem;
 
 public class ItemPickUp : MonoBehaviour
 {
     [Header("Pickup Settings")]
     public Item item; // Reference to the item that can be picked up
-    [SerializeField] private KeyCode pickupKey = KeyCode.E; // Key to press for picking up items
     [SerializeField] private float raycastDistance = 5f; // Distance to check for raycast
     [SerializeField] private float pickupRadius = 1f; // Radius around the centre of the screen for pickup detection
     [SerializeField] private string playerCameraTag = "PlayerCamera"; // Tag for the player's camera
@@ -15,6 +14,41 @@ public class ItemPickUp : MonoBehaviour
 
     [SerializeField] private bool canPickUp = false; // Flag to check if the player is in range
     [SerializeField] private bool isPickingUp = false; // Flag to prevent picking up multiple items at once
+
+    [Header("Input Settings")]
+    [SerializeField] private InputActionAsset inputActions;
+    [SerializeField] private string pickupActionName = "PickUp"; // Action name for item pickup
+
+    private InputAction pickupAction; // Reference to the input action for pickup
+
+    void Awake()
+    {
+        // If inputActions is not assigned via the inspector, load it from the Resources/Keybinds folder
+        if (inputActions == null)
+        {
+            // Load from the "Keybinds" folder in Resources
+            inputActions = Resources.Load<InputActionAsset>("Keybinds/PlayerInputs");
+
+            if (inputActions == null)
+            {
+                Debug.LogError("PlayerInputs asset not found in Resources/Keybinds folder!");
+            }
+        }
+    }
+    void Start()
+    {
+        // Get Pickup action from Input Action Asset
+        pickupAction = inputActions.FindAction(pickupActionName);
+
+        if (pickupAction != null)
+        {
+            pickupAction.Enable();
+        }
+        else
+        {
+            Debug.LogError($"Input action '{pickupActionName}' not found in Input Action Asset!");
+        }
+    }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -42,9 +76,9 @@ public class ItemPickUp : MonoBehaviour
         }
     }
 
-    private void Update()
+    void Update()
     {
-        if (canPickUp && Input.GetKeyDown(pickupKey))
+        if (canPickUp && pickupAction.triggered) // Check if pickup action is triggered
         {
             Camera playerCamera = FindCameraWithTag(playerCameraTag);
 

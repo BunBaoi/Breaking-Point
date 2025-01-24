@@ -480,6 +480,12 @@ MonoBehaviour:
   checklistItemPrefab: {fileID: 1568883887729301952, guid: c6c7049fd966c4aeb97a3dfba73a8077, type: 3}
   nextPageButton: {fileID: 1181421075709366670}
   prevPageButton: {fileID: 7279805822085980531}
+  nextPageImage: {fileID: 5028910372545372320}
+  prevPageImage: {fileID: 6570286451013400996}
+  inputActions: {fileID: 0}
+  useItemName: Use
+  nextPageName: Next
+  previousPageName: Previous
 --- !u!114 &4208634193636873749
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -493,7 +499,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   item: {fileID: 11400000, guid: 0a6bafd8d5c4049af99472d555941f81, type: 2}
-  pickupKey: 101
   raycastDistance: 3
   pickupRadius: 1
   playerCameraTag: PlayerCamera
@@ -506,6 +511,8 @@ MonoBehaviour:
     m_Bits: 65536
   canPickUp: 0
   isPickingUp: 0
+  inputActions: {fileID: 0}
+  pickupActionName: PickUp
 --- !u!1 &2035373246615655833
 GameObject:
   m_ObjectHideFlags: 0
@@ -524,7 +531,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &5110278954097380991
 RectTransform:
   m_ObjectHideFlags: 0

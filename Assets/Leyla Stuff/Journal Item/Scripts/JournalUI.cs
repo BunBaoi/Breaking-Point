@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 
 public class JournalUI : MonoBehaviour
 {
@@ -26,8 +27,19 @@ public class JournalUI : MonoBehaviour
     [Header("Navigation Buttons")]
     [SerializeField] private Button nextPageButton;
     [SerializeField] private Button prevPageButton;
+    [SerializeField] private Image nextPageImage;
+    [SerializeField] private Image prevPageImage;
     private PlayerMovement playerMovement;
     private CameraController cameraController;
+
+    [Header("Keybinds")]
+    [SerializeField] private InputActionAsset inputActions; // Reference to the Input Action Asset
+    [SerializeField] private string useItemName = "Use";
+    [SerializeField] private string nextPageName = "Next";
+    [SerializeField] private string previousPageName = "Previous";
+    private InputAction useItem;
+    private InputAction nextPage;
+    private InputAction previousPage;
 
     // [Header("Journal Pages")]
     [SerializeField] private List<JournalPage> pages => PageTracker.Instance != null ? PageTracker.Instance.Pages : new List<JournalPage>();
@@ -37,6 +49,18 @@ public class JournalUI : MonoBehaviour
 
     private void Awake()
     {
+        // If inputActions is not assigned via the inspector, load it from the Resources/Keybinds folder
+        if (inputActions == null)
+        {
+            // Load from the "Keybinds" folder in Resources
+            inputActions = Resources.Load<InputActionAsset>("Keybinds/PlayerInputs");
+
+            if (inputActions == null)
+            {
+                Debug.LogError("PlayerInputs asset not found in Resources/Keybinds folder!");
+            }
+        }
+
         journalUI.SetActive(false);
     }
 
@@ -45,15 +69,33 @@ public class JournalUI : MonoBehaviour
         journalUI.SetActive(false); // Ensure journal is hidden at start
         nextPageButton.onClick.AddListener(NextPage);
         prevPageButton.onClick.AddListener(PreviousPage);
+
+        useItem = inputActions.FindAction(useItemName);
+        nextPage = inputActions.FindAction(nextPageName);
+        previousPage = inputActions.FindAction(previousPageName);
+
+        if (useItem != null)
+        {
+            useItem.Enable(); // Enable the action
+        }
+        if (nextPage != null)
+        {
+            nextPage.Enable(); // Enable the action
+        }
+        if (previousPage != null)
+        {
+            previousPage.Enable(); // Enable the action
+        }
     }
 
     private void Update()
     {
         // Right-click to toggle journal visibility
-        if (Input.GetMouseButtonDown(1))
+        if (useItem.triggered)
         {
             ToggleJournal();
         }
+
         // Ensure cursor stays visible when journal is open
         if (isJournalOpen)
         {
@@ -79,6 +121,18 @@ public class JournalUI : MonoBehaviour
 
                 currentPageIndex = PageTracker.Instance != null ? PageTracker.Instance.CurrentPageIndex : 0;
                 UpdateJournalUI();
+
+                var pages = PageTracker.Instance.Pages;
+
+                if (nextPage.triggered && pages.Count > 2 && currentPageIndex + 1 < pages.Count)
+                {
+                    NextPage();
+                }
+
+                if (previousPage.triggered)
+                {
+                    PreviousPage();
+                }
             }
         }
 
@@ -163,6 +217,30 @@ public class JournalUI : MonoBehaviour
         }
     }
 
+    private void UpdatePreviousPageImage()
+    {
+        if (KeyBindingManager.Instance == null) return;
+
+        KeyBinding binding = KeyBindingManager.Instance.GetKeybinding(previousPageName);
+        if (binding == null) return;
+
+        // Choose the correct sprite based on input device
+        prevPageImage.sprite = KeyBindingManager.Instance.IsUsingController() ?
+                                            binding.controllerSprite : binding.keySprite;
+    }
+
+    private void UpdateNextPageImage()
+    {
+        if (KeyBindingManager.Instance == null) return;
+
+        KeyBinding binding = KeyBindingManager.Instance.GetKeybinding(nextPageName);
+        if (binding == null) return;
+
+        // Choose the correct sprite based on input device
+        nextPageImage.sprite = KeyBindingManager.Instance.IsUsingController() ?
+                                            binding.controllerSprite : binding.keySprite;
+    }
+
     private void UpdateJournalUI()
     {
         if (PageTracker.Instance == null || PageTracker.Instance.Pages.Count == 0) return;
@@ -190,6 +268,9 @@ public class JournalUI : MonoBehaviour
             // If there is no next page, leave the right side blank
             ClearPageUI(rightTitleText, rightContentText, rightChecklistContainer);
         }
+
+        UpdatePreviousPageImage();
+        UpdateNextPageImage();
 
         // Adjust button interactability based on available pages
         prevPageButton.interactable = currentPageIndex > 0;

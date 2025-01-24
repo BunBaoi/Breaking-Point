@@ -39,7 +39,7 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private InputActionAsset inputActions;
     [SerializeField] private string advanceDialogueName = "Advance Dialogue";
     [SerializeField] private string selectOptionName = "Select Option";
-    [SerializeField] private string scrollName = "Scroll";
+    [SerializeField] private string scrollName = "Interaction Scroll";
 
     // OLD KEYBINDS
     /* [SerializeField] private string scrollUpName = "Scroll Up";
@@ -124,6 +124,18 @@ public class DialogueManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        // If inputActions is not assigned via the inspector, load it from the Resources/Keybinds folder
+        if (inputActions == null)
+        {
+            // Load from the "Keybinds" folder in Resources
+            inputActions = Resources.Load<InputActionAsset>("Keybinds/PlayerInputs");
+
+            if (inputActions == null)
+            {
+                Debug.LogError("PlayerInputs asset not found in Resources/Keybinds folder!");
+            }
+        }
     }
 
     private void OnEnable()
@@ -165,7 +177,7 @@ public class DialogueManager : MonoBehaviour
         }
         if (!optionsAreVisible)
         {
-            if (advanceDialogue.WasPressedThisFrame() && isDialogueActive)
+            if (advanceDialogue.triggered && isDialogueActive)
             {
                 if (isTextScrolling)
                 {

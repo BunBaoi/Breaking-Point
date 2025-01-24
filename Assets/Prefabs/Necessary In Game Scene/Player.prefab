@@ -238,13 +238,17 @@ MonoBehaviour:
   inventoryPanel: {fileID: 6267325978070755587}
   leftHandPosition: {fileID: 3250508413225319028}
   rightHandPosition: {fileID: 6812937287833296610}
-  dropKey: 113
   groundLayer:
     serializedVersion: 2
     m_Bits: 131072
   itemLayer:
     serializedVersion: 2
     m_Bits: 32768
+  inputActions: {fileID: 0}
+  scrollActionName: Inventory Scroll
+  dropActionName: Drop
+  slotActionsName: Slot
+  scrollCooldown: 0.02
 --- !u!54 &8519684001432960098
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -312,10 +316,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   controller: {fileID: 897709939373269665}
   walkSpeed: 12
+  sprintSpeed: 20
   gravity: -9.81
   IsSprint: 0
-  playerHeight: 0
   canMove: 1
+  inputActions: {fileID: -944628639613478452, guid: 5ec57af691e024f5495721c1aec07891, type: 3}
+  movementName: Move
+  sprintName: Sprint
 --- !u!1 &3619808905300106697
 GameObject:
   m_ObjectHideFlags: 0
@@ -579,6 +586,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mouseSensitivity: 300
   playerBody: {fileID: 1694757373622639524}
+  inputActions: {fileID: -944628639613478452, guid: 5ec57af691e024f5495721c1aec07891, type: 3}
+  lookName: Look
   xRotation: 0
 --- !u!114 &2435927527163000300
 MonoBehaviour:

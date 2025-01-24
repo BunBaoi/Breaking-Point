@@ -29,6 +29,21 @@ public class NPCDialogue : MonoBehaviour
 
     private InputAction interactAction; // Reference to the "Interact" InputAction
 
+    void Awake()
+    {
+        // If inputActions is not assigned via the inspector, load it from the Resources/Keybinds folder
+        if (inputActions == null)
+        {
+            // Load from the "Keybinds" folder in Resources
+            inputActions = Resources.Load<InputActionAsset>("Keybinds/PlayerInputs");
+
+            if (inputActions == null)
+            {
+                Debug.LogError("PlayerInputs asset not found in Resources/Keybinds folder!");
+            }
+        }
+    }
+
     private void Start()
     {
         isDialoguePressed = PlayerPrefs.GetInt(dialogueKey, 0) == 1;
@@ -166,7 +181,7 @@ public class NPCDialogue : MonoBehaviour
         }
 
         // Check if the interact key is pressed
-        if (playerInRange && interactAction.WasPressedThisFrame() && !isDialoguePressed && CanStartDialogue())
+        if (playerInRange && interactAction.triggered && !isDialoguePressed && CanStartDialogue())
         {
             isDialoguePressed = true;
             PlayerPrefs.SetInt(dialogueKey, 1);
