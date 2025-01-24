@@ -201,27 +201,35 @@ public class DialogueManager : MonoBehaviour
     {
         if (KeyBindingManager.Instance == null || indicatorObject == null || inputActions == null) return;
 
-        KeyBinding binding = KeyBindingManager.Instance.GetKeybinding(actionName);
-        if (binding == null) return;
+        // **Step 1: Get the actual action**
+        InputAction action = inputActions.FindAction(actionName);
+        if (action == null) return;
 
-        bool isUsingController = KeyBindingManager.Instance.IsUsingController();
-        Image indicatorImage = indicatorObject.GetComponent<Image>();
+        // **Step 2: Get the first binding (keyboard) or second binding (controller)**
+        int bindingIndex = KeyBindingManager.Instance.IsUsingController() ? 1 : 0;
+        if (action.bindings.Count <= bindingIndex) return;
 
-        if (indicatorImage == null) return;
+        InputBinding binding = action.bindings[bindingIndex];
 
-        // **Step 1: Get the actual bound key/button from PlayerInput**
-        string boundKeyOrButton = GetBoundKeyOrButton(actionName);
-
+        // **Step 3: Get the display name for the key/button bound**
+        string boundKeyOrButton = KeyBindingManager.Instance.GetSanitisedKeyName(binding.effectivePath);
         if (string.IsNullOrEmpty(boundKeyOrButton))
         {
             Debug.LogWarning($"No key binding found for action: {actionName}");
             return;
         }
 
-        // **Step 2: Set the correct sprite**
-        indicatorImage.sprite = isUsingController ? binding.controllerSprite : binding.keySprite;
+        // **Step 4: Get the keybinding from KeyBindingManager**
+        KeyBinding keyBinding = KeyBindingManager.Instance.GetKeybinding(actionName);
+        if (keyBinding == null) return;
 
-        // **Step 3: Get or add Animator component**
+        // **Step 5: Set the sprite for the indicator**
+        Image indicatorImage = indicatorObject.GetComponent<Image>();
+        if (indicatorImage == null) return;
+
+        indicatorImage.sprite = KeyBindingManager.Instance.IsUsingController() ? keyBinding.controllerSprite : keyBinding.keySprite;
+
+        // **Step 6: Set up the Animator**
         Animator animator = indicatorObject.GetComponent<Animator>();
         if (animator == null)
         {
@@ -230,8 +238,8 @@ public class DialogueManager : MonoBehaviour
 
         animator.enabled = true; // Ensure animator is enabled
 
-        // **Step 4: Load the correct Animator dynamically**
-        string folderPath = isUsingController ? "UI/Controller/" : "UI/Keyboard/";
+        // **Step 7: Load the correct animator based on the key/button**
+        string folderPath = KeyBindingManager.Instance.IsUsingController() ? "UI/Controller/" : "UI/Keyboard/";
         string animatorName = KeyBindingManager.Instance.GetSanitisedKeyName(boundKeyOrButton);
         RuntimeAnimatorController assignedAnimator = Resources.Load<RuntimeAnimatorController>(folderPath + animatorName);
 
@@ -244,24 +252,6 @@ public class DialogueManager : MonoBehaviour
         {
             Debug.LogError($"Animator '{animatorName}' not found in {folderPath}");
         }
-    }
-
-    private string GetBoundKeyOrButton(string actionName)
-    {
-        if (inputActions == null) return null;
-
-        InputAction action = inputActions.FindAction(actionName);
-
-        if (action == null || action.bindings.Count == 0) return null;
-
-        foreach (var binding in action.bindings)
-        {
-            if (binding.isPartOfComposite) continue;
-
-            return KeyBindingManager.Instance.GetSanitisedKeyName(binding.effectivePath);
-        }
-
-        return null;
     }
 
     private void UpdateAdvanceDialogueIndicatorSprite()

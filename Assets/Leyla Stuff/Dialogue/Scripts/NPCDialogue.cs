@@ -160,18 +160,30 @@ public class NPCDialogue : MonoBehaviour
     {
         if (KeyBindingManager.Instance == null || iconObject == null || inputActions == null) return;
 
-        KeyBinding binding = KeyBindingManager.Instance.GetKeybinding(actionName);
-        if (binding == null) return;
+        InputAction action = inputActions.FindAction(actionName);
+        if (action == null) return;
+
+        int bindingIndex = KeyBindingManager.Instance.IsUsingController() ? 1 : 0;
+        if (action.bindings.Count <= bindingIndex) return;
+
+        InputBinding binding = action.bindings[bindingIndex];
+
+        string boundKeyOrButton = KeyBindingManager.Instance.GetSanitisedKeyName(binding.effectivePath);
+        if (string.IsNullOrEmpty(boundKeyOrButton))
+        {
+            Debug.LogWarning($"No key binding found for action: {actionName}");
+            return;
+        }
 
         bool isUsingController = KeyBindingManager.Instance.IsUsingController();
 
-        // Ensure the GameObject has a SpriteRenderer
+        KeyBinding keyBinding = KeyBindingManager.Instance.GetKeybinding(actionName);
+        if (keyBinding == null) return;
+
         SpriteRenderer spriteRenderer = iconObject.GetComponent<SpriteRenderer>();
 
-        // Assign sprite based on input type
-        spriteRenderer.sprite = isUsingController ? binding.controllerSprite : binding.keySprite;
+        spriteRenderer.sprite = KeyBindingManager.Instance.IsUsingController() ? keyBinding.controllerSprite : keyBinding.keySprite;
 
-        // Check for an animator and assign one if needed
         Animator animator = iconObject.GetComponent<Animator>();
         if (animator == null)
         {
@@ -181,7 +193,7 @@ public class NPCDialogue : MonoBehaviour
         animator.enabled = true; // Ensure animator is enabled
 
         string folderPath = isUsingController ? "UI/Controller/" : "UI/Keyboard/";
-        string animatorName = KeyBindingManager.Instance.GetSanitisedKeyName(GetBoundKeyOrButton(actionName)) + ".sprite";
+        string animatorName = KeyBindingManager.Instance.GetSanitisedKeyName(boundKeyOrButton) + ".sprite";
         RuntimeAnimatorController assignedAnimator = Resources.Load<RuntimeAnimatorController>(folderPath + animatorName);
 
         if (assignedAnimator != null)
@@ -195,28 +207,11 @@ public class NPCDialogue : MonoBehaviour
         }
     }
 
-    private string GetBoundKeyOrButton(string actionName)
-    {
-        if (inputActions == null) return null;
-
-        InputAction action = inputActions.FindAction(actionName);
-
-        if (action == null || action.bindings.Count == 0) return null;
-
-        foreach (var binding in action.bindings)
-        {
-            if (binding.isPartOfComposite) continue;
-
-            return KeyBindingManager.Instance.GetSanitisedKeyName(binding.effectivePath);
-        }
-
-        return null;
-    }
-
     private void OnTriggerStay(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && playerInRange)
         {
+
             UpdateSprite(iconObject.gameObject, interactActionName);
         }
     }
