@@ -183,17 +183,14 @@ public class JournalUI : MonoBehaviour
     {
         if (KeyBindingManager.Instance == null || imageObject == null || inputActions == null) return;
 
-        // **Step 1: Get the actual action**
         InputAction action = inputActions.FindAction(actionName);
         if (action == null) return;
 
-        // **Step 2: Get the first binding (keyboard) or second binding (controller)**
         int bindingIndex = KeyBindingManager.Instance.IsUsingController() ? 1 : 0;
         if (action.bindings.Count <= bindingIndex) return;
 
         InputBinding binding = action.bindings[bindingIndex];
 
-        // **Step 3: Get the display name for the key/button bound**
         string boundKeyOrButton = KeyBindingManager.Instance.GetSanitisedKeyName(binding.effectivePath);
         if (string.IsNullOrEmpty(boundKeyOrButton))
         {
@@ -201,26 +198,22 @@ public class JournalUI : MonoBehaviour
             return;
         }
 
-        // **Step 4: Get the keybinding from KeyBindingManager**
         KeyBinding keyBinding = KeyBindingManager.Instance.GetKeybinding(actionName);
         if (keyBinding == null) return;
 
-        // **Step 5: Set the sprite for the indicator**
         Image indicatorImage = imageObject.GetComponent<Image>();
         if (indicatorImage == null) return;
 
         indicatorImage.sprite = KeyBindingManager.Instance.IsUsingController() ? keyBinding.controllerSprite : keyBinding.keySprite;
 
-        // **Step 6: Set up the Animator**
         Animator animator = imageObject.GetComponent<Animator>();
         if (animator == null)
         {
             animator = imageObject.AddComponent<Animator>();
         }
 
-        animator.enabled = true; // Ensure animator is enabled
+        animator.enabled = true;
 
-        // **Step 7: Load the correct animator based on the key/button**
         string folderPath = KeyBindingManager.Instance.IsUsingController() ? "UI/Controller/" : "UI/Keyboard/";
         string animatorName = KeyBindingManager.Instance.GetSanitisedKeyName(boundKeyOrButton);
         RuntimeAnimatorController assignedAnimator = Resources.Load<RuntimeAnimatorController>(folderPath + animatorName);
