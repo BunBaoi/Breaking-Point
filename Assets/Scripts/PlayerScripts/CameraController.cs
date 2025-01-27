@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Cinemachine;
 
 public class CameraController : MonoBehaviour
 {
@@ -7,22 +8,23 @@ public class CameraController : MonoBehaviour
     public float mouseSensitivity = 100f;
     public Transform playerBody;
 
+    [Header("Cinemachine")]
+    public CinemachineVirtualCamera virtualCamera;
+
     [Header("Keybinds")]
     [SerializeField] private InputActionAsset inputActions;
     [SerializeField] private string lookName = "Look";
 
+    [SerializeField] private bool canLook = true;
     private InputAction lookAction;
     private Vector2 lookInput;
     public float xRotation = 0f;
 
     void Awake()
     {
-        // If inputActions is not assigned via the inspector, load it from the Resources/Keybinds folder
         if (inputActions == null)
         {
-            // Load from the "Keybinds" folder in Resources
             inputActions = Resources.Load<InputActionAsset>("Keybinds/PlayerInputs");
-
             if (inputActions == null)
             {
                 Debug.LogError("PlayerInputs asset not found in Resources/Keybinds folder!");
@@ -34,9 +36,7 @@ public class CameraController : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
 
-        // Get Look action from Input Action Asset
         lookAction = inputActions.FindAction(lookName);
-
         if (lookAction != null)
         {
             lookAction.Enable();
@@ -49,12 +49,16 @@ public class CameraController : MonoBehaviour
 
     void Update()
     {
-        HandleLook();
+        if (canLook)
+        {
+            HandleLook();
+        }
     }
 
     void HandleLook()
     {
-        // Read input from Input Action Asset
+        if (playerBody == null || virtualCamera == null || lookAction == null) return;
+
         lookInput = lookAction.ReadValue<Vector2>();
 
         float mouseX = lookInput.x * mouseSensitivity * Time.deltaTime;
@@ -63,7 +67,15 @@ public class CameraController : MonoBehaviour
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
 
-        transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+        // Rotate the Cinemachine Virtual Camera for up/down look
+        virtualCamera.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+
+        // Rotate the player body for left/right look
         playerBody.Rotate(Vector3.up * mouseX);
+    }
+
+    public void SetLookState(bool state)
+    {
+        canLook = state;
     }
 }

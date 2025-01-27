@@ -3,6 +3,7 @@ using TMPro;
 using System.Collections;
 using FMODUnity;
 using System.Collections.Generic;
+using Cinemachine;
 
 public class CinematicSequence : MonoBehaviour
 {
@@ -28,10 +29,10 @@ public class CinematicSequence : MonoBehaviour
     [SerializeField] private float textFadeInDuration = 1f; // Duration for fading in text
 
     [Header("Camera")]
-    [SerializeField] private Camera cinematicCameraPrefab;
+    [SerializeField] private CinemachineVirtualCamera cinematicCameraPrefab;
     [SerializeField] private float cameraPanDuration = 2f;
     [SerializeField] private float cameraRemovalDelay = 0.5f;
-    private Camera instantiatedCamera;
+    private CinemachineVirtualCamera instantiatedCamera;
     private List<Camera> disabledCameras = new List<Camera>();
 
     [Header("Bool Conditions")]
@@ -40,6 +41,7 @@ public class CinematicSequence : MonoBehaviour
     [SerializeField] private float eventIdsDelay = 0.5f;
 
     private PlayerMovement playerMovement;
+    private CameraController cameraController;
     [SerializeField] private InventoryManager inventoryManager;
     [SerializeField] private Canvas inventoryCanvas;
     [SerializeField] private DayNightCycle dayNightCycle;
@@ -64,7 +66,6 @@ public class CinematicSequence : MonoBehaviour
                 // Disable player movement when dialogue starts
                 if (playerMovement != null)
                 {
-                    Debug.Log("Disabling movement");
                     playerMovement.SetMovementState(false);
                 }
                 else
@@ -80,7 +81,16 @@ public class CinematicSequence : MonoBehaviour
             {
                 dayNightCycle.StopTime();
             }
-            DisableAllCameras();
+            GameObject playerCamera = GameObject.FindGameObjectWithTag("PlayerCamera");
+            if (playerCamera !=null)
+            {
+                cameraController = playerCamera.GetComponent<CameraController>();
+                if (cameraController != null)
+                {
+                    cameraController.SetLookState(false);
+                }
+            }
+            // DisableAllCameras();
             StartCoroutine(PlayCinematic());
             // Instantiate the cinematic camera
             instantiatedCamera = Instantiate(cinematicCameraPrefab);
@@ -452,19 +462,49 @@ public class CinematicSequence : MonoBehaviour
         // Wait for the specified delay before removing the camera
         yield return new WaitForSeconds(cameraRemovalDelay);
 
-        // Destroy the camera
-        if (instantiatedCamera != null)
-        {
-            EnableAllCameras();
-            Destroy(instantiatedCamera.gameObject);
-            Debug.Log("Cinematic camera removed.");
+        // Find the camera with the "PlayerCamera" tag
+        GameObject playerCamera = GameObject.FindGameObjectWithTag("PlayerCamera");
 
-            yield return new WaitForSeconds(0.1f);
-            StartCoroutine(TriggerEventIDs());
+        if (playerCamera != null)
+        {
+            // Get the CinemachineBrain from the found camera
+            CinemachineBrain brain = playerCamera.GetComponent<CinemachineBrain>();
+
+            if (brain != null && instantiatedCamera != null)
+            {
+                // Transition to the default or previous virtual camera (or whichever one you want to use)
+                CinemachineVirtualCamera defaultCamera = GameObject.Find("Player Virtual Camera").GetComponent<CinemachineVirtualCamera>(); // Change as needed
+
+                // Optionally, use a CinemachineBlendDefinition to control the camera blend
+                CinemachineBlendDefinition blend = new CinemachineBlendDefinition(CinemachineBlendDefinition.Style.EaseInOut, 1f); // 1 second blend
+
+                // Set the default blend (for a smooth transition)
+                brain.m_DefaultBlend = blend;
+
+                // Deactivate the current cinematic camera
+                instantiatedCamera.gameObject.SetActive(false);
+
+                // Activate the default camera
+                defaultCamera.gameObject.SetActive(true);
+
+                // Optionally, you can use the brain's blend to smoothly transition
+                yield return new WaitForSeconds(blend.m_Time); // Wait for the blend to finish
+
+                // Now that transition is complete, destroy the cinematic camera
+                Destroy(instantiatedCamera.gameObject);
+                Debug.Log("Cinematic camera removed.");
+
+                yield return new WaitForSeconds(0.1f);
+                StartCoroutine(TriggerEventIDs());
+            }
+            else
+            {
+                Debug.LogWarning("CinemachineBrain or Cinematic camera is not assigned!");
+            }
         }
         else
         {
-            Debug.LogWarning("Cinematic camera is not assigned!");
+            Debug.LogWarning("PlayerCamera with tag not found!");
         }
     }
 
@@ -491,6 +531,10 @@ public class CinematicSequence : MonoBehaviour
         {
             inventoryManager.enabled = true;
             inventoryCanvas.gameObject.SetActive(true);
+        }
+        if (cameraController != null)
+        {
+            cameraController.SetLookState(true);
         }
     }
 }
