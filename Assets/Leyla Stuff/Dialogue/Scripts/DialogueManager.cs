@@ -10,7 +10,7 @@ public class DialogueManager : MonoBehaviour
 {
     public static DialogueManager Instance;
 
-    [Header("Dialogue UI Settings")]
+    [Header("Dialogue Settings")]
     [SerializeField] private TMP_Text dialogueTextUI;
     // [SerializeField] private TMP_Text npcNameUI;
     [SerializeField] private Canvas dialogueCanvas;
@@ -19,6 +19,7 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private Image nextDialogueIndicatorImage;
     [SerializeField] private CanvasGroup nextDialogueIndicatorCanvasGroup;
     [SerializeField] private Camera mainCamera;  // Player camera
+    [SerializeField] private float scrollSpeed = 0.05f;
 
     [Header("Colour Settings")]
     [SerializeField] private string npcNameColorHex = "#D95959"; // Default colour
@@ -139,6 +140,14 @@ public class DialogueManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        if (SettingsManager.Instance != null)
+        {
+            scrollSpeed = SettingsManager.Instance.GetScrollSpeed();
+        }
+    }
+
     private void OnEnable()
     {
         KeyBindingManager.OnInputDeviceChanged += UpdateAllIndicatorSprites;
@@ -194,6 +203,10 @@ public class DialogueManager : MonoBehaviour
                     ShowNextDialogue();
                 }
             }
+        }
+        if (SettingsManager.Instance != null)
+        {
+            scrollSpeed = SettingsManager.Instance.GetScrollSpeed();
         }
     }
 
@@ -734,7 +747,7 @@ public class DialogueManager : MonoBehaviour
         for (int i = 0; i < node.dialogueText.Length; i++)
         {
             dialogueTextUI.text = $"<color={npcNameColorHex}>{node.npcName}:</color> {node.dialogueText.Substring(0, i + 1)}";
-            yield return new WaitForSeconds(0.05f);
+            yield return new WaitForSeconds(scrollSpeed);
         }
 
         // After scrolling, display the full formatted text
