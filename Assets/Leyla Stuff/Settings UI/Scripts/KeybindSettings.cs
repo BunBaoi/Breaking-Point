@@ -5,7 +5,7 @@ using TMPro;
 using System.Collections;
 using System.Collections.Generic;
 
-public class KeybindManager : MonoBehaviour
+public class KeybindSettings: MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private InputActionAsset inputActions;

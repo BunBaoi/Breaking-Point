@@ -81,7 +81,19 @@ public class KeyBindingManager : MonoBehaviour
             .Replace("middleButton", "MiddleClick")
             .Replace("scroll/y", "ScrollUpDown")
             .Replace("dpad/y", "dpadUpDown")
-            .Replace("dpad/x", "dpadLeftRight");
+            .Replace("dpad/x", "dpadLeftRight")
+            .Replace("dpad/up", "dpadUp")
+            .Replace("dpad/down", "dpadDown")
+            .Replace("dpad/left", "dpadLeft")
+            .Replace("dpad/right", "dpadRight")
+            .Replace("leftStick/up", "leftStickUp")
+            .Replace("leftStick/down", "leftStickDown")
+            .Replace("leftStick/left", "leftStickLeft")
+            .Replace("leftStick/right", "leftStickRight")
+            .Replace("rightStick/up", "rightStickUp")
+            .Replace("rightStick/down", "rightStickDown")
+            .Replace("rightStick/left", "rightStickLeft")
+            .Replace("rightStick/right", "rightStickRight");
     }
 
     public string GetBindingDisplayName(string actionName)
