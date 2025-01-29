@@ -4,6 +4,8 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections;
 using System.Collections.Generic;
+using System;
+using UnityEngine.EventSystems;
 
 public class KeybindSettings: MonoBehaviour
 {
@@ -14,9 +16,24 @@ public class KeybindSettings: MonoBehaviour
     [SerializeField] private ScrollRect scrollRect; // Reference to the ScrollView
     [SerializeField] private RectTransform contentRect; // Content inside ScrollView
     [SerializeField] private TMP_Text warningText;
+    private const string KEYBINDS_SAVE_KEY = "PlayerKeybinds";
 
+    public static event Action<string, string> OnKeyBindingsChanged;
     private Dictionary<string, InputAction> actionDictionary = new Dictionary<string, InputAction>();
     private InputActionRebindingExtensions.RebindingOperation rebindingOperation;
+
+    private void Awake()
+    {
+        foreach (var actionMap in inputActions.actionMaps)
+        {
+            foreach (var action in actionMap.actions)
+            {
+                actionDictionary[action.name] = action;
+            }
+        }
+
+        LoadKeybinds(); // Load saved keybinds when game starts
+    }
 
     void Start()
     {
@@ -57,13 +74,13 @@ public class KeybindSettings: MonoBehaviour
 
     void CreateKeybindEntry(InputAction action)
     {
-        // Check if the action has a Mouse binding, and skip if true
+        // Check if the action has a Mouse movement binding and skip it, but allow mouse buttons
         foreach (var binding in action.bindings)
         {
-            if (binding.path.Contains("Mouse"))
+            if (binding.path.Contains("Mouse") &&
+                (binding.path.Contains("delta") || binding.path.Contains("scroll/y") || binding.path.Contains("scroll/x")))
             {
-                // Skip creating keybind entries for actions with Mouse bindings
-                Debug.Log($"Skipping action '{action.name}' due to Mouse binding.");
+                Debug.Log($"Skipping action '{action.name}' due to Mouse movement or scrolling binding.");
                 return;
             }
         }
@@ -153,99 +170,149 @@ public class KeybindSettings: MonoBehaviour
         }
     }
 
-    // A variable to store the original state of the keybinding text.
     private TMP_Text previousKeybindText = null;
     private string originalKeybindText = "";
 
-    // Start Rebinding Function
     void StartRebinding(InputAction action, TMP_Text keybindText, bool isController, int bindingIndex)
     {
-        // If there is an ongoing rebinding, cancel it first
         if (rebindingOperation != null)
         {
             rebindingOperation.Cancel();
         }
 
-        // Store the current keybinding text as the original before starting the rebinding
         originalKeybindText = keybindText.text;
         previousKeybindText = keybindText;
 
-        // Temporarily disable the action before rebinding
         action.Disable();
-
-        // Change the keybinding text to show the rebinding process is in progress
         keybindText.text = "...";
         int index = bindingIndex;
 
-        // Start the rebinding operation
         rebindingOperation = action.PerformInteractiveRebinding(index)
-            .WithControlsExcluding("Mouse") // Exclude mouse bindings
-            .OnComplete(operation =>
+    .WithControlsExcluding("Mouse/delta")   // Exclude mouse movement
+    .WithControlsExcluding("Mouse/scroll/y") // Exclude vertical scroll
+    .WithControlsExcluding("Mouse/scroll/x") // Exclude horizontal scroll
+    /*.WithControlsExcluding("<Mouse>/leftButton")
+    .WithControlsExcluding("<Pointer>/press")*/
+    .OnComplete(operation =>
+    {
+        string newKey = action.bindings[index].ToDisplayString()
+            .Replace("Press ", "")
+            .Replace("Hold", "");
+
+        Debug.Log($"Keybinding changed to: {newKey}");
+
+        bool isConflict = false;
+        foreach (var otherAction in actionDictionary.Values)
+        {
+            if (otherAction != action)
             {
-            // Get the new pressed key as a string
-            string newKey = action.bindings[index].ToDisplayString()
-                    .Replace("Press ", "")  // Remove "Press"
-                    .Replace("Hold", "");   // Remove "Hold"
-
-            // Debug log the new keybinding
-            Debug.Log($"Keybinding changed to: {newKey}");
-
-            // Check for conflicts with other bindings
-            bool isConflict = false;
-
-                foreach (var otherAction in actionDictionary.Values)
+                foreach (var binding in otherAction.bindings)
                 {
-                    if (otherAction != action)
-                    {
-                        foreach (var binding in otherAction.bindings)
-                        {
-                            string otherKey = binding.ToDisplayString()
-                                .Replace("Press ", "")
-                                .Replace("Hold", "");
+                    string otherKey = binding.ToDisplayString()
+                        .Replace("Press ", "")
+                        .Replace("Hold", "");
 
-                        // Check if the new key is already bound
-                        if (newKey != "" && newKey == otherKey)
-                            {
-                                isConflict = true;
-                                break;
-                            }
-                            else if (newKey == "" && binding.path == action.bindings[index].path)
-                            {
-                                isConflict = true;
-                                break;
-                            }
+                    if (newKey != "" && newKey == otherKey)
+                    {
+                        isConflict = true;
+                        break;
+                    }
+                    else if (newKey == "" && binding.path == action.bindings[index].path)
+                    {
+                        isConflict = true;
+                        break;
+                    }
+                }
+            }
+            if (isConflict) break;
+        }
+
+        keybindText.text = newKey != "" ? newKey : action.bindings[index].ToDisplayString();
+
+        if (isConflict)
+        {
+            ShowWarningText("Note: This key is the same as another action, recommended to only have a max of 2 per key!");
+        }
+
+        OnKeyBindingsChanged?.Invoke(action.name, newKey);
+
+        SaveKeybinds();
+
+        operation.Dispose();
+        action.Enable();
+    })
+    .OnCancel(operation =>
+    {
+        if (previousKeybindText != null)
+        {
+            previousKeybindText.text = originalKeybindText;
+        }
+
+        operation.Dispose();
+        action.Enable();
+    })
+    .Start();
+    }
+
+        private void SaveKeybinds()
+    {
+        var bindings = new Dictionary<string, string>();
+
+        foreach (var action in actionDictionary.Values)
+        {
+            for (int i = 0; i < action.bindings.Count; i++)
+            {
+                if (!action.bindings[i].isComposite) // Avoid composite bindings (e.g., WASD)
+                {
+                    string assignedPath = string.IsNullOrEmpty(action.bindings[i].overridePath)
+                        ? action.bindings[i].path  // If no override, keep the default path
+                        : action.bindings[i].overridePath;
+
+                    bindings[action.name + i] = assignedPath;
+
+                    Debug.Log($"Saving: {action.name} [{i}] = {assignedPath}");
+                }
+            }
+        }
+
+        string json = JsonUtility.ToJson(new Serialization<string, string>(bindings));
+        PlayerPrefs.SetString(KEYBINDS_SAVE_KEY, json);
+        PlayerPrefs.Save();
+
+        Debug.Log("Keybinds saved successfully.");
+    }
+
+    private void LoadKeybinds()
+    {
+        if (PlayerPrefs.HasKey(KEYBINDS_SAVE_KEY))
+        {
+            string json = PlayerPrefs.GetString(KEYBINDS_SAVE_KEY);
+            var bindings = JsonUtility.FromJson<Serialization<string, string>>(json).ToDictionary();
+
+            foreach (var action in actionDictionary.Values)
+            {
+                for (int i = 0; i < action.bindings.Count; i++)
+                {
+                    if (!action.bindings[i].isComposite)
+                    {
+                        if (bindings.ContainsKey(action.name + i))
+                        {
+                            string savedPath = bindings[action.name + i];
+                            action.ApplyBindingOverride(i, savedPath);
+                            Debug.Log($"Loaded: {action.name} [{i}] = {savedPath}");
+                        }
+                        else
+                        {
+                            Debug.Log($"No saved keybind for {action.name} [{i}]. Keeping default: {action.bindings[i].path}");
                         }
                     }
-
-                    if (isConflict) break;
                 }
-
-            // Update the binding text to reflect the new keybinding or the default if empty
-            keybindText.text = newKey != "" ? newKey : action.bindings[index].ToDisplayString();
-
-            // Show a warning if there was a conflict with another binding
-            if (isConflict)
-                {
-                    ShowWarningText("Note: This key is the same as another action, recommended to only have a max of 2 per key!");
-                }
-
-            // Dispose of the operation and re-enable the action after rebinding
-            operation.Dispose();
-                action.Enable();
-            })
-            .OnCancel(operation =>
-            {
-            // If the rebinding was canceled, reset the keybinding to its original state
-            if (previousKeybindText != null)
-                {
-                    previousKeybindText.text = originalKeybindText; // Reset the text to the original value
             }
-
-            // Reset the rebinding process
-            operation.Dispose();
-                action.Enable();
-            })
-            .Start();
+        }
+        else
+        {
+            Debug.Log("No saved keybinds found. Using default bindings.");
+        }
     }
 
     void ShowWarningText(string message)
@@ -302,4 +369,26 @@ public class KeybindSettings: MonoBehaviour
     }
 }
 
+[System.Serializable]
+public class Serialization<TKey, TValue>
+{
+    public List<TKey> keys;
+    public List<TValue> values;
+
+    public Serialization(Dictionary<TKey, TValue> dictionary)
+    {
+        keys = new List<TKey>(dictionary.Keys);
+        values = new List<TValue>(dictionary.Values);
+    }
+
+    public Dictionary<TKey, TValue> ToDictionary()
+    {
+        var dictionary = new Dictionary<TKey, TValue>();
+        for (int i = 0; i < keys.Count; i++)
+        {
+            dictionary[keys[i]] = values[i];
+        }
+        return dictionary;
+    }
+}
 

@@ -39,6 +39,7 @@ public class DialogueManager : MonoBehaviour
 
     [Header("Keybinds")]
     [SerializeField] private InputActionAsset inputActions;
+    [SerializeField] private KeybindSettings keybindSettings;
     [SerializeField] private string advanceDialogueName = "Advance Dialogue";
     [SerializeField] private string selectOptionName = "Select Option";
     [SerializeField] private string scrollName = "Interaction Scroll";
@@ -51,8 +52,6 @@ public class DialogueManager : MonoBehaviour
 
     private InputAction advanceDialogue;
     private InputAction selectOption;
-    private InputAction scrollUp;
-    private InputAction scrollDown;
     private InputAction scroll;
 
     private int selectedOptionIndex = 0;
@@ -151,11 +150,17 @@ public class DialogueManager : MonoBehaviour
     private void OnEnable()
     {
         KeyBindingManager.OnInputDeviceChanged += UpdateAllIndicatorSprites;
+
+        // Correctly subscribe using a lambda function
+        KeybindSettings.OnKeyBindingsChanged += (_, _) => UpdateAllIndicatorSprites();
     }
 
     private void OnDisable()
     {
         KeyBindingManager.OnInputDeviceChanged -= UpdateAllIndicatorSprites;
+
+        // Unsubscribe correctly
+        KeybindSettings.OnKeyBindingsChanged -= (_, _) => UpdateAllIndicatorSprites();
     }
 
     private void UpdateAllIndicatorSprites()
