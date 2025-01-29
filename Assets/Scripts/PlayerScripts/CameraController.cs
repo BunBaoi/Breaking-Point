@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Cinemachine;
+using TMPro;
 
 public class CameraController : MonoBehaviour
 {
@@ -58,6 +59,8 @@ public class CameraController : MonoBehaviour
     void HandleLook()
     {
         if (playerBody == null || virtualCamera == null || lookAction == null) return;
+
+        mouseSensitivity = SettingsManager.Instance.GetMouseSensitivity();
 
         lookInput = lookAction.ReadValue<Vector2>();
 

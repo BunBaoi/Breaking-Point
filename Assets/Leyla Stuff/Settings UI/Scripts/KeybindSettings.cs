@@ -5,7 +5,6 @@ using TMPro;
 using System.Collections;
 using System.Collections.Generic;
 using System;
-using UnityEngine.EventSystems;
 
 public class KeybindSettings: MonoBehaviour
 {
@@ -21,9 +20,24 @@ public class KeybindSettings: MonoBehaviour
     public static event Action<string, string> OnKeyBindingsChanged;
     private Dictionary<string, InputAction> actionDictionary = new Dictionary<string, InputAction>();
     private InputActionRebindingExtensions.RebindingOperation rebindingOperation;
+    private List<Button> instantiatedButtons = new List<Button>();
+    private Coroutine notificationMessageCoroutine;
+
+    public static KeybindSettings Instance;
 
     private void Awake()
     {
+
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         foreach (var actionMap in inputActions.actionMaps)
         {
             foreach (var action in actionMap.actions)
@@ -72,9 +86,8 @@ public class KeybindSettings: MonoBehaviour
         UpdateContentSize();
     }
 
-    void CreateKeybindEntry(InputAction action)
+    private void CreateKeybindEntry(InputAction action)
     {
-        // Check if the action has a Mouse movement binding and skip it, but allow mouse buttons
         foreach (var binding in action.bindings)
         {
             if (binding.path.Contains("Mouse") &&
@@ -85,16 +98,12 @@ public class KeybindSettings: MonoBehaviour
             }
         }
 
-        // Check if it's a composite action (e.g., a 2D Vector with separate bindings for Up, Down, Left, Right)
         if (action.bindings.Count > 1 && action.bindings[0].isComposite)
         {
-            // Only instantiate 4 entries for Up, Down, Left, Right
             string[] directions = { "Up", "Down", "Left", "Right" };
 
-            // Iterate over the 4 directions
             for (int i = 0; i < 4; i++)
             {
-                // Instantiate the prefab for each direction (Up, Down, Left, Right)
                 GameObject compositeEntry = Instantiate(keybindPrefab, keybindListParent);
                 TMP_Text compositeActionLabel = compositeEntry.transform.Find("ActionLabel")?.GetComponent<TMP_Text>();
                 Button compositeKeybindButtonKeyboard = compositeEntry.transform.Find("KeybindButtonKeyboard")?.GetComponent<Button>();
@@ -108,33 +117,31 @@ public class KeybindSettings: MonoBehaviour
                     return;
                 }
 
-                // Set the label for the action (e.g., Up, Down, Left, Right)
                 compositeActionLabel.text = directions[i];
 
-                // Adjust index logic for the keyboard (1, 2, 3, 4)
-                int keyboardIndex = i + 1; // Up = 1, Down = 2, Left = 3, Right = 4
+                int keyboardIndex = i + 1;
                 if (keyboardIndex < action.bindings.Count && action.bindings[keyboardIndex].path.Contains("Keyboard"))
                 {
                     compositeKeybindTextKeyboard.text = action.bindings[keyboardIndex].ToDisplayString()
-                        .Replace("Press ", "")  // Remove "Press"
-                        .Replace("Hold", "");   // Remove "Hold"
+                        .Replace("Press ", "").Replace("Hold", "");
                     compositeKeybindButtonKeyboard.onClick.AddListener(() => StartRebinding(action, compositeKeybindTextKeyboard, false, keyboardIndex));
+
+                    instantiatedButtons.Add(compositeKeybindButtonKeyboard); // Add to list
                 }
 
-                // Adjust index logic for the controller (6, 7, 8, 9)
-                int controllerIndex = i + 6; // Up = 6, Down = 7, Left = 8, Right = 9
+                int controllerIndex = i + 6;
                 if (controllerIndex < action.bindings.Count && action.bindings[controllerIndex].path.Contains("Controller"))
                 {
                     compositeKeybindTextController.text = action.bindings[controllerIndex].ToDisplayString()
-                        .Replace("Press ", "")  // Remove "Press"
-                        .Replace("Hold", "");   // Remove "Hold"
+                        .Replace("Press ", "").Replace("Hold", "");
                     compositeKeybindButtonController.onClick.AddListener(() => StartRebinding(action, compositeKeybindTextController, true, controllerIndex));
+
+                    instantiatedButtons.Add(compositeKeybindButtonController); // Add to list
                 }
             }
         }
         else
         {
-            // Handle non-composite actions if necessary, for example for simple actions like Jump, Shoot, etc.
             GameObject entry = Instantiate(keybindPrefab, keybindListParent);
             TMP_Text actionLabel = entry.transform.Find("ActionLabel")?.GetComponent<TMP_Text>();
             Button keybindButtonKeyboard = entry.transform.Find("KeybindButtonKeyboard")?.GetComponent<Button>();
@@ -148,24 +155,22 @@ public class KeybindSettings: MonoBehaviour
                 return;
             }
 
-            actionLabel.text = action.name; // For non-composite actions
+            actionLabel.text = action.name;
 
-            // Set the keyboard binding
             if (action.bindings.Count > 0)
             {
-                keybindTextKeyboard.text = action.bindings[0].ToDisplayString()
-                    .Replace("Press ", "")  // Remove "Press"
-                    .Replace("Hold", "");   // Remove "Hold"
+                keybindTextKeyboard.text = action.bindings[0].ToDisplayString().Replace("Press ", "").Replace("Hold", "");
                 keybindButtonKeyboard.onClick.AddListener(() => StartRebinding(action, keybindTextKeyboard, false, 0));
+
+                instantiatedButtons.Add(keybindButtonKeyboard); // Add to list
             }
 
-            // Set the controller binding
             if (action.bindings.Count > 1)
             {
-                keybindTextController.text = action.bindings[1].ToDisplayString()
-                    .Replace("Press ", "")  // Remove "Press"
-                    .Replace("Hold", "");   // Remove "Hold"
+                keybindTextController.text = action.bindings[1].ToDisplayString().Replace("Press ", "").Replace("Hold", "");
                 keybindButtonController.onClick.AddListener(() => StartRebinding(action, keybindTextController, true, 1));
+
+                instantiatedButtons.Add(keybindButtonController); // Add to list
             }
         }
     }
@@ -173,11 +178,14 @@ public class KeybindSettings: MonoBehaviour
     private TMP_Text previousKeybindText = null;
     private string originalKeybindText = "";
 
+    private bool isRebindingInProgress = false;
+
     void StartRebinding(InputAction action, TMP_Text keybindText, bool isController, int bindingIndex)
     {
         if (rebindingOperation != null)
         {
             rebindingOperation.Cancel();
+            rebindingOperation.Dispose();
         }
 
         originalKeybindText = keybindText.text;
@@ -187,74 +195,99 @@ public class KeybindSettings: MonoBehaviour
         keybindText.text = "...";
         int index = bindingIndex;
 
+        string previousBinding = action.bindings[index].ToDisplayString(); // Store previous binding
+
+        // Set rebinding flag to true to track the operation status
+        isRebindingInProgress = true;
+
         rebindingOperation = action.PerformInteractiveRebinding(index)
-    .WithControlsExcluding("Mouse/delta")   // Exclude mouse movement
-    .WithControlsExcluding("Mouse/scroll/y") // Exclude vertical scroll
-    .WithControlsExcluding("Mouse/scroll/x") // Exclude horizontal scroll
-    /*.WithControlsExcluding("<Mouse>/leftButton")
-    .WithControlsExcluding("<Pointer>/press")*/
-    .OnComplete(operation =>
-    {
-        string newKey = action.bindings[index].ToDisplayString()
-            .Replace("Press ", "")
-            .Replace("Hold", "");
-
-        Debug.Log($"Keybinding changed to: {newKey}");
-
-        bool isConflict = false;
-        foreach (var otherAction in actionDictionary.Values)
-        {
-            if (otherAction != action)
+            .WithControlsExcluding("Mouse/delta")   // Exclude mouse movement
+            .WithControlsExcluding("Mouse/scroll/y") // Exclude vertical scroll
+            .WithControlsExcluding("Mouse/scroll/x") // Exclude horizontal scroll
+            .WithControlsExcluding("Mouse/scroll/up")
+            .WithControlsExcluding("Mouse/scroll/down")
+            .WithControlsExcluding("Mouse/scroll/right")
+            .WithControlsExcluding("Mouse/scroll/left")
+            .OnMatchWaitForAnother(0.2f) // Wait for 200ms for a valid input
+            .OnComplete(operation =>
             {
-                foreach (var binding in otherAction.bindings)
+                if (!isRebindingInProgress) return; // Ignore completion if the rebinding was interrupted
+
+            string newKey = action.bindings[index].ToDisplayString()
+                    .Replace("Press ", "")
+                    .Replace("Hold", "")
+                    .Trim();
+
+                Debug.Log($"Keybinding changed to: {newKey}");
+
+                bool isConflict = false;
+                foreach (var otherAction in actionDictionary.Values)
                 {
-                    string otherKey = binding.ToDisplayString()
-                        .Replace("Press ", "")
-                        .Replace("Hold", "");
+                    if (otherAction != action)
+                    {
+                        foreach (var binding in otherAction.bindings)
+                        {
+                            string otherKey = binding.ToDisplayString()
+                                .Replace("Press ", "")
+                                .Replace("Hold", "")
+                                .Trim();
 
-                    if (newKey != "" && newKey == otherKey)
-                    {
-                        isConflict = true;
-                        break;
+                            if (newKey != "" && newKey == otherKey)
+                            {
+                                isConflict = true;
+                                break;
+                            }
+                            else if (newKey == "" && binding.path == action.bindings[index].path)
+                            {
+                                isConflict = true;
+                                break;
+                            }
+                        }
                     }
-                    else if (newKey == "" && binding.path == action.bindings[index].path)
-                    {
-                        isConflict = true;
-                        break;
-                    }
+                    if (isConflict) break;
                 }
-            }
-            if (isConflict) break;
-        }
 
-        keybindText.text = newKey != "" ? newKey : action.bindings[index].ToDisplayString();
+            // Check if the rebinding operation was interrupted or left click was pressed
+            if (previousBinding != newKey && newKey == "Left Click" && isRebindingInProgress)
+                {
+                    Debug.LogWarning("Left Click binding is only allowed if the rebinding was not interrupted.");
+                    keybindText.text = originalKeybindText;
+                    action.ApplyBindingOverride(index, previousBinding);
+                }
+                else
+                {
+                    keybindText.text = newKey != "" ? newKey : action.bindings[index].ToDisplayString();
+                }
 
-        if (isConflict)
-        {
-            ShowWarningText("Note: This key is the same as another action, recommended to only have a max of 2 per key!");
-        }
+                if (isConflict)
+                {
+                    ShowWarningText("Note: This key is the same as another action, recommended to only have a max of 2 per key!");
+                }
 
-        OnKeyBindingsChanged?.Invoke(action.name, newKey);
+                OnKeyBindingsChanged?.Invoke(action.name, newKey);
+                SaveKeybinds();
 
-        SaveKeybinds();
+            // Reset rebinding flag once done
+            isRebindingInProgress = false;
+                operation.Dispose();
+                action.Enable();
+            })
+            .OnCancel(operation =>
+            {
+                if (previousKeybindText != null)
+                {
+                    previousKeybindText.text = originalKeybindText;
+                }
 
-        operation.Dispose();
-        action.Enable();
-    })
-    .OnCancel(operation =>
-    {
-        if (previousKeybindText != null)
-        {
-            previousKeybindText.text = originalKeybindText;
-        }
-
-        operation.Dispose();
-        action.Enable();
-    })
-    .Start();
+            // Reset rebinding flag if canceled
+            isRebindingInProgress = false;
+                operation.Dispose();
+                action.Enable();
+            })
+            .Start();
     }
 
-        private void SaveKeybinds()
+    public void SaveKeybinds()
     {
         var bindings = new Dictionary<string, string>();
 
@@ -320,21 +353,22 @@ public class KeybindSettings: MonoBehaviour
         warningText.text = message;
         warningText.gameObject.SetActive(true);
 
-        // Start a coroutine that doesn't depend on the time scale
-        StartCoroutine(HideWarningText());
+        // If there's an existing coroutine running, stop it
+        if (notificationMessageCoroutine != null)
+        {
+            StopCoroutine(notificationMessageCoroutine);
+        }
+
+        // Show the reset message
+        warningText.gameObject.SetActive(true);
+
+        // Start a new coroutine
+        notificationMessageCoroutine = StartCoroutine(HideWarningText());
     }
 
     IEnumerator HideWarningText()
     {
-        // Use unscaled time so it runs even when the game is paused
-        float elapsedTime = 0f;
-        float warningDuration = 3f; // Duration for the warning text
-
-        while (elapsedTime < warningDuration)
-        {
-            elapsedTime += Time.unscaledDeltaTime;
-            yield return null;
-        }
+        yield return new WaitForSecondsRealtime(3f);
 
         warningText.text = "";
         // Hide the warning text after the duration
