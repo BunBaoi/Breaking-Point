@@ -8,7 +8,7 @@ public class ButtonHoverEffect : MonoBehaviour, IPointerEnterHandler, IPointerEx
     private TextMeshProUGUI buttonText;
     public Color originalColor;
 
-    [SerializeField] private float hoverScaleMultiplier = 1.2f;  // Scale multiplier when hovering
+    public float hoverScaleMultiplier = 1.2f;  // Scale multiplier when hovering
     public Color hoverColor;                   // Color when hovering
     public Color pressedColor;                 // Color when pressing
 

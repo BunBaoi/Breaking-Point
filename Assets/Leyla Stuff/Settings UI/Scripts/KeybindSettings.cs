@@ -100,7 +100,7 @@ public class KeybindSettings: MonoBehaviour
 
         if (action.bindings.Count > 1 && action.bindings[0].isComposite)
         {
-            string[] directions = { "Up", "Down", "Left", "Right" };
+            string[] directions = { "Move Forward", "Move Backward", "Move Left", "Move Right" };
 
             for (int i = 0; i < 4; i++)
             {
@@ -182,6 +182,7 @@ public class KeybindSettings: MonoBehaviour
 
     void StartRebinding(InputAction action, TMP_Text keybindText, bool isController, int bindingIndex)
     {
+        warningText.text = "";
         if (rebindingOperation != null)
         {
             rebindingOperation.Cancel();
@@ -196,6 +197,13 @@ public class KeybindSettings: MonoBehaviour
         int index = bindingIndex;
 
         string previousBinding = action.bindings[index].ToDisplayString(); // Store previous binding
+        string bindingGroup = action.bindings[index].groups; // Determine control scheme
+
+        Button currentButton = keybindText.GetComponentInParent<Button>();
+        if (currentButton != null)
+        {
+            currentButton.interactable = false;
+        }
 
         // Set rebinding flag to true to track the operation status
         isRebindingInProgress = true;
@@ -211,7 +219,7 @@ public class KeybindSettings: MonoBehaviour
             .OnMatchWaitForAnother(0.2f) // Wait for 200ms for a valid input
             .OnComplete(operation =>
             {
-                if (!isRebindingInProgress) return; // Ignore completion if the rebinding was interrupted
+                if (!isRebindingInProgress) return; // Ignore completion if rebinding was interrupted
 
             string newKey = action.bindings[index].ToDisplayString()
                     .Replace("Press ", "")
@@ -221,33 +229,59 @@ public class KeybindSettings: MonoBehaviour
                 Debug.Log($"Keybinding changed to: {newKey}");
 
                 bool isConflict = false;
-                foreach (var otherAction in actionDictionary.Values)
+
+            // **Step 1: Check for conflicts within the same action (including composites)**
+            for (int i = 0; i < action.bindings.Count; i++)
+                {
+                    if (i == index) continue; // Skip checking itself
+
+                if (action.bindings[i].groups == bindingGroup) // Only check within the same control scheme
+                {
+                        string existingKey = action.bindings[i].ToDisplayString()
+                            .Replace("Press ", "")
+                            .Replace("Hold", "")
+                            .Trim();
+
+                        if (newKey == existingKey)
+                        {
+                            Debug.LogWarning($"Conflict detected in the same action: {action.name} (Binding {index} conflicts with {i})");
+                            isConflict = true;
+                            break;
+                        }
+                    }
+                }
+
+            // **Step 2: Check for conflicts with other actions within the same control scheme**
+            foreach (var otherAction in actionDictionary.Values)
                 {
                     if (otherAction != action)
                     {
                         foreach (var binding in otherAction.bindings)
                         {
-                            string otherKey = binding.ToDisplayString()
-                                .Replace("Press ", "")
-                                .Replace("Hold", "")
-                                .Trim();
+                            if (binding.groups == bindingGroup) // Only check within the same control scheme
+                        {
+                                string otherKey = binding.ToDisplayString()
+                                    .Replace("Press ", "")
+                                    .Replace("Hold", "")
+                                    .Trim();
 
-                            if (newKey != "" && newKey == otherKey)
-                            {
-                                isConflict = true;
-                                break;
-                            }
-                            else if (newKey == "" && binding.path == action.bindings[index].path)
-                            {
-                                isConflict = true;
-                                break;
+                                if (newKey != "" && newKey == otherKey)
+                                {
+                                    isConflict = true;
+                                    break;
+                                }
+                                else if (newKey == "" && binding.path == action.bindings[index].path)
+                                {
+                                    isConflict = true;
+                                    break;
+                                }
                             }
                         }
                     }
                     if (isConflict) break;
                 }
 
-            // Check if the rebinding operation was interrupted or left click was pressed
+            // **Step 3: Prevent Left Click from overriding improperly**
             if (previousBinding != newKey && newKey == "Left Click" && isRebindingInProgress)
                 {
                     Debug.LogWarning("Left Click binding is only allowed if the rebinding was not interrupted.");
@@ -261,7 +295,7 @@ public class KeybindSettings: MonoBehaviour
 
                 if (isConflict)
                 {
-                    ShowWarningText("Note: This key is the same as another action, recommended to only have a max of 2 per key!");
+                    ShowWarningText("Note: This key is the same as another action. Recommended to have a max of 2 per key!");
                 }
 
                 OnKeyBindingsChanged?.Invoke(action.name, newKey);
@@ -271,6 +305,11 @@ public class KeybindSettings: MonoBehaviour
             isRebindingInProgress = false;
                 operation.Dispose();
                 action.Enable();
+
+                if (currentButton != null)
+                {
+                    currentButton.interactable = true; // Re-enable the button after rebinding
+                }
             })
             .OnCancel(operation =>
             {
@@ -283,6 +322,10 @@ public class KeybindSettings: MonoBehaviour
             isRebindingInProgress = false;
                 operation.Dispose();
                 action.Enable();
+                if (currentButton != null)
+                {
+                    currentButton.interactable = true; // Re-enable the button after rebinding
+                }
             })
             .Start();
     }

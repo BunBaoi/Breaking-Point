@@ -4,6 +4,8 @@ using UnityEngine.InputSystem;
 using TMPro;
 using UnityEngine.Rendering.PostProcessing;
 using System.Collections;
+using FMOD.Studio;
+using FMODUnity;
 
 public class SettingsManager : MonoBehaviour
 {
@@ -13,6 +15,13 @@ public class SettingsManager : MonoBehaviour
     [Header("Panels & Buttons")]
     public Button[] panelButtons;
     public GameObject[] panels;
+    [SerializeField] private Color originalColor = Color.white;
+    [SerializeField] private Color hoverColor = Color.yellow;
+    [SerializeField] private Color pressedColor = Color.red;
+    [SerializeField] private float hoverScaleMultiplier = 1.2f;
+
+    [Header("Resume Game Settings")]
+    [SerializeField] private Button resumeButton;
 
     [Header("Keybinds")]
     [SerializeField] private InputActionAsset inputActions;
@@ -29,6 +38,19 @@ public class SettingsManager : MonoBehaviour
     [Header("Mouse Sensitivity Settings")]
     [SerializeField] private TMP_InputField sensitivityInputField;
     public static float mouseSensitivity = 100f;
+
+    [Header("Audio Settings")]
+    [SerializeField] private Slider masterSlider;
+    [SerializeField] private Slider dialogueSlider;
+    [SerializeField] private Slider sfxSlider;
+    [SerializeField] private Slider masterMusicSlider;
+    [SerializeField] private Slider menuMusicSlider;
+
+    private Bus masterBus;
+    private Bus dialogueBus;
+    private Bus sfxBus;
+    private Bus masterMusicBus;
+    private Bus menuMusicBus;
 
     [Header("Reset to Default Settings")]
     [SerializeField] private Button resetButton;
@@ -86,7 +108,28 @@ public class SettingsManager : MonoBehaviour
 
         settingsCanvas.SetActive(isMenuOpen);
 
-        // Panel buttons setup
+        foreach (var button in panelButtons)
+        {
+            if (button != null)
+            {
+                ButtonHoverEffect effect = button.gameObject.GetComponent<ButtonHoverEffect>();
+                if (effect == null)
+                {
+                    effect = button.gameObject.AddComponent<ButtonHoverEffect>();
+                }
+
+                button.GetComponent<ButtonHoverEffect>();
+                if (effect != null)
+                {
+                    effect.originalColor = originalColor;
+                    effect.hoverColor = hoverColor;
+                    effect.pressedColor = pressedColor;
+                    effect.hoverScaleMultiplier = hoverScaleMultiplier;
+                }
+            }
+        }
+
+        // Panel buttons
         if (panelButtons.Length == panels.Length)
         {
             for (int i = 0; i < panelButtons.Length; i++)
@@ -100,10 +143,10 @@ public class SettingsManager : MonoBehaviour
             Debug.LogError("Mismatch between panel buttons and panels count!");
         }
 
-        // Reset button setup
+        // Reset button
         if (resetButton != null)
         {
-            resetButton.onClick.AddListener(ResetToDefaultSettings); // Add listener to reset settings
+            resetButton.onClick.AddListener(ResetToDefaultSettings);
         }
         else
         {
@@ -143,6 +186,61 @@ public class SettingsManager : MonoBehaviour
             sensitivityInputField.text = (mouseSensitivity / 100f).ToString("0.00");
             sensitivityInputField.onEndEdit.AddListener(UpdateSensitivity);
         }
+
+        // Resume button
+        if (resumeButton != null)
+        {
+            resumeButton.onClick.AddListener(ResumeGame);
+        }
+        else
+        {
+            Debug.LogError("Reset Button is not assigned in the Inspector!");
+        }
+
+        // Initialise FMOD buses
+        masterBus = RuntimeManager.GetBus("bus:/");
+        dialogueBus = RuntimeManager.GetBus("bus:/dialogue");
+        sfxBus = RuntimeManager.GetBus("bus:/sfx");
+        masterMusicBus = RuntimeManager.GetBus("bus:/masterMusic");
+        menuMusicBus = RuntimeManager.GetBus("bus:/masterMusic/menuMusic");
+
+        // Debug logs to check if buses are initialized
+        Debug.Log($"Master Bus Initialised: {masterBus.isValid()}");
+        Debug.Log($"Dialogue Bus Initialised: {dialogueBus.isValid()}");
+        Debug.Log($"SFX Bus Initialised: {sfxBus.isValid()}");
+        Debug.Log($"Master Music Bus Initialised: {masterMusicBus.isValid()}");
+        Debug.Log($"Menu Music Bus Initialised: {menuMusicBus.isValid()}");
+
+
+        // Set initial slider values from PlayerPrefs or defaults
+        if (masterSlider != null && dialogueSlider != null && sfxSlider != null && masterMusicSlider != null && menuMusicSlider != null)
+        {
+            float savedMasterVolume = PlayerPrefs.GetFloat("MasterVolume", 1f);
+            float savedDialogueVolume = PlayerPrefs.GetFloat("DialogueVolume", 1f);
+            float savedSfxVolume = PlayerPrefs.GetFloat("SFXVolume", 1f);
+            float savedMasterMusicVolume = PlayerPrefs.GetFloat("MasterMusicVolume", 1f);
+            float savedMenuMusicVolume = PlayerPrefs.GetFloat("MenuMusicVolume", 1f);
+            masterSlider.value = savedMasterVolume;
+            dialogueSlider.value = savedDialogueVolume;
+            sfxSlider.value = savedSfxVolume;
+            masterMusicSlider.value = savedMasterMusicVolume;
+            menuMusicSlider.value = savedMenuMusicVolume;
+            UpdateMasterVolume(savedMasterVolume);
+            UpdateDialogueVolume(savedDialogueVolume);
+            UpdateSFXVolume(savedSfxVolume);
+            UpdateMasterMusicVolume(savedMasterMusicVolume);
+            UpdateMenuMusicVolume(savedMenuMusicVolume);
+        }
+
+        if (masterSlider != null && dialogueSlider != null && sfxSlider != null && masterMusicSlider != null && menuMusicSlider != null)
+        {
+            // Add listeners for the sliders to adjust volumes
+            masterSlider.onValueChanged.AddListener(UpdateMasterVolume);
+            dialogueSlider.onValueChanged.AddListener(UpdateDialogueVolume);
+            sfxSlider.onValueChanged.AddListener(UpdateSFXVolume);
+            masterMusicSlider.onValueChanged.AddListener(UpdateMasterMusicVolume);
+            menuMusicSlider.onValueChanged.AddListener(UpdateMenuMusicVolume);
+        }
     }
 
     void OnDestroy()
@@ -161,6 +259,11 @@ public class SettingsManager : MonoBehaviour
         {
             resetButton.onClick.RemoveListener(ResetToDefaultSettings); // Remove listener when destroyed
         }
+
+        // Remove listeners when the object is destroyed
+        masterSlider.onValueChanged.RemoveListener(UpdateMasterVolume);
+        dialogueSlider.onValueChanged.RemoveListener(UpdateDialogueVolume);
+        sfxSlider.onValueChanged.RemoveListener(UpdateSFXVolume);
     }
 
     void ToggleMenu(InputAction.CallbackContext context)
@@ -278,6 +381,22 @@ public class SettingsManager : MonoBehaviour
         KeybindSettings.Instance.ResetToDefaults();
         KeybindSettings.Instance.SaveKeybinds();
 
+        masterSlider.value = 1f;
+        dialogueSlider.value = 1f;
+        sfxSlider.value = 1f;
+        masterMusicSlider.value = 1f;
+        menuMusicSlider.value = 1f;
+        UpdateMasterVolume(1f);
+        UpdateDialogueVolume(1f);
+        UpdateSFXVolume(1f);
+        UpdateMasterMusicVolume(1f);
+        UpdateMenuMusicVolume(1f);
+        PlayerPrefs.SetFloat("MasterVolume", 1f);
+        PlayerPrefs.SetFloat("DialogueVolume", 1f);
+        PlayerPrefs.SetFloat("SFXVolume", 1f);
+        PlayerPrefs.SetFloat("MasterMusicVolume", 1f);
+        PlayerPrefs.SetFloat("MenuMusicVolume", 1f);
+
         ShowResetText("Settings have been reset to default");
 
         Debug.Log("Settings Reset to Default");
@@ -310,4 +429,49 @@ public class SettingsManager : MonoBehaviour
         resetMessageText.gameObject.SetActive(false);
     }
 
+    public void ResumeGame()
+    {
+        isMenuOpen = false;
+        settingsCanvas.SetActive(false);
+
+        // Resume time and hide cursor
+        Time.timeScale = 1f;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+
+    // Master Volume Adjustment
+    public void UpdateMasterVolume(float value)
+    {
+        masterBus.setVolume(value); // Set the volume for the master bus
+        PlayerPrefs.SetFloat("MasterVolume", value); // Save the value
+    }
+
+    // Dialogue Volume Adjustment
+    public void UpdateDialogueVolume(float value)
+    {
+        dialogueBus.setVolume(value);
+        PlayerPrefs.SetFloat("DialogueVolume", value);
+    }
+
+    // SFX Volume Adjustment
+    public void UpdateSFXVolume(float value)
+    {
+        sfxBus.setVolume(value);
+        PlayerPrefs.SetFloat("SFXVolume", value);
+    }
+
+    // Master Music Volume Adjustment
+    public void UpdateMasterMusicVolume(float value)
+    {
+        masterMusicBus.setVolume(value);
+        PlayerPrefs.SetFloat("MasterMusicVolume", value);
+    }
+
+    // Menu Music Volume Adjustment
+    public void UpdateMenuMusicVolume(float value)
+    {
+        menuMusicBus.setVolume(value);
+        PlayerPrefs.SetFloat("MenuMusicVolume", value);
+    }
 }
