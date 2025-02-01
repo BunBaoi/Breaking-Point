@@ -5,6 +5,21 @@ using TMPro;
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using System.Linq;
+
+public class KeybindingMetadata
+{
+    public InputAction action;
+    public bool isCleared;
+    public List<string> bindings; // Track individual bindings in a list
+
+    public KeybindingMetadata(InputAction action)
+    {
+        this.action = action;
+        isCleared = false;
+        bindings = new List<string>();
+    }
+}
 
 public class KeybindSettings: MonoBehaviour
 {
@@ -22,6 +37,9 @@ public class KeybindSettings: MonoBehaviour
     private InputActionRebindingExtensions.RebindingOperation rebindingOperation;
     private List<Button> instantiatedButtons = new List<Button>();
     private Coroutine notificationMessageCoroutine;
+
+    private Dictionary<string, string> defaultBindings = new Dictionary<string, string>();
+    private List<(string actionName, int bindingIndex)> bindingHistory = new List<(string, int)>();
 
     public static KeybindSettings Instance;
 
@@ -52,6 +70,45 @@ public class KeybindSettings: MonoBehaviour
     void Start()
     {
         PopulateKeybindList();
+        InitialiseDefaultBindings();
+    }
+
+    private void Update()
+    {
+        /*if (Input.GetKeyDown(KeyCode.L))
+        {
+            Debug.Log("Instantiated Buttons List:");
+            foreach (Button button in instantiatedButtons)
+            {
+                if (button != null)
+                    Debug.Log($"Button: {button.name}");
+                else
+                    Debug.Log("Null Button Found");
+            }
+        }*/
+    }
+
+    private void InitialiseDefaultBindings()
+    {
+        bindingHistory.Clear();
+        foreach (var entry in actionDictionary)
+        {
+            InputAction action = entry.Value;
+            for (int i = 0; i < action.bindings.Count; i++)
+            {
+                string defaultKey = InputControlPath.ToHumanReadableString(
+                    action.bindings[i].effectivePath, InputControlPath.HumanReadableStringOptions.OmitDevice
+                );
+
+                string actionName = entry.Key;
+
+                // Store default bindings
+                defaultBindings[actionName] = defaultKey;
+
+                // Track defaults in history
+                bindingHistory.Add((actionName, i));
+            }
+        }
     }
 
     void PopulateKeybindList()
@@ -68,6 +125,7 @@ public class KeybindSettings: MonoBehaviour
             Destroy(child.gameObject);
         }
 
+        instantiatedButtons.Clear();
         actionDictionary.Clear();
 
         foreach (InputActionMap actionMap in inputActions.actionMaps)
@@ -123,20 +181,26 @@ public class KeybindSettings: MonoBehaviour
                 if (keyboardIndex < action.bindings.Count && action.bindings[keyboardIndex].path.Contains("Keyboard"))
                 {
                     compositeKeybindTextKeyboard.text = action.bindings[keyboardIndex].ToDisplayString()
-                        .Replace("Press ", "").Replace("Hold", "");
+                        .Replace("Press ", "").Replace("Hold", "").Replace("LMB", "Left Button").Replace("RMB", "Right Button").Replace("Forward", "Forward Button").Replace("Back", "Back Button").Replace("MMB", "Middle Button");
                     compositeKeybindButtonKeyboard.onClick.AddListener(() => StartRebinding(action, compositeKeybindTextKeyboard, false, keyboardIndex));
 
-                    instantiatedButtons.Add(compositeKeybindButtonKeyboard); // Add to list
+                    // Add the button with the action name and "_Keyboard"
+                    instantiatedButtons.Add(compositeKeybindButtonKeyboard);
+                    Debug.Log($"Added button: {compositeKeybindButtonKeyboard.name}");
+                    compositeKeybindButtonKeyboard.name = $"{action.name}_{keyboardIndex}_Keyboard"; // Add unique name
                 }
 
                 int controllerIndex = i + 6;
                 if (controllerIndex < action.bindings.Count && action.bindings[controllerIndex].path.Contains("Controller"))
                 {
                     compositeKeybindTextController.text = action.bindings[controllerIndex].ToDisplayString()
-                        .Replace("Press ", "").Replace("Hold", "");
+                        .Replace("Press ", "").Replace("Hold", "").Replace("LMB", "Left Button").Replace("RMB", "Right Button").Replace("Forward", "Forward Button").Replace("Back", "Back Button").Replace("MMB", "Middle Button");
                     compositeKeybindButtonController.onClick.AddListener(() => StartRebinding(action, compositeKeybindTextController, true, controllerIndex));
 
-                    instantiatedButtons.Add(compositeKeybindButtonController); // Add to list
+                    // Add the button with the action name and "_Controller"
+                    instantiatedButtons.Add(compositeKeybindButtonController);
+                    Debug.Log($"Added button: {compositeKeybindButtonController.name}");
+                    compositeKeybindButtonController.name = $"{action.name}_{controllerIndex}_Controller"; // Add unique name
                 }
             }
         }
@@ -159,18 +223,24 @@ public class KeybindSettings: MonoBehaviour
 
             if (action.bindings.Count > 0)
             {
-                keybindTextKeyboard.text = action.bindings[0].ToDisplayString().Replace("Press ", "").Replace("Hold", "");
+                keybindTextKeyboard.text = action.bindings[0].ToDisplayString().Replace("Press ", "").Replace("Hold", "").Replace("LMB", "Left Button").Replace("RMB", "Right Button").Replace("Forward", "Forward Button").Replace("Back", "Back Button").Replace("MMB", "Middle Button");
                 keybindButtonKeyboard.onClick.AddListener(() => StartRebinding(action, keybindTextKeyboard, false, 0));
 
-                instantiatedButtons.Add(keybindButtonKeyboard); // Add to list
+                // Add the button with the action name and "_Keyboard"
+                instantiatedButtons.Add(keybindButtonKeyboard);
+                Debug.Log($"Added button: {keybindButtonKeyboard.name}");
+                keybindButtonKeyboard.name = $"{action.name}_Keyboard"; // Add unique name
             }
 
             if (action.bindings.Count > 1)
             {
-                keybindTextController.text = action.bindings[1].ToDisplayString().Replace("Press ", "").Replace("Hold", "");
+                keybindTextController.text = action.bindings[1].ToDisplayString().Replace("Press ", "").Replace("Hold", "").Replace("LMB", "Left Button").Replace("RMB", "Right Button").Replace("Forward", "Forward Button").Replace("Back", "Back Button").Replace("MMB", "Middle Button");
                 keybindButtonController.onClick.AddListener(() => StartRebinding(action, keybindTextController, true, 1));
 
-                instantiatedButtons.Add(keybindButtonController); // Add to list
+                // Add the button with the action name and "_Controller"
+                instantiatedButtons.Add(keybindButtonController);
+                Debug.Log($"Added button: {keybindButtonKeyboard.name}");
+                keybindButtonController.name = $"{action.name}_Controller"; // Add unique name
             }
         }
     }
@@ -183,6 +253,11 @@ public class KeybindSettings: MonoBehaviour
     void StartRebinding(InputAction action, TMP_Text keybindText, bool isController, int bindingIndex)
     {
         warningText.text = "";
+        Debug.Log("Before Rebinding:");
+        foreach (var entry in actionDictionary)
+        {
+            Debug.Log($"Action Name: {entry.Key}, Bindings: {string.Join(", ", entry.Value.bindings.Select(b => b.ToDisplayString()))}");
+        }
         if (rebindingOperation != null)
         {
             rebindingOperation.Cancel();
@@ -221,7 +296,7 @@ public class KeybindSettings: MonoBehaviour
             {
                 if (!isRebindingInProgress) return; // Ignore completion if rebinding was interrupted
 
-            string newKey = action.bindings[index].ToDisplayString()
+            string newKey = operation.selectedControl.displayName
                     .Replace("Press ", "")
                     .Replace("Hold", "")
                     .Trim();
@@ -230,7 +305,7 @@ public class KeybindSettings: MonoBehaviour
 
                 bool isConflict = false;
 
-            // **Step 1: Check for conflicts within the same action (including composites)**
+            // Check for conflicts within the same action (including composites)
             for (int i = 0; i < action.bindings.Count; i++)
                 {
                     if (i == index) continue; // Skip checking itself
@@ -251,7 +326,7 @@ public class KeybindSettings: MonoBehaviour
                     }
                 }
 
-            // **Step 2: Check for conflicts with other actions within the same control scheme**
+            // Check for conflicts with other actions within the same control scheme
             foreach (var otherAction in actionDictionary.Values)
                 {
                     if (otherAction != action)
@@ -281,7 +356,7 @@ public class KeybindSettings: MonoBehaviour
                     if (isConflict) break;
                 }
 
-            // **Step 3: Prevent Left Click from overriding improperly**
+            // Prevent Left Click from overriding improperly
             if (previousBinding != newKey && newKey == "Left Click" && isRebindingInProgress)
                 {
                     Debug.LogWarning("Left Click binding is only allowed if the rebinding was not interrupted.");
@@ -298,11 +373,48 @@ public class KeybindSettings: MonoBehaviour
                     ShowWarningText("Note: This key is the same as another action. Recommended to have a max of 2 per key!");
                 }
 
+                // Capture the raw input path directly during the rebinding process
+                string newPath = operation.selectedControl.path;
+
+                string deviceType = "Unknown";
+
+                // Determine the device type by the newPath above
+                if (newPath.Contains("Keyboard") || newPath.Contains("Mouse"))
+                {
+                    deviceType = "Keyboard";
+                }
+                else if (newPath.Contains("Gamepad") || newPath.Contains("XInput"))
+                {
+                    deviceType = "Controller";
+                }
+
+                // Add new binding to history
+                bindingHistory.Add((action.name, bindingIndex));
+
+                // Unbind the latest instance based on the device type
+                UnbindLatestInstance(newKey, action.name, index, deviceType);
+
+                // Override keybind text to change specific keys to other text
+                if (newKey == "Back")
+                {
+                    keybindText.text = "Back Button"; 
+                }
+                if (newKey == "Forward")
+                {
+                    keybindText.text = "Forward Button";
+                }
+
                 OnKeyBindingsChanged?.Invoke(action.name, newKey);
                 SaveKeybinds();
 
-            // Reset rebinding flag once done
-            isRebindingInProgress = false;
+                Debug.Log("After Rebinding:");
+                foreach (var entry in actionDictionary)
+                {
+                    Debug.Log($"Action Name: {entry.Key}, Bindings: {string.Join(", ", entry.Value.bindings.Select(b => b.ToDisplayString()))}");
+                }
+
+                // Reset rebinding flag once done
+                isRebindingInProgress = false;
                 operation.Dispose();
                 action.Enable();
 
@@ -318,8 +430,14 @@ public class KeybindSettings: MonoBehaviour
                     previousKeybindText.text = originalKeybindText;
                 }
 
-            // Reset rebinding flag if canceled
-            isRebindingInProgress = false;
+                Debug.Log("After Rebinding:");
+                foreach (var entry in actionDictionary)
+                {
+                    Debug.Log($"Action Name: {entry.Key}, Bindings: {string.Join(", ", entry.Value.bindings.Select(b => b.ToDisplayString()))}");
+                }
+
+                // Reset rebinding flag if canceled
+                isRebindingInProgress = false;
                 operation.Dispose();
                 action.Enable();
                 if (currentButton != null)
@@ -330,6 +448,238 @@ public class KeybindSettings: MonoBehaviour
             .Start();
     }
 
+    private void UnbindLatestInstance(string newKey, string currentActionName, int bindingIndex, string deviceType)
+    {
+        warningText.text = "";
+        if (newKey == "<None>")
+        {
+            Debug.Log("Skipping unbinding since the new key is <None>");
+            return;
+        }
+
+        InputAction action = actionDictionary[currentActionName];
+
+        int keyBindingCount = 0;
+
+        // Check all bindings in the current action to see if the new key is already bound
+        for (int i = 0; i < action.bindings.Count; i++)
+        {
+            var binding = action.bindings[i];
+
+            // Check if the binding's device matches the deviceType
+            bool matchesDeviceType = false;
+
+            if (deviceType == "Keyboard" && binding.path.Contains("Keyboard") || binding.path.Contains("Mouse"))
+            {
+                matchesDeviceType = true;
+            }
+            else if (deviceType == "Controller" && (binding.path.Contains("Gamepad") || binding.path.Contains("XInput")))
+            {
+                matchesDeviceType = true;
+            }
+                string boundKey = InputControlPath.ToHumanReadableString(
+                    binding.effectivePath,
+                    InputControlPath.HumanReadableStringOptions.OmitDevice
+                );
+
+                if (boundKey == newKey && matchesDeviceType)
+                {
+                    keyBindingCount++;
+
+                    // Skip the bindingIndex we are currently modifying
+                    if (i == bindingIndex)
+                        continue;
+
+                    // If it's part of a composite, handle unbinding logic
+                    if (binding.isPartOfComposite)
+                    {
+                        ShowWarningText($"[{newKey}] is already bound in [{currentActionName}]! Unbinding [{newKey}] from [{i}] in {currentActionName}.");
+                        action.ApplyBindingOverride(i, "<None>");
+                        UpdateKeybindButtonText(currentActionName, i, "<Unbound>", deviceType); // Update UI text
+                        Debug.Log($"Unbinding {currentActionName} at index {i} because [{newKey}] is already in use in this composite.");
+
+                        // Remove from history and insert "<None>"
+                        for (int j = 0; j < bindingHistory.Count; j++)
+                        {
+                            if (bindingHistory[j].actionName == currentActionName && bindingHistory[j].bindingIndex == i)
+                            {
+                                bindingHistory.RemoveAt(j);
+                                bindingHistory.Insert(j, (currentActionName, i));
+                                break;
+                            }
+                        }
+                        return;
+                    }
+                }
+            }
+
+        // Debug log for keyBindingCount in the current action
+        Debug.Log($"Keybinding count for {newKey} in current action {currentActionName}: {keyBindingCount}");
+
+        // Check how many times the newKey is bound across all actions (not just current action)
+        int globalBindingCount = 0;
+
+        foreach (var actionPair in actionDictionary)
+        {
+            InputAction otherAction = actionPair.Value;
+
+            // Debugging: Log the current action
+            Debug.Log($"Checking action: {otherAction.name}");
+
+            for (int i = 0; i < otherAction.bindings.Count; i++)
+            {
+                var binding = otherAction.bindings[i];
+
+                // Debugging: Log each binding's path
+                Debug.Log($"Binding {i}: {binding.path}");
+
+                // Check if the binding's device matches the deviceType
+                bool matchesDeviceType = false;
+
+                // Debugging: Log the device type and whether it matches
+                if (deviceType == "Keyboard" && binding.path.Contains("Keyboard") || binding.path.Contains("Mouse"))
+                {
+                    matchesDeviceType = true;
+                    Debug.Log("Device matches Keyboard");
+                }
+                else if (deviceType == "Controller" && (binding.path.Contains("Gamepad") || binding.path.Contains("XInput")))
+                {
+                    matchesDeviceType = true;
+                    Debug.Log("Device matches Controller");
+                }
+                else
+                {
+                    Debug.Log($"No match for device type: {deviceType} on binding {i}");
+                }
+
+                string boundKey = InputControlPath.ToHumanReadableString(
+                    binding.effectivePath,
+                    InputControlPath.HumanReadableStringOptions.OmitDevice
+                );
+
+                // Debugging: Log the bound key
+                Debug.Log($"Bound Key: {boundKey}, New Key: {newKey}");
+
+                // If the binding matches the new key, increment the count
+                if (boundKey == newKey && matchesDeviceType)
+                {
+                    globalBindingCount++;
+                    Debug.Log($"Match found. Global Binding Count: {globalBindingCount}");
+                }
+                else
+                {
+                    Debug.Log("No match or device mismatch");
+                }
+            }
+        }
+
+        // Debug log for globalBindingCount across all actions
+        Debug.Log($"Global binding count for {newKey}: {globalBindingCount}");
+
+
+        // If the key is bound to more than one action (not composite), unbind the conflicting bindings, except the current one
+        if (globalBindingCount > 2)
+        {
+            warningText.text = "";
+            Debug.Log($"[{newKey}] is bound to more than 2 actions globally. Unbinding conflicting instance...");
+
+            for (int i = 0; i < bindingHistory.Count; i++)
+            {
+                var (actionName, bindingIndexInHistory) = bindingHistory[i];
+
+                if (actionDictionary.ContainsKey(actionName))
+                {
+                    InputAction otherAction = actionDictionary[actionName];
+                    var binding = otherAction.bindings[bindingIndexInHistory];
+
+                    string boundKey = InputControlPath.ToHumanReadableString(
+                        binding.effectivePath,
+                        InputControlPath.HumanReadableStringOptions.OmitDevice
+                    );
+
+                    // Check if the binding groups match the device type
+                    if (!binding.groups.Contains(deviceType))
+                    {
+                        Debug.Log($"Skipping {boundKey} in {actionName} because its binding group does not match {deviceType}.");
+                        continue;
+                    }
+
+                    if (binding.isPartOfComposite) continue;
+
+                    // Ensure we don't unbind the current keybinding
+                    if (boundKey == newKey && actionName != currentActionName)
+                    {
+                        Debug.Log($"Checking binding: {boundKey} with device {deviceType}, action: {actionName}, binding groups: {otherAction.bindings[bindingIndexInHistory].groups}");
+                        // Unbind the conflicting key
+                        ShowWarningText($"Only allowed up to 2 of the same key to be bound to different actions! Unbinding [{newKey}] from {actionName}.");
+                        otherAction.ApplyBindingOverride(bindingIndexInHistory, "<None>");
+                        UpdateKeybindButtonText(actionName, null, "<Unbound>", deviceType); // Update specific button text
+                        Debug.Log($"Unbinding {actionName} at index {bindingIndexInHistory} to make room for {newKey}.");
+
+                        // Remove from history and update it
+                        bindingHistory.RemoveAt(i);
+                        bindingHistory.Insert(i, (actionName, bindingIndexInHistory));
+
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    private void UpdateKeybindButtonText(string actionName, int? bindingIndex, string newText, string deviceType = "Keyboard")
+    {
+        Debug.Log($"Updating button text for action: {actionName}, bindingIndex: {bindingIndex?.ToString() ?? "None"}, newText: {newText}");
+
+        foreach (Button button in instantiatedButtons)
+        {
+            Debug.Log($"Checking button: {button.name}");
+
+            // If bindingIndex is provided (for composite bindings), check the button name for both actionName and bindingIndex
+            if (bindingIndex.HasValue)
+            {
+                Debug.Log($"Checking for composite binding: {actionName}_{bindingIndex.Value}_");
+
+                if (button.name.StartsWith(actionName) && button.name.Contains($"_{bindingIndex.Value}_{deviceType}"))
+                {
+                    Debug.Log($"Found matching button: {button.name}");
+
+                    TMP_Text buttonText = button.GetComponentInChildren<TMP_Text>();
+                    if (buttonText != null)
+                    {
+                        buttonText.text = newText;
+                        Debug.Log($"Updated text for {button.name} to: {newText}");
+                    }
+                    break; // Stop after updating the first match
+                }
+                else
+                {
+                    Debug.Log($"No match for composite binding on button: {button.name}");
+                }
+            }
+            // If bindingIndex is not provided (for non-composite bindings), just check for the actionName
+            else
+            {
+                if (button.name.StartsWith(actionName))
+                {
+                    Debug.Log($"Found matching button for non-composite: {button.name}");
+
+                    TMP_Text buttonText = button.GetComponentInChildren<TMP_Text>();
+                    if (buttonText != null)
+                    {
+                        buttonText.text = newText;
+                        Debug.Log($"Updated text for {button.name} to: {newText}");
+                    }
+                    break; // Stop after updating the first match
+                }
+                else
+                {
+                    Debug.Log($"No match for non-composite binding on button: {button.name}");
+                }
+            }
+        }
+    }
+
     public void SaveKeybinds()
     {
         var bindings = new Dictionary<string, string>();
@@ -338,7 +688,7 @@ public class KeybindSettings: MonoBehaviour
         {
             for (int i = 0; i < action.bindings.Count; i++)
             {
-                if (!action.bindings[i].isComposite) // Avoid composite bindings (e.g., WASD)
+                if (!action.bindings[i].isComposite) // Avoid composite bindings
                 {
                     string assignedPath = string.IsNullOrEmpty(action.bindings[i].overridePath)
                         ? action.bindings[i].path  // If no override, keep the default path
@@ -425,6 +775,7 @@ public class KeybindSettings: MonoBehaviour
             action.RemoveAllBindingOverrides();
         }
         PopulateKeybindList();
+        InitialiseDefaultBindings();
     }
 
     void UpdateContentSize()
