@@ -181,7 +181,30 @@ public class KeybindSettings: MonoBehaviour
                 if (keyboardIndex < action.bindings.Count && action.bindings[keyboardIndex].path.Contains("Keyboard"))
                 {
                     compositeKeybindTextKeyboard.text = action.bindings[keyboardIndex].ToDisplayString()
-                        .Replace("Press ", "").Replace("Hold", "").Replace("LMB", "Left Button").Replace("RMB", "Right Button").Replace("Forward", "Forward Button").Replace("Back", "Back Button").Replace("MMB", "Middle Button");
+                        .Replace("Hold", "")
+                        .Replace("Press", "")
+                    .Replace("LMB", "Left Button")
+                    .Replace("RMB", "Right Button")
+                    .Replace("Forward", "Forward Button")
+                    .Replace("Back", "Back Button")
+                    .Replace("MMB", "Middle Button")
+                    .Replace("LB", "Left Bumper")
+                    .Replace("RB", "Right Bumper")
+                    .Replace("LT", "Left Trigger")
+                    .Replace("RT", "Right Trigger")
+                    .Replace("LS/Up", "Left Stick Up")
+                    .Replace("LS/Down", "Left Stick Down")
+                    .Replace("LS/Left", "Left Stick Left")
+                    .Replace("LS/Right", "Left Stick Right")
+                    .Replace("RS/Up", "Right Stick Up")
+                    .Replace("RS/Down", "Right Stick Down")
+                    .Replace("RS/Left", "Right Stick Left")
+                    .Replace("RS/Right", "Right Stick Right")
+                   .Replace("D-Pad/Up", "D-Pad Up")
+                    .Replace("D-Pad/Down", "D-Pad Down")
+                    .Replace("D-Pad/Left", "D-Pad Left")
+                    .Replace("D-Pad/Right", "D-Pad Right")
+                    .Replace("Menu", "Start");
                     compositeKeybindButtonKeyboard.onClick.AddListener(() => StartRebinding(action, compositeKeybindTextKeyboard, false, keyboardIndex));
 
                     // Add the button with the action name and "_Keyboard"
@@ -191,11 +214,67 @@ public class KeybindSettings: MonoBehaviour
                 }
 
                 int controllerIndex = i + 6;
-                if (controllerIndex < action.bindings.Count && action.bindings[controllerIndex].path.Contains("Controller"))
+                if (controllerIndex < action.bindings.Count && action.bindings[controllerIndex].path.Contains("Controller") || action.bindings[controllerIndex].path.Contains("Gamepad"))
                 {
                     compositeKeybindTextController.text = action.bindings[controllerIndex].ToDisplayString()
-                        .Replace("Press ", "").Replace("Hold", "").Replace("LMB", "Left Button").Replace("RMB", "Right Button").Replace("Forward", "Forward Button").Replace("Back", "Back Button").Replace("MMB", "Middle Button");
+                        .Replace("Hold", "")
+                    .Replace("LMB", "Left Button")
+                    .Replace("RMB", "Right Button")
+                    .Replace("Forward", "Forward Button")
+                    .Replace("Back", "Back Button")
+                    .Replace("MMB", "Middle Button")
+                    .Replace("LB", "Left Bumper")
+                    .Replace("RB", "Right Bumper")
+                    .Replace("LT", "Left Trigger")
+                    .Replace("RT", "Right Trigger")
+                    .Replace("LS/Up", "Left Stick Up")
+                    .Replace("LS/Down", "Left Stick Down")
+                    .Replace("LS/Left", "Left Stick Left")
+                    .Replace("LS/Right", "Left Stick Right")
+                    .Replace("RS/Up", "Right Stick Up")
+                    .Replace("RS/Down", "Right Stick Down")
+                    .Replace("RS/Left", "Right Stick Left")
+                    .Replace("RS/Right", "Right Stick Right")
+                   .Replace("D-Pad/Up", "D-Pad Up")
+                    .Replace("D-Pad/Down", "D-Pad Down")
+                    .Replace("D-Pad/Left", "D-Pad Left")
+                    .Replace("D-Pad/Right", "D-Pad Right")
+                    .Replace("Menu", "Start");
                     compositeKeybindButtonController.onClick.AddListener(() => StartRebinding(action, compositeKeybindTextController, true, controllerIndex));
+
+                    string bindingText = action.bindings[1].ToDisplayString();
+
+                    // Count occurrences of "Press"
+                    int compositePressCount = bindingText.Split(new[] { "Press" }, StringSplitOptions.None).Length - 1;
+                    if (compositePressCount > 0 && bindingText.StartsWith("Press"))
+                    {
+                        bindingText = bindingText.Replace("Press", "").TrimStart()
+                            .Replace("Hold", "")
+                        .Replace("LMB", "Left Button")
+                        .Replace("RMB", "Right Button")
+                        .Replace("Forward", "Forward Button")
+                        .Replace("Back", "Back Button")
+                        .Replace("MMB", "Middle Button")
+                        .Replace("LB", "Left Bumper")
+                        .Replace("RB", "Right Bumper")
+                        .Replace("LT", "Left Trigger")
+                        .Replace("RT", "Right Trigger")
+                        .Replace("LS/Up", "Left Stick Up")
+                        .Replace("LS/Down", "Left Stick Down")
+                        .Replace("LS/Left", "Left Stick Left")
+                        .Replace("LS/Right", "Left Stick Right")
+                        .Replace("RS/Up", "Right Stick Up")
+                        .Replace("RS/Down", "Right Stick Down")
+                        .Replace("RS/Left", "Right Stick Left")
+                        .Replace("RS/Right", "Right Stick Right")
+                       .Replace("D-Pad/Up", "D-Pad Up")
+                        .Replace("D-Pad/Down", "D-Pad Down")
+                        .Replace("D-Pad/Left", "D-Pad Left")
+                        .Replace("D-Pad/Right", "D-Pad Right")
+                        .Replace("Menu", "Start");
+                        compositeKeybindTextController.text = bindingText;
+                        Debug.Log("trimmed press");
+                    }
 
                     // Add the button with the action name and "_Controller"
                     instantiatedButtons.Add(compositeKeybindButtonController);
@@ -223,7 +302,32 @@ public class KeybindSettings: MonoBehaviour
 
             if (action.bindings.Count > 0)
             {
-                keybindTextKeyboard.text = action.bindings[0].ToDisplayString().Replace("Press ", "").Replace("Hold", "").Replace("LMB", "Left Button").Replace("RMB", "Right Button").Replace("Forward", "Forward Button").Replace("Back", "Back Button").Replace("MMB", "Middle Button");
+                keybindTextKeyboard.text = action.bindings[0].ToDisplayString()
+                    .Replace("Hold", "")
+                    .Replace("Press", "")
+                    .Replace("LMB", "Left Button")
+                    .Replace("RMB", "Right Button")
+                    .Replace("Forward", "Forward Button")
+                    .Replace("Back", "Back Button")
+                    .Replace("MMB", "Middle Button")
+                    .Replace("LB", "Left Bumper")
+                    .Replace("RB", "Right Bumper")
+                    .Replace("LT", "Left Trigger")
+                    .Replace("RT", "Right Trigger")
+                    .Replace("LS/Up", "Left Stick Up")
+                    .Replace("LS/Down", "Left Stick Down")
+                    .Replace("LS/Left", "Left Stick Left")
+                    .Replace("LS/Right", "Left Stick Right")
+                    .Replace("RS/Up", "Right Stick Up")
+                    .Replace("RS/Down", "Right Stick Down")
+                    .Replace("RS/Left", "Right Stick Left")
+                    .Replace("RS/Right", "Right Stick Right")
+                   .Replace("D-Pad/Up", "D-Pad Up")
+                    .Replace("D-Pad/Down", "D-Pad Down")
+                    .Replace("D-Pad/Left", "D-Pad Left")
+                    .Replace("D-Pad/Right", "D-Pad Right")
+                    .Replace("Menu", "Start");
+
                 keybindButtonKeyboard.onClick.AddListener(() => StartRebinding(action, keybindTextKeyboard, false, 0));
 
                 // Add the button with the action name and "_Keyboard"
@@ -234,9 +338,66 @@ public class KeybindSettings: MonoBehaviour
 
             if (action.bindings.Count > 1)
             {
-                keybindTextController.text = action.bindings[1].ToDisplayString().Replace("Press ", "").Replace("Hold", "").Replace("LMB", "Left Button").Replace("RMB", "Right Button").Replace("Forward", "Forward Button").Replace("Back", "Back Button").Replace("MMB", "Middle Button");
+                keybindTextController.text = action.bindings[1].ToDisplayString()
+
+                    .Replace("Hold", "")
+                    .Replace("LMB", "Left Button")
+                    .Replace("RMB", "Right Button")
+                    .Replace("Forward", "Forward Button")
+                    .Replace("Back", "Back Button")
+                    .Replace("MMB", "Middle Button")
+                    .Replace("LB", "Left Bumper")
+                    .Replace("RB", "Right Bumper")
+                    .Replace("LT", "Left Trigger")
+                    .Replace("RT", "Right Trigger")
+                    .Replace("LS/Up", "Left Stick Up")
+                    .Replace("LS/Down", "Left Stick Down")
+                    .Replace("LS/Left", "Left Stick Left")
+                    .Replace("LS/Right", "Left Stick Right")
+                    .Replace("RS/Up", "Right Stick Up")
+                    .Replace("RS/Down", "Right Stick Down")
+                    .Replace("RS/Left", "Right Stick Left")
+                    .Replace("RS/Right", "Right Stick Right")
+                   .Replace("D-Pad/Up", "D-Pad Up")
+                    .Replace("D-Pad/Down", "D-Pad Down")
+                    .Replace("D-Pad/Left", "D-Pad Left")
+                    .Replace("D-Pad/Right", "D-Pad Right")
+                    .Replace("Menu", "Start");
                 keybindButtonController.onClick.AddListener(() => StartRebinding(action, keybindTextController, true, 1));
 
+                string bindingText = action.bindings[1].ToDisplayString();
+
+                // Count occurrences of "Press"
+                int pressCount = bindingText.Split(new[] { "Press" }, StringSplitOptions.None).Length - 1;
+                if (pressCount > 0 && bindingText.StartsWith("Press"))
+                {
+                    bindingText = bindingText.Replace("Press", "").TrimStart()
+                        .Replace("Hold", "")
+                    .Replace("LMB", "Left Button")
+                    .Replace("RMB", "Right Button")
+                    .Replace("Forward", "Forward Button")
+                    .Replace("Back", "Back Button")
+                    .Replace("MMB", "Middle Button")
+                    .Replace("LB", "Left Bumper")
+                    .Replace("RB", "Right Bumper")
+                    .Replace("LT", "Left Trigger")
+                    .Replace("RT", "Right Trigger")
+                    .Replace("LS/Up", "Left Stick Up")
+                    .Replace("LS/Down", "Left Stick Down")
+                    .Replace("LS/Left", "Left Stick Left")
+                    .Replace("LS/Right", "Left Stick Right")
+                    .Replace("RS/Up", "Right Stick Up")
+                    .Replace("RS/Down", "Right Stick Down")
+                    .Replace("RS/Left", "Right Stick Left")
+                    .Replace("RS/Right", "Right Stick Right")
+                   .Replace("D-Pad/Up", "D-Pad Up")
+                    .Replace("D-Pad/Down", "D-Pad Down")
+                    .Replace("D-Pad/Left", "D-Pad Left")
+                    .Replace("D-Pad/Right", "D-Pad Right")
+                    .Replace("Menu", "Start");
+                    keybindTextController.text = bindingText;
+                    Debug.Log("trimmed press");
+                }
                 // Add the button with the action name and "_Controller"
                 instantiatedButtons.Add(keybindButtonController);
                 Debug.Log($"Added button: {keybindButtonKeyboard.name}");
@@ -284,13 +445,30 @@ public class KeybindSettings: MonoBehaviour
         isRebindingInProgress = true;
 
         rebindingOperation = action.PerformInteractiveRebinding(index)
-            .WithControlsExcluding("Mouse/delta")   // Exclude mouse movement
-            .WithControlsExcluding("Mouse/scroll/y") // Exclude vertical scroll
-            .WithControlsExcluding("Mouse/scroll/x") // Exclude horizontal scroll
+            // Exclude certain controls
+            .WithControlsExcluding("Mouse/delta")
+            .WithControlsExcluding("Mouse/scroll/y")
+            .WithControlsExcluding("Mouse/scroll/x") 
             .WithControlsExcluding("Mouse/scroll/up")
             .WithControlsExcluding("Mouse/scroll/down")
             .WithControlsExcluding("Mouse/scroll/right")
             .WithControlsExcluding("Mouse/scroll/left")
+            .WithControlsExcluding("Gamepad/leftStick/x")
+    .WithControlsExcluding("Gamepad/leftStick/y")
+    .WithControlsExcluding("XInputController/leftStick/x")
+    .WithControlsExcluding("XInputController/leftStick/y")
+.WithControlsExcluding("<Gamepad>/leftStick/x")
+    .WithControlsExcluding("<Gamepad>/leftStick/y")
+    .WithControlsExcluding("<XInputController>/leftStick/x")
+    .WithControlsExcluding("<XInputController>/leftStick/y")
+    .WithControlsExcluding("Gamepad/rightStick/x")
+    .WithControlsExcluding("Gamepad/rightStick/y")
+    .WithControlsExcluding("XInputController/rightStick/x")
+    .WithControlsExcluding("XInputController/rightStick/y")
+.WithControlsExcluding("<Gamepad>/rightStick/x")
+    .WithControlsExcluding("<Gamepad>/rightStick/y")
+    .WithControlsExcluding("<XInputController>/rightStick/x")
+    .WithControlsExcluding("<XInputController>/rightStick/y")
             .OnMatchWaitForAnother(0.2f) // Wait for 200ms for a valid input
             .OnComplete(operation =>
             {
@@ -376,6 +554,8 @@ public class KeybindSettings: MonoBehaviour
                 // Capture the raw input path directly during the rebinding process
                 string newPath = operation.selectedControl.path;
 
+                Debug.Log("Selected Control Path: " + newPath);
+
                 string deviceType = "Unknown";
 
                 // Determine the device type by the newPath above
@@ -386,6 +566,103 @@ public class KeybindSettings: MonoBehaviour
                 else if (newPath.Contains("Gamepad") || newPath.Contains("XInput"))
                 {
                     deviceType = "Controller";
+                }
+                // SET CONTROLLER BUTTON NAMES
+                if (newPath.Contains("buttonNorth"))
+                {
+                    newKey = "Button North";  // Button Y
+                }
+                else if (newPath.Contains("buttonSouth"))
+                {
+                    newKey = "Button South";  // Button A
+                }
+                else if (newPath.Contains("buttonEast"))
+                {
+                    newKey = "Button East";  // Button B
+                }
+                else if (newPath.Contains("buttonWest"))
+                {
+                    newKey = "Button West";  // Button X
+                }
+                else if (newPath.Contains("leftShoulder"))
+                {
+                    newKey = "Left Shoulder";  // LB
+                }
+                else if (newPath.Contains("rightShoulder"))
+                {
+                    newKey = "Right Shoulder";  // RB
+                }
+                else if (newPath.Contains("leftTrigger"))
+                {
+                    newKey = "Left Trigger";  // LT
+                }
+                else if (newPath.Contains("rightTrigger"))
+                {
+                    newKey = "Right Trigger";  // RT
+                }
+                else if (newPath.Contains("leftStickPress"))
+                {
+                    newKey = "Left Stick Press";  // LS (press down on the left stick)
+                }
+                else if (newPath.Contains("rightStickPress"))
+                {
+                    newKey = "Right Stick Press";  // RS (press down on the right stick)
+                }
+                else if (newPath.Contains("select"))
+                {
+                    newKey = "Select";  // Select
+                }
+                else if (newPath.Contains("start"))
+                {
+                    newKey = "Start";  // Start (or Menu on newer controllers)
+                }
+                else if (newPath.Contains("dpad/up"))
+                {
+                    newKey = "D-Pad/Up";  // D-Pad Up
+                }
+                else if (newPath.Contains("dpad/down"))
+                {
+                    newKey = "D-Pad/Down";  // D-Pad Down
+                }
+                else if (newPath.Contains("dpad/left"))
+                {
+                    newKey = "D-Pad/Left";  // D-Pad Left
+                }
+                else if (newPath.Contains("dpad/right"))
+                {
+                    newKey = "D-Pad/Right";  // D-Pad Right
+                }
+                else if (newPath.Contains("leftStick/up"))
+                {
+                    newKey = "Left Stick/Up";  // Left Thumbstick Up
+                }
+                else if (newPath.Contains("leftStick/down"))
+                {
+                    newKey = "Left Stick/Down";  // Left Thumbstick Down
+                }
+                else if (newPath.Contains("leftStick/left"))
+                {
+                    newKey = "Left Stick/Left";  // Left Thumbstick Left
+                }
+                else if (newPath.Contains("leftStick/right"))
+                {
+                    newKey = "Left Stick/Right";  // Left Thumbstick Right
+                }
+                else if (newPath.Contains("rightStick/up"))
+                {
+                    newKey = "Right Stick/Up";  // Right Thumbstick Up
+                }
+                else if (newPath.Contains("rightStick/down"))
+                {
+                    newKey = "Right Stick/Down";  // Right Thumbstick Down
+                }
+                else if (newPath.Contains("rightStick/left"))
+                {
+                    newKey = "Right Stick/Left";  // Right Thumbstick Left
+                }
+                else if (newPath.Contains("rightStick/right"))
+                {
+                    newKey = "Right Stick/Right";  // Right Thumbstick Right
                 }
 
                 // Add new binding to history
@@ -469,11 +746,11 @@ public class KeybindSettings: MonoBehaviour
             // Check if the binding's device matches the deviceType
             bool matchesDeviceType = false;
 
-            if (deviceType == "Keyboard" && binding.path.Contains("Keyboard") || binding.path.Contains("Mouse"))
+            if (deviceType == "Keyboard")
             {
                 matchesDeviceType = true;
             }
-            else if (deviceType == "Controller" && (binding.path.Contains("Gamepad") || binding.path.Contains("XInput")))
+            else if (deviceType == "Controller")
             {
                 matchesDeviceType = true;
             }
@@ -537,12 +814,12 @@ public class KeybindSettings: MonoBehaviour
                 bool matchesDeviceType = false;
 
                 // Debugging: Log the device type and whether it matches
-                if (deviceType == "Keyboard" && binding.path.Contains("Keyboard") || binding.path.Contains("Mouse"))
+                if (deviceType == "Keyboard")
                 {
                     matchesDeviceType = true;
                     Debug.Log("Device matches Keyboard");
                 }
-                else if (deviceType == "Controller" && (binding.path.Contains("Gamepad") || binding.path.Contains("XInput")))
+                else if (deviceType == "Controller")
                 {
                     matchesDeviceType = true;
                     Debug.Log("Device matches Controller");
@@ -627,7 +904,7 @@ public class KeybindSettings: MonoBehaviour
         }
     }
 
-    private void UpdateKeybindButtonText(string actionName, int? bindingIndex, string newText, string deviceType = "Keyboard")
+    private void UpdateKeybindButtonText(string actionName, int? bindingIndex, string newText, string deviceType)
     {
         Debug.Log($"Updating button text for action: {actionName}, bindingIndex: {bindingIndex?.ToString() ?? "None"}, newText: {newText}");
 
@@ -660,7 +937,7 @@ public class KeybindSettings: MonoBehaviour
             // If bindingIndex is not provided (for non-composite bindings), just check for the actionName
             else
             {
-                if (button.name.StartsWith(actionName))
+                if (button.name.StartsWith(actionName) && button.name.Contains($"_{deviceType}"))
                 {
                     Debug.Log($"Found matching button for non-composite: {button.name}");
 
