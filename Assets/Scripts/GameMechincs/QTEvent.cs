@@ -110,6 +110,7 @@ public class QTEvent : MonoBehaviour
 
             //OpenreloadUI();
             qTEMechanic.QTEMove(); // Check player need to move when QTE success 
+            qTEMechanic.QTEMechanicScriptActive = false;
 
         }
         //*/
