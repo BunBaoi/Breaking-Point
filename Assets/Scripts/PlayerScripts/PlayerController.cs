@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour
     // private float moveDuration = 5f;
     public GameObject targetPos;
     public GameObject playerPos;
-    
+
 
 
     public float speed = 12f;
@@ -29,7 +29,7 @@ public class PlayerController : MonoBehaviour
     //public float maxSlopeAngle;
     //private RaycastHit slopehit;
 
-
+    public bool canMove = true; // Active QTE disable -> WASD during state 
 
 
     void Start()
@@ -39,18 +39,18 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        float x = Input.GetAxis("Horizontal");
-        float z = Input.GetAxis("Vertical");
-
-        Vector3 move = transform.right * x + transform.forward * z;
-        if(qTEMechanic.QTEMechanicScriptActive == true) // CHANGE MADE HERE //
+        if (canMove)
         {
-            controller.Move(move * speed * Time.deltaTime);
-            velocity.y += gravity * Time.deltaTime;
+            float x = Input.GetAxis("Horizontal");
+            float z = Input.GetAxis("Vertical");
 
-            controller.Move(velocity * Time.deltaTime);
+            Vector3 move = transform.right * x + transform.forward * z;
+
+            controller.Move(move * speed * Time.deltaTime);
         }
 
+        velocity.y += gravity * Time.deltaTime;
+        controller.Move(velocity * Time.deltaTime);
 
         sprint();
         OxyOuputRate();
@@ -62,10 +62,14 @@ public class PlayerController : MonoBehaviour
             //Debug.Log("Movement Lock");
         }
     }
+    public void SetMovementState(bool newCanMove)
+    {
+        canMove = newCanMove;
+    }
 
     private void sprint()
     {
-        if(Input.GetKey(KeyCode.LeftShift))
+        if (Input.GetKey(KeyCode.LeftShift))
         {
             speed = 20f;
             IsSprint = true;
@@ -75,28 +79,29 @@ public class PlayerController : MonoBehaviour
             speed = 12f;
             IsSprint = false;
         }
-        
+
     }
 
     public void QTEControl()
     {
-        if (Input.GetKeyDown(KeyCode.F))
+        if (Input.GetKeyDown(KeyCode.F)) //CAN PRESS MULTIPLE TIMES THUS CAN AFFECT QTEvent KEY LOAD FIX -> CAN ONLY BE PRESSED ONCE WITHIN CERTAIN AREA
         {
             qTEMechanic.QTEMove();
-            
-            //qTEMechanic.PositionOfPlayer = PlayerPos.PlayerPos2;
-            //Vector3 target = targetPos.transform.position;
+            canMove = false;
+            Debug.Log("Player Movement Locked");
+            /*
             CharacterController characterController = GetComponent<CharacterController>();
             if (characterController != null) 
             {
                 characterController.enabled = false;
             }
+            */
         }
     }
-    
+
     public void OxyOuputRate()
     {
-        if(Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.E))
         {
             playerStats.OxygenTankRefillRate++;
             //Debug.log("Rate Up");

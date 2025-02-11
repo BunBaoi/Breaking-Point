@@ -47,7 +47,7 @@ public class QTEvent : MonoBehaviour
 
     void Update()
     {
-        if(qTEMechanic.QTEMechanicScriptActive == true)
+        if (qTEMechanic.QTEMechanicScriptActive == true)
         {
             if (CountDownTimer >= 0)
             {
@@ -62,7 +62,7 @@ public class QTEvent : MonoBehaviour
         //    _Button.onClick.Invoke();
         //}
 
-        if(Input.GetKeyUp(KeyCode.R))
+        if (Input.GetKeyUp(KeyCode.R))
         {
             OpenreloadUI();
         }
@@ -85,11 +85,6 @@ public class QTEvent : MonoBehaviour
 
     }
 
-    public void KeyChecker()
-    { 
-
-    }
-
     // QTE Player Timer
     public void updateTimer()
     {
@@ -100,13 +95,13 @@ public class QTEvent : MonoBehaviour
         {
             //KeyChecker(); // Checks key before starting to reload 
 
-            CountDownTimer = 15;
+            CountDownTimer = 5; // QTE CountDownTimer
             //playerStats.IsAlive = false;
 
             WaitingKeyLoad = 0;
-            Debug.Log("Reset Waiting Key Load " + WaitingKeyLoad);
+            //Debug.Log("Reset Waiting Key Load " + WaitingKeyLoad);
             CorrectKeyCounter = 0;
-            Debug.Log("Reset Correct Key Counter " + CorrectKeyCounter);
+            //Debug.Log("Reset Correct Key Counter " + CorrectKeyCounter);
 
             //OpenreloadUI();
             qTEMechanic.QTEMove(); // Check player need to move when QTE success 
