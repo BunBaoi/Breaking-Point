@@ -3,31 +3,30 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static PlayerStats;
 
 public class PlayerStats : MonoBehaviour
 {
-
+    [Header("Oxygen Stats")]
     public float Oxygen;
-    //public float Stamina;
     public float OxygenTank;
-
     public float OxygenDeductionRate;
-    //public float StaminaDeduction;
     public float OxygenTankRefillRate;
 
-    public bool Atmosphere;
+    [Header("Player Status")]
     public bool IsAlive = true;
-    public bool PlayerStaticState;
+    public bool QTEState = false;
+    public PlayerStatus stateOfPlayer;
 
     private PlayerController playerController;
     public QTEMechanic qTEMechanic;
 
-    // Timer
+    [Header("Timer")]
     public const float TickMax = 1;
     private int Tick;
     private float TickTimer;
 
-    // Slope Climb
+    // Slope Climb // Double check if needed for slope stuff
     CharacterController controller;
 
     void Start()
@@ -47,29 +46,27 @@ public class PlayerStats : MonoBehaviour
 
     }
 
-    public PlayerStatus stateOfPlayer;
     public enum PlayerStatus
     {
         FreeRoam,
         QTEBridge,
         RClimbing,
         DeadZone,
+        QTE
     }
 
     // PRINT ENUM STATUS//
 
     public void STP()
     {
-        switch (stateOfPlayer)
+        switch (stateOfPlayer) // checks current state of player
         {
             case PlayerStatus.FreeRoam:
                 Debug.Log("Status: FreeRoam");
                 break;
 
-            case PlayerStatus.QTEBridge:
+            case PlayerStatus.QTEBridge: // Might remove not activating
                 Debug.Log("Status: QTE Bridge");
-
-
                 break;
 
             case PlayerStatus.RClimbing:
@@ -77,6 +74,9 @@ public class PlayerStats : MonoBehaviour
                 break;
 
             case PlayerStatus.DeadZone:
+                Debug.Log("Status: DeadZone");
+                break;
+            case PlayerStatus.QTE:
                 Debug.Log("Status: DeadZone");
                 break;
 
@@ -125,17 +125,24 @@ public class PlayerStats : MonoBehaviour
         }
     }
 
-    public void OnTriggerEnter(Collider other)
+    public void OnTriggerEnter(Collider collision)
     {
-        stateOfPlayer = PlayerStatus.DeadZone;
-        Debug.Log("Atmosphere Danger");
-        
-        
+        if(collision.gameObject.tag == "Level4Zone")
+        {
+            stateOfPlayer = PlayerStatus.DeadZone;
+            Debug.Log("Atmosphere Danger");
+        }
+        if (collision.gameObject.tag == "Level2QTE.1")
+        {
+            stateOfPlayer = PlayerStatus.QTE;
+            Debug.Log("Level2QTE.1 Enter");
+        }
     }
-    public void OnTriggerExit(Collider other)
+    public void OnTriggerExit(Collider collision)
     {
         stateOfPlayer = PlayerStatus.FreeRoam;
         Debug.Log("Atmosphere Safe");
+        
     }
 
     public void PlayerAlive()

@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using static PlayerStats;
 
 public class QTEMechanic : MonoBehaviour
 {
-
+    [Header("QTE Position")]
     public GameObject Pos1;
     public GameObject Pos2;
     public GameObject Pos3;
@@ -16,6 +18,7 @@ public class QTEMechanic : MonoBehaviour
     public QTEvent qTEvent;
     public PlayerController playerController;
     public GameObject objectPlayer;
+    public PlayerStats playerStats;
 
     public PlayerPos PositionOfPlayer;
     public bool QTEMechanicScriptActive;
@@ -45,27 +48,24 @@ public class QTEMechanic : MonoBehaviour
     {
         switch (PositionOfPlayer)
         {
-            case PlayerPos.PlayerPosIdle:
+            case PlayerPos.PlayerPosIdle: // Move player to first position of QTE
+                if (CHKPos1 == false)
                 {
-                    //Debug.Log("Player Position 1");
-                    if (CHKPos1 == false) // 
-                    {
-                        // Player move to Target position
-                        Vector3 target = Pos1.transform.position;
-                        PositionOfPlayer = PlayerPos.PlayerPos1; // Update Switch
-                        CHKCounter++;
-                        StartCoroutine(MoveCube(target));
-                        CHKPos1 = true;
+                    // Player move to Target position
+                    Vector3 target = Pos1.transform.position; // Update target position to Pos 1
+                    PositionOfPlayer = PlayerPos.PlayerPos1; // Update Switch
+                    CHKCounter++;
+                    StartCoroutine(MoveCube(target));
+                    CHKPos1 = true;
 
-                    }
-                    break;
                 }
+                break;
+
             case PlayerPos.PlayerPos1:
-                //Debug.Log("Player Position 1");
                 if (CHKPos2 == false) // 
                 {
                     // Player move to Target position
-                    Vector3 target = Pos2.transform.position;
+                    Vector3 target = Pos2.transform.position;// Update target position to Pos 2
                     PositionOfPlayer = PlayerPos.PlayerPos2; // Update Switch
                     CHKCounter++;
                     StartCoroutine(MoveCube(target));
@@ -78,7 +78,7 @@ public class QTEMechanic : MonoBehaviour
                 if (CHKPos3 == false)
                 {
                     // Player move to Target position
-                    Vector3 target = Pos3.transform.position;
+                    Vector3 target = Pos3.transform.position; // Update target position to Pos 3
                     PositionOfPlayer = PlayerPos.PlayerPos3;  // Update Switch
                     CHKCounter++;
                     StartCoroutine(MoveCube(target));
@@ -92,23 +92,15 @@ public class QTEMechanic : MonoBehaviour
                 if (CHKPos3 == false)
                 {
                     // Player move to Target position
-                    Vector3 target = Pos4.transform.position; // Update Target Position
+                    Vector3 target = Pos4.transform.position; // Update target position to Pos 4
                     PositionOfPlayer = PlayerPos.PlayerPos4; // Update Switch
                     CHKCounter++;
                     StartCoroutine(MoveCube(target));
-
+                    
                     CHKPos3 = true;
                 }
                 break;
-            case PlayerPos.PlayerPos4: // QTE End transition to player free movement
-                // DOUBLE TEST IF CODE UNDERNEATH IS NECCESARY!!
-                if (CHKPos4 == false)
-                {
-
-                    CHKPos4 = true;
-
-                }
-                break;
+                
 
         }
 
@@ -127,12 +119,13 @@ public class QTEMechanic : MonoBehaviour
 
             if (PositionOfPlayer != PlayerPos.PlayerPos4)
             {
-                qTEvent.OpenreloadUI(); // PLAYING TWICE UPON QTE COMPLETION AND MOVE COMPLETION
+                qTEvent.OpenreloadUI(); // PLAYING TWICE UPON QTE COMPLETION AND MOVE COMPLETION // UPDATE may not need to be fixed
                 QTEMechanicScriptActive = true; // KEY TO ACTIVATINE TIMER 
             }
             else
             {
                 QTEMechanicScriptActive = false;
+                playerStats.QTEState = false;
                 CHKPos4 = true;
                 playerController.canMove = true;
                 Debug.Log("Player Movement Unlocked");

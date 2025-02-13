@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
-using static QTEMechanic;
+using static PlayerStats;
+//using static QTEMechanic;
 
 public class PlayerController : MonoBehaviour
 {
@@ -10,26 +12,19 @@ public class PlayerController : MonoBehaviour
     public CharacterController controller;
     public PlayerStats playerStats;
 
-    public float objectSpeed = 3;
-    // private float moveDuration = 5f;
     public GameObject targetPos;
     public GameObject playerPos;
 
-
-
+    public float objectSpeed = 3;
     public float speed = 12f;
     public float gravity = -9.81f;
     public bool IsSprint = false;
-
     public float playerHeight;
 
     Vector3 velocity;
     Rigidbody rb;
 
-    //public float maxSlopeAngle;
-    //private RaycastHit slopehit;
-
-    public bool canMove = true; // Active QTE disable -> WASD during state 
+    public bool canMove = true; // Active QTE disable -> WASD during QTE state 
 
 
     void Start()
@@ -39,7 +34,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (canMove)
+        if (canMove) // Boolean for player movement
         {
             float x = Input.GetAxis("Horizontal");
             float z = Input.GetAxis("Vertical");
@@ -56,13 +51,8 @@ public class PlayerController : MonoBehaviour
         OxyOuputRate();
         QTEControl();
 
-
-        if (qTEMechanic.QTEMechanicScriptActive == true)
-        {
-            //Debug.Log("Movement Lock");
-        }
     }
-    public void SetMovementState(bool newCanMove)
+    public void SetMovementState(bool newCanMove) // Boolean for player movement
     {
         canMove = newCanMove;
     }
@@ -84,18 +74,13 @@ public class PlayerController : MonoBehaviour
 
     public void QTEControl()
     {
-        if (Input.GetKeyDown(KeyCode.F)) //CAN PRESS MULTIPLE TIMES THUS CAN AFFECT QTEvent KEY LOAD FIX -> CAN ONLY BE PRESSED ONCE WITHIN CERTAIN AREA
+        if (Input.GetKeyDown(KeyCode.F) && playerStats.stateOfPlayer == PlayerStatus.QTE)
         {
             qTEMechanic.QTEMove();
             canMove = false;
             Debug.Log("Player Movement Locked");
-            /*
-            CharacterController characterController = GetComponent<CharacterController>();
-            if (characterController != null) 
-            {
-                characterController.enabled = false;
-            }
-            */
+            playerStats.QTEState = true;
+
         }
     }
 
