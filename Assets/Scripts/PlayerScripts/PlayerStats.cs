@@ -3,37 +3,33 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static PlayerStats;
 
 public class PlayerStats : MonoBehaviour
 {
-    [Header("Oxygen System")]
-    public float Oxygen = 100f;
-    public float OxygenTank = 100f;
+    [Header("Oxygen Stats")]
+    public float Oxygen;
+    public float OxygenTank;
     public float OxygenDeductionRate;
     public float OxygenTankRefillRate;
     public float baseOxygenDeductionRate = 2f;
     public float sprintOxygenDeductionRate = 12f;
     public float climbingOxygenMultiplier = 1.5f;
 
-    [Header("Stamina System")]
-    public float MaxStamina = 100f;
-    public float CurrentStamina;
-    public float StaminaRegenRate = 5f;
-    public float ClimbingStaminaDrain = 10f;
-    public float SprintStaminaDrain = 15f;
-
-    [Header("Status")]
-    public bool Atmosphere;
+    [Header("Player Status")]
     public bool IsAlive = true;
-    private PlayerControls playerControls;
+    public bool QTEState = false;
+    public PlayerStatus stateOfPlayer;
+
+    private PlayerController playerController;
     public QTEMechanic qTEMechanic;
 
-    // Timer
+    [Header("Timer")]
     public const float TickMax = 1;
     private int Tick;
     private float TickTimer;
 
-    // Slope Climb
+    // Slope Climb // Double check if needed for slope stuff
     CharacterController controller;
 
     void Start()
@@ -51,47 +47,44 @@ public class PlayerStats : MonoBehaviour
         UpdateStamina();
     }
 
-    public PlayerStatus stateOfPlayer;
     public enum PlayerStatus
     {
         FreeRoam,
         QTEBridge,
         RClimbing,
         DeadZone,
+        QTE
     }
     // PRINT ENUM STATUS//
 
-    //public void STP()
-    //{
-    //    switch (stateOfPlayer)
-    //    {
-    //        case PlayerStatus.FreeRoam:
-    //            Debug.Log("Status: FreeRoam");
-    //            break;
-
-    //        case PlayerStatus.QTEBridge:
-    //            Debug.Log("Status: QTE Bridge");
-
-
-    //            break;
-
-    //        case PlayerStatus.RClimbing:
-    //            Debug.Log("Status: RClimbing");
-    //            break;
-
-    //        case PlayerStatus.DeadZone:
-    //            Debug.Log("Status: DeadZone");
-    //            break;
-
-    //    }
-    //}
-
-    public void DrainStamina(float amount)
+    public void STP()
     {
-        CurrentStamina = Mathf.Max(0f, CurrentStamina - amount);
+        switch (stateOfPlayer) // checks current state of player
+        {
+            case PlayerStatus.FreeRoam:
+                Debug.Log("Status: FreeRoam");
+                break;
+
+            case PlayerStatus.QTEBridge: // Might remove not activating
+                Debug.Log("Status: QTE Bridge");
+                break;
+
+            case PlayerStatus.RClimbing:
+                Debug.Log("Status: RClimbing");
+                break;
+
+            case PlayerStatus.DeadZone:
+                Debug.Log("Status: DeadZone");
+                break;
+            case PlayerStatus.QTE:
+                Debug.Log("Status: DeadZone");
+                break;
+
+        }
     }
 
-    public void RegenerateStamina(float amount)
+
+    void DeadZone ()
     {
         if (!playerControls.IsHolding() && !playerControls.IsSprint)
         {
@@ -156,16 +149,24 @@ public class PlayerStats : MonoBehaviour
         }
     }
 
-    public void OnTriggerEnter(Collider other)
+    public void OnTriggerEnter(Collider collision)
     {
-        stateOfPlayer = PlayerStatus.DeadZone;
-        Debug.Log("Atmosphere Danger");
+        if(collision.gameObject.tag == "Level4Zone")
+        {
+            stateOfPlayer = PlayerStatus.DeadZone;
+            Debug.Log("Atmosphere Danger");
+        }
+        if (collision.gameObject.tag == "Level2QTE.1")
+        {
+            stateOfPlayer = PlayerStatus.QTE;
+            Debug.Log("Level2QTE.1 Enter");
+        }
     }
-
-    public void OnTriggerExit(Collider other)
+    public void OnTriggerExit(Collider collision)
     {
         stateOfPlayer = PlayerStatus.FreeRoam;
         Debug.Log("Atmosphere Safe");
+        
     }
 
     public void PlayerAlive()
