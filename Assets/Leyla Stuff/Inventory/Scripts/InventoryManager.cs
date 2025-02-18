@@ -1,18 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class InventoryManager : MonoBehaviour
 {
-    public int defaultSlotCount = 4;  // Default number of inventory slots
-    public GameObject inventorySlotPrefab;  // Prefab for the inventory slots
-    public Transform inventoryPanel;  // UI panel for inventory display
-    public Transform handPosition;  // Position where the item appears in the player's hand
-    public KeyCode dropKey = KeyCode.Q; // Key to drop an item
-    public LayerMask groundLayer;
-
     private List<InventorySlot> slots = new List<InventorySlot>();
     private int selectedSlotIndex = 0; // Currently selected inventory slot
-    private GameObject heldItemInstance; // Instance of the item in the player's hand
+    private GameObject heldLeftHandItemInstance; // Instance of the item in the player's left hand
+    private GameObject heldRightHandItemInstance; // Instance of the item in the player's right hand
     private Item currentItem;  // Reference to the currently equipped item
     private bool isSwitchingDisabled = false; // Flag to disable item switching
 
@@ -21,107 +16,154 @@ public class InventoryManager : MonoBehaviour
     private const float WeightThreshold2 = 15.0f; // Weight threshold for second action
 
     private GameObject playerController; // CHANGE TO ACTUAL PLAYER MOVEMENT SCRIPT LATER
+    private PlayerClimbingState playerClimbingState;
 
+    [Header("Setup Settings")]
+    public int defaultSlotCount = 4;  // Default number of inventory slots
+    public GameObject inventorySlotPrefab;  // Prefab for the inventory slots
+    public Transform inventoryPanel;  // UI panel for inventory display
+    public Transform leftHandPosition;  // Position for left hand item
+    public Transform rightHandPosition;  // Position for right hand item
+    // public KeyCode dropKey = KeyCode.Q; // Key to drop an item
+
+    [Header("Layer Setup")]
+    public LayerMask groundLayer;
+    [SerializeField] private LayerMask itemLayer;
+
+    [Header("Keybinds")]
+    [SerializeField] private InputActionAsset inputActions;  // Input Action Asset
+    [SerializeField] private string scrollActionName = "Inventory Scroll";
+    [SerializeField] private string dropActionName = "Drop";
+    [SerializeField] private string slotActionsName = "Slot";
+    [SerializeField] private float scrollCooldown = 0.1f; // Cooldown time (in seconds)
+    private float lastScrollTime = 0f; // Time when the last scroll occurred
+    private InputAction scrollAction;
+    private InputAction dropAction;
+    private List<InputAction> slotActions = new List<InputAction>();
+
+    private void Awake()
+    {
+        if (inputActions == null)
+        {
+            inputActions = Resources.Load<InputActionAsset>("Keybinds/PlayerInputs");
+
+            if (inputActions == null)
+            {
+                Debug.LogError("PlayerInputs asset not found in Resources/Keybinds folder!");
+            }
+        }
+    }
 
     private void Start()
     {
-        playerController = GetComponent<GameObject>(); // CHANGE TO ACTUAL PLAYER MOVEMENT SCRIPT LATER
+        DisableScriptsOnInventoryItems();
         CreateSlots(defaultSlotCount);
+
+        // Retrieve the PlayerClimbingState component instead of using GetComponent in the method call
+        playerClimbingState = GetComponent<PlayerClimbingState>();
+
+        scrollAction = inputActions.FindAction(scrollActionName);
+        dropAction = inputActions.FindAction(dropActionName);
+
+        if (scrollAction != null)
+        {
+            scrollAction.Enable();
+        }
+
+        if (dropAction != null)
+        {
+            dropAction.Enable();
+        }
+
+        for (int i = 0; i < defaultSlotCount; i++)
+        {
+            string actionName = slotActionsName + (i + 1); 
+            InputAction slotAction = inputActions.FindAction(actionName);
+            if (slotAction != null)
+            {
+                slotActions.Add(slotAction);
+                slotAction.Enable();
+            }
+        }
     }
 
     private void Update()
     {
         // Check if the drop key is pressed
-        if (Input.GetKeyDown(dropKey))
+        if (dropAction.triggered)
         {
             DropItem();
         }
 
-        // Check for scroll wheel input
-        float scrollInput = Input.GetAxis("Mouse ScrollWheel");
-        if (scrollInput > 0)
+        // Scroll wheel input (using the scroll action)
+        float scrollInput = scrollAction.ReadValue<float>();
+        if (Time.time - lastScrollTime >= scrollCooldown) // Check if cooldown has passed
         {
-            // Scroll up
-            ScrollInventory(-1);
-        }
-        else if (scrollInput < 0)
-        {
-            // Scroll down
-            ScrollInventory(1);
-        }
-
-        // Check for number key presses to select inventory slots
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            SelectSlot(0);
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            SelectSlot(1);
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            SelectSlot(2);
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha4))
-        {
-            SelectSlot(3);
-        }
-
-        // Check total weight and trigger actions
-        float totalWeight = GetTotalWeight();
-
-        if (totalWeight > WeightThreshold2)
-        {
-            if (playerController != null) // ADD MOVEMENT FALLOUTS LATER
+            if (scrollInput > 0)
             {
-                // playerController.SetSprintDuration(3f); // Set a new sprint duration
-                // playerController.UpdateMovementSettings(3f, 5f, 0.3f, 3f);
+                // Scroll up
+                ScrollInventory(-1);
             }
-        }
-        else if (totalWeight > WeightThreshold1) // ADD MOVEMENT FALLOUTS LATER
-        {
-            if (playerController != null)
+            else if (scrollInput < 0)
             {
-                // playerController.SetSprintDuration(3f); // Set a new sprint duration
-               // playerController.UpdateMovementSettings(3f, 5f, 0.3f, 3f);
+                // Scroll down
+                ScrollInventory(1);
             }
+
+            // Update the time of the last scroll
+            lastScrollTime = Time.time;
         }
-        else
+
+        // Check slot actions based on available slots
+        for (int i = 0; i < slotActions.Count; i++)
         {
-            if (playerController != null) // ADD MOVEMENT FALLOUTS LATER
+            if (slotActions[i].triggered)
             {
-                // playerController.SetSprintDuration(5f); // Set a new sprint duration
-                // playerController.UpdateMovementSettings(5f, 7f, 0.5f, 4f);
+                SelectSlot(i);
+                break; // Exit after triggering the first matching slot action
             }
         }
     }
 
-    // Selects the inventory slot by index
-    private void SelectSlot(int index)
-    {
-        if (index >= 0 && index < slots.Count)
+        // Selects the inventory slot by index
+        private void SelectSlot(int index)
         {
-            // Prevent switching if switching is disabled
-            if (isSwitchingDisabled)
+            // Check if the index is within valid range
+            if (index >= 0 && index < slots.Count)
             {
-                Debug.Log("Cannot switch items. The currently equipped item is too heavy!");
-                return;
+                // Prevent switching if switching is disabled
+                if (isSwitchingDisabled)
+                {
+                    Debug.Log("Cannot switch items. The currently equipped item is too heavy!");
+                    return;
+                }
+
+                // Log the correct selected slot index
+                Debug.Log("Selecting Slot: " + index);
+
+                // Now actually set the selected slot index
+                selectedSlotIndex = index;
+
+                // Update the equipped item (optional, based on your implementation)
+                UpdateEquippedItem();
             }
-
-            selectedSlotIndex = index;
-            UpdateEquippedItem();
+            else
+            {
+                Debug.LogWarning("Invalid slot index: " + index + ". Available slots: " + slots.Count);
+            }
         }
-    }
 
-    // Creates inventory slots dynamically
-    public void CreateSlots(int slotCount)
+        public void CreateSlots(int slotCount)
     {
         for (int i = 0; i < slotCount; i++)
         {
+            // Instantiate the slot prefab and get its components
             GameObject newSlot = Instantiate(inventorySlotPrefab, inventoryPanel);
             InventorySlot slotComponent = newSlot.GetComponent<InventorySlot>();
             slots.Add(slotComponent);
+
+            // Set the name of the slot GameObject based on the index
+            newSlot.name = "Slot_" + i;
         }
     }
 
@@ -171,6 +213,7 @@ public class InventoryManager : MonoBehaviour
         {
             slots[selectedSlotIndex].AddItem(item);
             EquipItem(item);
+            DisableItemPickup(item);
             return true;
         }
 
@@ -186,12 +229,97 @@ public class InventoryManager : MonoBehaviour
 
                 // Equip the item if added to the selected slot
                 EquipItem(item);
+                DisableItemPickup(item);
                 return true;
             }
         }
 
         Debug.Log("Inventory is full!");
         return false;
+    }
+
+    public void DisableItemPickup(Item item)
+    {
+        GameObject itemObject = FindItemInScene(item);
+
+        if (itemObject == null)
+        {
+            Debug.LogWarning("Item instance not found in the scene: " + item.itemPrefab.name);
+            return;
+        }
+
+        Debug.Log("Disabling ItemPickUp on item: " + itemObject.name);
+
+        ItemPickUp itemPickUpScript = itemObject.GetComponent<ItemPickUp>();
+        if (itemPickUpScript != null)
+        {
+            Debug.Log("ItemPickUp script found. Disabling it.");
+            itemPickUpScript.enabled = false;
+        }
+        else
+        {
+            Debug.Log("No ItemPickUp script attached to item.");
+        }
+
+        // Enable all other components
+        MonoBehaviour[] components = itemObject.GetComponents<MonoBehaviour>();
+        foreach (var component in components)
+        {
+            if (component is ItemPickUp) continue;
+            Debug.Log("Enabling script: " + component.GetType().Name);
+            component.enabled = true;
+        }
+    }
+
+    public void EnableItemPickup(Item item)
+    {
+        GameObject itemObject = FindItemInScene(item);
+
+        if (itemObject == null)
+        {
+            Debug.LogWarning("Item instance not found in the scene: " + item.itemPrefab.name);
+            return;
+        }
+
+        Debug.Log("Enabling ItemPickUp on item: " + itemObject.name);
+
+        Component[] itemComponents = itemObject.GetComponents<Component>();
+        foreach (Component component in itemComponents)
+        {
+            if (component is ItemPickUp == false)
+            {
+                Debug.Log("Disabling component: " + component.GetType().Name);
+                Behaviour behaviour = component as Behaviour;
+                if (behaviour != null)
+                {
+                    behaviour.enabled = false;
+                }
+            }
+            else
+            {
+                Debug.Log("Enabling ItemPickUp component.");
+                ItemPickUp itemPickUp = component as ItemPickUp;
+                if (itemPickUp != null)
+                {
+                    itemPickUp.enabled = true;
+                }
+            }
+        }
+    }
+
+    private GameObject FindItemInScene(Item item)
+    {
+        GameObject[] sceneObjects = GameObject.FindObjectsOfType<GameObject>();
+
+        foreach (GameObject obj in sceneObjects)
+        {
+            if (obj.name == item.itemPrefab.name || obj.name == item.itemPrefab.name + "(Clone)")
+            {
+                return obj;
+            }
+        }
+
+        return null;
     }
 
     // Drops the currently selected item
@@ -202,11 +330,32 @@ public class InventoryManager : MonoBehaviour
 
         if (itemToDrop != null)
         {
+            // Clear the slot
             selectedSlot.ClearSlot();
-            Destroy(heldItemInstance); // Destroy the currently held item in hand
-            SpawnDroppedItem(itemToDrop); // Drop the item in the game world
-            currentItem = null; // Clear current item reference after dropping
-            isSwitchingDisabled = false; // Re-enable switching
+
+            // Destroy left hand item
+            if (heldLeftHandItemInstance != null)
+            {
+                Destroy(heldLeftHandItemInstance);
+                heldLeftHandItemInstance = null;
+            }
+
+            // Destroy right hand item
+            if (heldRightHandItemInstance != null)
+            {
+                Destroy(heldRightHandItemInstance);
+                heldRightHandItemInstance = null;
+            }
+
+            // Reset climbing state if exists and component is available
+            if (playerClimbingState != null)
+            {
+                playerClimbingState.ExitClimbingState(); // Use ExitClimbingState() method instead
+            }
+
+            SpawnDroppedItem(itemToDrop);
+            currentItem = null;
+            isSwitchingDisabled = false;
         }
     }
 
@@ -214,7 +363,8 @@ public class InventoryManager : MonoBehaviour
     {
         if (item.itemPrefab != null)  // Check if the item has a prefab
         {
-            Vector3 startPosition = handPosition.position + Vector3.up * 10f;
+            // Use leftHandPosition instead of the removed handPosition
+            Vector3 startPosition = leftHandPosition.position + Vector3.up * 10f;
             RaycastHit hit;
             if (Physics.Raycast(startPosition, Vector3.down, out hit, Mathf.Infinity, groundLayer))
             {
@@ -227,7 +377,8 @@ public class InventoryManager : MonoBehaviour
                     float itemHeight = meshRenderer.bounds.size.y;
                     Vector3 adjustedDropPosition = dropPosition + Vector3.up * (itemHeight / 2);
                     droppedItem.transform.position = adjustedDropPosition;
-                    droppedItem.transform.rotation = Quaternion.Euler(0, handPosition.eulerAngles.y, 0);
+                    // Use leftHandPosition's rotation instead of handPosition
+                    droppedItem.transform.rotation = Quaternion.Euler(0, leftHandPosition.eulerAngles.y, 0);
                 }
                 else
                 {
@@ -239,10 +390,12 @@ public class InventoryManager : MonoBehaviour
             else
             {
                 Debug.LogWarning("No ground detected. Item may drop in mid-air.");
-                Vector3 fallbackPosition = handPosition.position - Vector3.up * 1f;
+                // Use leftHandPosition instead of handPosition
+                Vector3 fallbackPosition = leftHandPosition.position - Vector3.up * 1f;
                 GameObject droppedItem = Instantiate(item.itemPrefab, fallbackPosition, Quaternion.identity);
                 droppedItem.GetComponent<ItemPickUp>().item = item;
             }
+            EnableItemPickup(item);
         }
         else
         {
@@ -271,35 +424,111 @@ public class InventoryManager : MonoBehaviour
     private void UpdateEquippedItem()
     {
         InventorySlot selectedSlot = slots[selectedSlotIndex];
+
+        // If the selected slot is empty or the item prevents climbing
+        if (selectedSlot.GetItem() == null)
+        {
+            if (playerClimbingState != null)
+            {
+                playerClimbingState.DisableClimbing();
+            }
+        }
+        else
+        {
+            // Re-enable climbing if the new item allows it
+            if (playerClimbingState != null)
+            {
+                playerClimbingState.EnableClimbing();
+            }
+        }
+
         EquipItem(selectedSlot.GetItem());
     }
 
-    // Equips an item to the player's hand
+    // Equips an item to the player's hand(s)
     public void EquipItem(Item item)
     {
-        if (heldItemInstance != null)
+        // Destroy any existing held items
+        if (heldLeftHandItemInstance != null)
         {
-            Destroy(heldItemInstance);
+            Destroy(heldLeftHandItemInstance);
+            heldLeftHandItemInstance = null;
+        }
+
+        if (heldRightHandItemInstance != null)
+        {
+            Destroy(heldRightHandItemInstance);
+            heldRightHandItemInstance = null;
+        }
+
+        // Reset climbing state if exists
+        if (playerClimbingState != null)
+        {
+            playerClimbingState.ExitClimbingState(); // Use ExitClimbingState() method
         }
 
         if (item != null)
         {
+            // Check if the item is too heavy to switch
             if (item.weight > MaxSwitchableWeight)
             {
-                // Switch to the heavy item and disable further switching
-                heldItemInstance = Instantiate(item.itemPrefab, handPosition.position, handPosition.rotation);
-                heldItemInstance.transform.SetParent(handPosition);
-                currentItem = item;
-                isSwitchingDisabled = true; // Disable switching if the item is too heavy
+                // Equip with weight-based switching restrictions
+                EquipItemWithWeightRestrictions(item);
             }
             else
             {
-                heldItemInstance = Instantiate(item.itemPrefab, handPosition.position, handPosition.rotation);
-                heldItemInstance.transform.SetParent(handPosition);
-                currentItem = item;
-                isSwitchingDisabled = false; // Enable switching if the item is light
+                // Normal item equipping
+                EquipNormalItem(item);
             }
         }
+    }
+
+    private void EquipNormalItem(Item item)
+    {
+        // For single-hand items, equip on left hand
+        if (item.handType == Item.HandType.SingleHand)
+        {
+            heldLeftHandItemInstance = Instantiate(item.itemPrefab, leftHandPosition.position, leftHandPosition.rotation);
+            heldLeftHandItemInstance.transform.SetParent(leftHandPosition);
+        }
+        // For double-hand items, equip on both hands
+        else if (item.handType == Item.HandType.DoubleHand)
+        {
+            // Left hand item
+            heldLeftHandItemInstance = Instantiate(item.itemPrefab, leftHandPosition.position, leftHandPosition.rotation);
+            heldLeftHandItemInstance.transform.SetParent(leftHandPosition);
+
+            // Right hand item
+            heldRightHandItemInstance = Instantiate(item.itemPrefab, rightHandPosition.position, rightHandPosition.rotation);
+            heldRightHandItemInstance.transform.SetParent(rightHandPosition);
+        }
+
+        currentItem = item;
+        isSwitchingDisabled = false; // Enable switching if the item is light
+    }
+
+    private void EquipItemWithWeightRestrictions(Item item)
+    {
+        // For single-hand items, equip on left hand
+        if (item.handType == Item.HandType.SingleHand)
+        {
+            heldLeftHandItemInstance = Instantiate(item.itemPrefab, leftHandPosition.position, leftHandPosition.rotation);
+            heldLeftHandItemInstance.transform.SetParent(leftHandPosition);
+        }
+        // For double-hand items, equip on both hands
+        else if (item.handType == Item.HandType.DoubleHand)
+        {
+            // Left hand item
+            heldLeftHandItemInstance = Instantiate(item.itemPrefab, leftHandPosition.position, leftHandPosition.rotation);
+            heldLeftHandItemInstance.transform.SetParent(leftHandPosition);
+
+            // Right hand item
+            heldRightHandItemInstance = Instantiate(item.itemPrefab, rightHandPosition.position, rightHandPosition.rotation);
+            heldRightHandItemInstance.transform.SetParent(rightHandPosition);
+        }
+
+        currentItem = item;
+        isSwitchingDisabled = true; // Disable switching if the item is too heavy
     }
 
     // Method to get the total weight of all items in the inventory
@@ -318,5 +547,43 @@ public class InventoryManager : MonoBehaviour
         }
 
         return totalWeight;
+    }
+
+    private void DisableScriptsOnInventoryItems()
+    {
+        // Find all objects in the specified itemLayer
+        GameObject[] inventoryItems = FindObjectsInLayer(itemLayer);
+
+        foreach (GameObject item in inventoryItems)
+        {
+            MonoBehaviour[] scripts = item.GetComponents<MonoBehaviour>();
+            foreach (MonoBehaviour script in scripts)
+            {
+                // Disable all scripts except the ItemPickUp script
+                if (script.GetType() != typeof(ItemPickUp))
+                {
+                    script.enabled = false;
+                }
+            }
+        }
+    }
+
+    // Utility function to find all objects in a specific layer
+    private GameObject[] FindObjectsInLayer(LayerMask layerMask)
+    {
+        // Get all objects in the scene
+        GameObject[] allObjects = GameObject.FindObjectsOfType<GameObject>();
+
+        // Filter the objects based on the specified layer
+        List<GameObject> objectsInLayer = new List<GameObject>();
+        foreach (GameObject obj in allObjects)
+        {
+            if (((1 << obj.layer) & layerMask) != 0)
+            {
+                objectsInLayer.Add(obj);
+            }
+        }
+
+        return objectsInLayer.ToArray();
     }
 }
