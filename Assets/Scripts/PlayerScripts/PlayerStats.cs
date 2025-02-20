@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
-//using static PlayerStats;
+using static PlayerStats;
 
 public class PlayerStats : MonoBehaviour
 {
@@ -108,7 +108,7 @@ public class PlayerStats : MonoBehaviour
                     Oxygen = Oxygen + OxygenTankRefillRate;
                     OxygenTank = OxygenTank - OxygenTankRefillRate;
                 }
-
+                // Need to REDO the oxygen when player is out of oxygen it takes from tank at RATE or else player dies
             }
             
             // PlayerSprint consume more oxygen
@@ -124,7 +124,7 @@ public class PlayerStats : MonoBehaviour
         }
     }
 
-    public void OnTriggerEnter(Collider collision) // Problem with collider not staying within box collision
+    public void OnTriggerEnter(Collider collision) // Problem with multiple collider with arms; To fix is disable arms
     {
         if(collision.gameObject.tag == "Level4Zone")
         {
@@ -138,7 +138,7 @@ public class PlayerStats : MonoBehaviour
         }
     }
     
-    public void OnTriggerExit(Collider collision) // Problem of auto updating the status
+    public void OnTriggerExit(Collider collision) // Problem of multiple collider arms auto colliding
     {
         stateOfPlayer = PlayerStatus.FreeRoam;
         Debug.Log("Atmosphere Safe");
