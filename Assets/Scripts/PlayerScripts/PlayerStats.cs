@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
-using static PlayerStats;
+//using static PlayerStats;
 
 public class PlayerStats : MonoBehaviour
 {
@@ -86,7 +86,6 @@ public class PlayerStats : MonoBehaviour
 
     void DeadZone ()
     {
-        //if (Atmosphere == true)
         if (stateOfPlayer == PlayerStatus.DeadZone)
         {
             // Tick Rate
@@ -125,7 +124,7 @@ public class PlayerStats : MonoBehaviour
         }
     }
 
-    public void OnTriggerEnter(Collider collision)
+    public void OnTriggerEnter(Collider collision) // Problem with collider not staying within box collision
     {
         if(collision.gameObject.tag == "Level4Zone")
         {
@@ -138,13 +137,14 @@ public class PlayerStats : MonoBehaviour
             Debug.Log("Level2QTE.1 Enter");
         }
     }
-    public void OnTriggerExit(Collider collision)
+    
+    public void OnTriggerExit(Collider collision) // Problem of auto updating the status
     {
         stateOfPlayer = PlayerStatus.FreeRoam;
         Debug.Log("Atmosphere Safe");
         
     }
-
+    
     public void PlayerAlive()
     {
         if (Oxygen <= 0)
