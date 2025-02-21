@@ -27,6 +27,8 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 velocity;
     private Vector2 moveInput;
 
+    private bool applyGravity = true;
+
     void Awake()
     {
         // If inputActions is not assigned via the inspector, load it from the Resources/Keybinds folder
@@ -91,8 +93,20 @@ public class PlayerMovement : MonoBehaviour
 
     void ApplyGravity()
     {
-        velocity.y += gravity * Time.deltaTime;
-        controller.Move(velocity * Time.deltaTime);
+        if (applyGravity)
+        {
+            velocity.y += gravity * Time.deltaTime;
+            controller.Move(velocity * Time.deltaTime);
+        }
+        else
+        {
+            velocity.y = 0; // Reset vertical velocity when gravity is not applied
+        }
+    }
+
+    public void SetApplyGravity(bool apply)
+    {
+        applyGravity = apply;
     }
 
     private void HandleSprint()
