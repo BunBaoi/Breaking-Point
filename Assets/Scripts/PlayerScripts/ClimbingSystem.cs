@@ -18,6 +18,10 @@ public class ClimbingSystem : MonoBehaviour
     public float maxPullDistance = 4f;
     public float handReachOffset = 1f;
     public float pullUpForce = 15f;
+    public float movementSmoothing = 8f;
+
+    private Vector3 currentVelocity;
+    private Vector3 lastMoveDirection;
 
     private float originalGravity;
 
@@ -152,16 +156,18 @@ public class ClimbingSystem : MonoBehaviour
             rightHandHolding = false;
         }
 
-        // If no hands are holding, restore original gravity
         if (!IsHolding())
         {
             playerMovement.SetApplyGravity(true);
             playerMovement.SetMovementState(true);
+            lastMoveDirection = Vector3.zero;
         }
     }
 
     void HandlePulling()
     {
+        if (!IsHolding()) return;
+
         Vector3 pullPoint = Vector3.zero;
         int activeHands = 0;
 
@@ -179,23 +185,23 @@ public class ClimbingSystem : MonoBehaviour
         if (activeHands > 0)
         {
             pullPoint /= activeHands;
-
             Vector3 toPoint = pullPoint - transform.position;
             float distance = toPoint.magnitude;
 
             if (distance > 0.1f)
             {
+                // Calculate basic pull direction
                 Vector3 pullDirection = toPoint.normalized;
-
-                // Add upward force
                 pullDirection.y += pullUpForce * Time.deltaTime;
-                pullDirection = pullDirection.normalized;
+                pullDirection = Vector3.Lerp(lastMoveDirection, pullDirection.normalized, Time.deltaTime * movementSmoothing);
 
-                // Calculate pull force based on distance
+                // Simple distance-based force calculation
                 float pullStrength = Mathf.Clamp01(1f - (distance / maxPullDistance));
                 Vector3 moveVector = pullDirection * pullForce * pullStrength * Time.deltaTime;
 
+                // Apply movement directly with minimal smoothing
                 controller.Move(moveVector);
+                lastMoveDirection = pullDirection;
             }
         }
     }
@@ -222,34 +228,38 @@ public class ClimbingSystem : MonoBehaviour
 
     void UpdateHandPositions()
     {
-        float handStability = 1f - (isExhausted ? handSwayAmount : 0f);
-
         if (leftHandHolding)
         {
-            Vector3 targetPos = leftHandHoldPosition;
-            if (isExhausted)
-            {
-                targetPos += Random.insideUnitSphere * handSwayAmount;
-            }
-            leftHandTransform.position = Vector3.Lerp(leftHandTransform.position, targetPos, handStability);
+            leftHandTransform.position = Vector3.Lerp(
+                leftHandTransform.position,
+                leftHandHoldPosition,
+                Time.deltaTime * handReturnSpeed
+            );
         }
         else
         {
-            leftHandTransform.localPosition = Vector3.Lerp(leftHandTransform.localPosition, leftHandOriginalLocalPos, Time.deltaTime * handReturnSpeed);
+            leftHandTransform.localPosition = Vector3.Lerp(
+                leftHandTransform.localPosition,
+                leftHandOriginalLocalPos,
+                Time.deltaTime * handReturnSpeed
+            );
         }
 
         if (rightHandHolding)
         {
-            Vector3 targetPos = rightHandHoldPosition;
-            if (isExhausted)
-            {
-                targetPos += Random.insideUnitSphere * handSwayAmount;
-            }
-            rightHandTransform.position = Vector3.Lerp(rightHandTransform.position, targetPos, handStability);
+            rightHandTransform.position = Vector3.Lerp(
+                rightHandTransform.position,
+                rightHandHoldPosition,
+                Time.deltaTime * handReturnSpeed
+            );
         }
         else
         {
-            rightHandTransform.localPosition = Vector3.Lerp(rightHandTransform.localPosition, rightHandOriginalLocalPos, Time.deltaTime * handReturnSpeed);
+            rightHandTransform.localPosition = Vector3.Lerp(
+                rightHandTransform.localPosition,
+                rightHandOriginalLocalPos,
+                Time.deltaTime * handReturnSpeed
+            );
         }
     }
 
@@ -258,9 +268,28 @@ public class ClimbingSystem : MonoBehaviour
         return leftHandHolding || rightHandHolding;
     }
 
+    private void OnEnable()
+    {
+        SetupInputActions();
+        if (playerMovement != null)
+        {
+            playerMovement.SetMovementState(true);
+        }
+    }
+
     private void OnDisable()
     {
-        // Unsubscribe from input events
+        // Release both hands when system is disabled
+        if (leftHandHolding)
+        {
+            Release(true);
+        }
+        if (rightHandHolding)
+        {
+            Release(false);
+        }
+
+        // Disable input actions
         if (leftGrab != null)
         {
             leftGrab.Disable();
@@ -273,9 +302,12 @@ public class ClimbingSystem : MonoBehaviour
             rightGrab.performed -= _ => TryGrab(false);
             rightGrab.canceled -= _ => Release(false);
         }
-        if (movement != null)
+
+        // Ensure normal movement is restored
+        if (playerMovement != null)
         {
-            movement.Disable();
+            playerMovement.SetMovementState(true);
+            playerMovement.SetApplyGravity(true);
         }
     }
 }

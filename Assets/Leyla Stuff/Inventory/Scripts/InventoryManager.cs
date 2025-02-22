@@ -41,6 +41,10 @@ public class InventoryManager : MonoBehaviour
     private InputAction dropAction;
     private List<InputAction> slotActions = new List<InputAction>();
 
+
+
+    private ClimbingSystem climbingSystem;
+
     private void Awake()
     {
         if (inputActions == null)
@@ -56,6 +60,7 @@ public class InventoryManager : MonoBehaviour
 
     private void Start()
     {
+        climbingSystem = GetComponent<ClimbingSystem>();
         DisableScriptsOnInventoryItems();
         CreateSlots(defaultSlotCount);
 
@@ -333,6 +338,11 @@ public class InventoryManager : MonoBehaviour
             // Clear the slot
             selectedSlot.ClearSlot();
 
+            if (itemToDrop.name.ToLower().Contains("icepick") && climbingSystem != null)
+            {
+                climbingSystem.enabled = false;
+            }
+
             // Destroy left hand item
             if (heldLeftHandItemInstance != null)
             {
@@ -424,25 +434,29 @@ public class InventoryManager : MonoBehaviour
     private void UpdateEquippedItem()
     {
         InventorySlot selectedSlot = slots[selectedSlotIndex];
+        Item currentItem = selectedSlot.GetItem();
 
-        // If the selected slot is empty or the item prevents climbing
-        if (selectedSlot.GetItem() == null)
+        if (currentItem != null)
         {
-            if (playerClimbingState != null)
+            // Check if the current item is an ice pick
+            bool hasIcePick = currentItem.name.ToLower().Contains("icepick");
+
+            // Enable/disable climbing based on ice pick
+            if (climbingSystem != null)
             {
-                playerClimbingState.DisableClimbing();
+                climbingSystem.enabled = hasIcePick;
             }
         }
         else
         {
-            // Re-enable climbing if the new item allows it
-            if (playerClimbingState != null)
+            // Disable climbing when no item is equipped
+            if (climbingSystem != null)
             {
-                playerClimbingState.EnableClimbing();
+                climbingSystem.enabled = false;
             }
         }
 
-        EquipItem(selectedSlot.GetItem());
+        EquipItem(currentItem);
     }
 
     // Equips an item to the player's hand(s)
