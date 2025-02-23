@@ -701,7 +701,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 385073716}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b7222f8c17dd0bb4e8843592de4ae71d, type: 3}
   m_Name: 
@@ -712,7 +712,7 @@ MonoBehaviour:
   rightHandTransform: {fileID: 480329443}
   pullForce: 40
   maxPullDistance: 1.5
-  handReachOffset: 1
+  handReachOffset: 1.5
   pullUpForce: 40
   movementSmoothing: 8
   climbableTag: Climbable
@@ -2055,14 +2055,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 586281057}
     m_Modifications:
-    - target: {fileID: 3021718051064668525, guid: eae525995f0d24e51bf1975e1d4f4f04, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3407735954489364013, guid: eae525995f0d24e51bf1975e1d4f4f04, type: 3}
-      propertyPath: item
-      value: 
-      objectReference: {fileID: 11400000, guid: 3eb11480d8035ee47a01bef20a217b0d, type: 2}
     - target: {fileID: 3859812622371921254, guid: eae525995f0d24e51bf1975e1d4f4f04, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.843

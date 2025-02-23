@@ -200,6 +200,10 @@ public class InventoryManager : MonoBehaviour
     {
         Debug.Log($"Attempting to add item: {item.name}");
 
+        // Check for ice pick when item is first picked up
+        bool isIcePick = item.name.ToLower().Contains("icepick");
+        Debug.Log($"Item pickup - Is ice pick detected? {isIcePick}");
+
         // Prevent adding new items if a heavy item is already equipped
         if (isSwitchingDisabled)
         {
@@ -217,6 +221,11 @@ public class InventoryManager : MonoBehaviour
         if (slots[selectedSlotIndex].GetItem() == null)
         {
             slots[selectedSlotIndex].AddItem(item);
+            if (isIcePick && climbingSystem != null)
+            {
+                Debug.Log("Ice pick added - Enabling climbing system");
+                climbingSystem.enabled = true;
+            }
             EquipItem(item);
             DisableItemPickup(item);
             return true;
@@ -231,6 +240,13 @@ public class InventoryManager : MonoBehaviour
                 slots[slotIndex].AddItem(item);
                 // Update selected slot index to the slot where the item was added
                 selectedSlotIndex = slotIndex;
+
+                // Check for ice pick again when adding to a different slot
+                if (isIcePick && climbingSystem != null)
+                {
+                    Debug.Log("Ice pick added to alternate slot - Enabling climbing system");
+                    climbingSystem.enabled = true;
+                }
 
                 // Equip the item if added to the selected slot
                 EquipItem(item);
@@ -441,10 +457,19 @@ public class InventoryManager : MonoBehaviour
             // Check if the current item is an ice pick
             bool hasIcePick = currentItem.name.ToLower().Contains("icepick");
 
+            // Add debug logs
+            Debug.Log($"Current item: {currentItem.name}");
+            Debug.Log($"Is ice pick detected? {hasIcePick}");
+
             // Enable/disable climbing based on ice pick
             if (climbingSystem != null)
             {
                 climbingSystem.enabled = hasIcePick;
+                Debug.Log($"Climbing system enabled: {hasIcePick}");
+            }
+            else
+            {
+                Debug.LogWarning("ClimbingSystem component not found!");
             }
         }
         else
@@ -453,6 +478,7 @@ public class InventoryManager : MonoBehaviour
             if (climbingSystem != null)
             {
                 climbingSystem.enabled = false;
+                Debug.Log("No item equipped - Climbing system disabled");
             }
         }
 
