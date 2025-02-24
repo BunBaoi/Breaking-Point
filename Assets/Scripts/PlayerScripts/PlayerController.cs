@@ -95,6 +95,9 @@ public class PlayerController : MonoBehaviour
         {
             playerStats.OxygenTankRefillRate--;
             //Debug.log("Rate Down");
+
+            // Need to add condition that the rate can't go negative
+
         }
     }
 

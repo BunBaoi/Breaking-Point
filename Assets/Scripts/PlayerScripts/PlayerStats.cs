@@ -83,7 +83,7 @@ public class PlayerStats : MonoBehaviour
         }
     }
 
-
+    
     void DeadZone ()
     {
         if (stateOfPlayer == PlayerStatus.DeadZone)
@@ -98,17 +98,24 @@ public class PlayerStats : MonoBehaviour
                 //Oxygen Rate deduction
                 Oxygen = Oxygen - OxygenDeductionRate;
 
+                if (Oxygen < 25) // This should play an effect to signafy low oxygen & oxygen rate
+                {
+
+                }
+
                 // Tank replanish Oxygen
-                if (OxygenTankRefillRate > OxygenTank) // Step 1: Checks rate enough in tank
+                if (OxygenTankRefillRate > OxygenTank) // Step 1: Refill rate bigger then tank
+                                                       // When the Tank is less then the rate itself
+                                                       // It would equal the remaing tank to the rate just so the player doesn't get extra
                 {
                     OxygenTankRefillRate = OxygenTank;
                 }
                 else if (Oxygen < 100 && OxygenTank > 0) // Step 2: Checks there is oxygen in tank
                 {
+
                     Oxygen = Oxygen + OxygenTankRefillRate;
                     OxygenTank = OxygenTank - OxygenTankRefillRate;
                 }
-                // Need to REDO the oxygen when player is out of oxygen it takes from tank at RATE or else player dies
             }
             
             // PlayerSprint consume more oxygen
@@ -145,12 +152,21 @@ public class PlayerStats : MonoBehaviour
         
     }
     
-    public void PlayerAlive()
+    public void PlayerAlive() // Ways of player Died
     {
-        if (Oxygen <= 0)
+
+
+        // Oxygen Death
+        if (Oxygen <= 0 && OxygenTank > 0)
+        {
+            IsAlive = false;
+            Debug.Log("Player Died From Low Oxygen Output");
+        }
+        else if (Oxygen <= 0 && OxygenTank <= 0)
         {
             IsAlive = false;
             Debug.Log("Player Died From Oxygen Starvation");
         }
     }
+    
 }
