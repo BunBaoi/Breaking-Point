@@ -119,11 +119,21 @@ public class DayNightCycle : MonoBehaviour
         timeText.text = $"Day {day}\n{hours:00}:{minutes:00}";
     }
 
-    public void SetTime(int newHours, int newMinutes, int newDay = -1)
+    public void SetTime(int newHours, int newMinutes, bool newDay)
     {
+        int previousTotalMinutes = (hours * 60) + minutes;
+        int newTotalMinutes = (newHours * 60) + newMinutes;
+
         hours = Mathf.Clamp(newHours, 0, 23);
         minutes = Mathf.Clamp(newMinutes, 0, 59);
-        if (newDay > 0) day = newDay; // Allow manually setting the day
+
+        // If newDay is true, always increment day
+        // If newDay is false, only increment day if time wraps past midnight
+        if (newDay || newTotalMinutes < previousTotalMinutes)
+        {
+            day++;
+        }
+
         UpdateLighting();
         UpdateTimeUI();
     }

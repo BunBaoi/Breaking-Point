@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8656086899620392465}
   - component: {fileID: 5038084411908042801}
   m_Layer: 16
-  m_Name: PickupCollider
+  m_Name: Pick Up Collider
   m_TagString: Pick Up Collider
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -83,7 +83,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.43, y: 0.14, z: 1}
-  m_LocalScale: {x: 0.1, y: 0.1, z: 1}
+  m_LocalScale: {x: 0.2, y: 0.2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8656086899620392465}
@@ -158,7 +158,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 15, y: 2.5, z: 3}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &2343729533051797035
 MonoBehaviour:
