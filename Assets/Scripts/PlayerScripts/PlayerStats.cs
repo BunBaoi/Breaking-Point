@@ -18,7 +18,7 @@ public class PlayerStats : MonoBehaviour
     public bool QTEState = false;
     public PlayerStatus stateOfPlayer;
 
-    private PlayerController playerController;
+    private PlayerMovement playerMovement;
     public QTEMechanic qTEMechanic;
 
     [Header("Timer")]
@@ -32,7 +32,7 @@ public class PlayerStats : MonoBehaviour
     void Start()
     {
         controller = GetComponent<CharacterController>();
-        playerController = GetComponent<PlayerController>();
+        playerMovement = GetComponent<PlayerMovement>();
 
         controller.slopeLimit = 45.0f;
 
@@ -119,7 +119,7 @@ public class PlayerStats : MonoBehaviour
             }
             
             // PlayerSprint consume more oxygen
-            if (playerController.IsSprint == true)
+            if (playerMovement.IsSprint == true)
             {
                 Debug.Log("Player Consumption Increase");
                 OxygenDeductionRate = 12f;

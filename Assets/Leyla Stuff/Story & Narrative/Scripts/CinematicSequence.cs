@@ -46,6 +46,9 @@ public class CinematicSequence : MonoBehaviour
     [SerializeField] private Canvas inventoryCanvas;
     [SerializeField] private DayNightCycle dayNightCycle;
 
+    public event System.Action OnCinematicFinished;
+    public event System.Action OnCinematicStarted;
+
     public void StartCinematic()
     {
         // Before starting the cinematic, check the boolean conditions
@@ -291,6 +294,8 @@ public class CinematicSequence : MonoBehaviour
 
         // Fade out the chapter text, using the serialized field
         yield return StartCoroutine(FadeText(chapterText, textFadeOutDuration, 0f));
+
+        OnCinematicStarted?.Invoke();
     }
 
     private void ShowRandomText(string text)
@@ -536,5 +541,7 @@ public class CinematicSequence : MonoBehaviour
         {
             cameraController.SetLookState(true);
         }
+
+        OnCinematicFinished?.Invoke();
     }
 }
