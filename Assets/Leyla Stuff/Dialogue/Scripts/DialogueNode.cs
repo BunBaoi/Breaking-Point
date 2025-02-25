@@ -1,7 +1,7 @@
 using UnityEngine;
-using UnityEngine.Events;
 using System.Collections.Generic;
-using FMODUnity; // FMOD namespace for Unity integration
+using FMODUnity;
+using System.Collections;
 
 [System.Serializable]
 public class DialogueOption
@@ -14,7 +14,11 @@ public class DialogueOption
 public class DialogueNode
 {
     [TextArea] public string dialogueText;
-    public EventReference fmodAudioEvent; // Replace AudioClip with FMOD event
-    public UnityEvent onDialogueEvent;
+    public EventReference fmodAudioEvent; // FMOD event for audio
+
+    public List<string> eventIds = new List<string>(); // List to store multiple eventIDs
     public List<DialogueOption> options;
+
+    public string npcName; // Name of the NPC in the dialogue
+    public string npcTag; // Optional tag to search for the NPC in the scene
 }

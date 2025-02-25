@@ -33,9 +33,6 @@ public class QTEvent : MonoBehaviour
 
     [Header("QTE Timer")]
     public float CountDownTimer;
-    public int MaxTimer;
-
-    public int KeyCountDownTime;
 
     void Start()
     {

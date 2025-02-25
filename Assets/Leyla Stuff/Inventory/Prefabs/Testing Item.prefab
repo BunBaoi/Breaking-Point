@@ -83,8 +83,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.36, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 7030249888608060991}
   m_Father: {fileID: 0}
@@ -151,8 +151,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9348f7f1823764b348b0fbc2afe2baa3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  item: {fileID: 11400000, guid: 1ff94f1e8742d464e86ccb3a5ade5139, type: 2}
-  pickupKey: 101
+  item: {fileID: 11400000, guid: 3eb11480d8035ee47a01bef20a217b0d, type: 2}
   raycastDistance: 3
   pickupRadius: 1
   playerCameraTag: PlayerCamera
@@ -165,6 +164,8 @@ MonoBehaviour:
     m_Bits: 65536
   canPickUp: 0
   isPickingUp: 0
+  inputActions: {fileID: -944628639613478452, guid: 5ec57af691e024f5495721c1aec07891, type: 3}
+  pickupActionName: PickUp
 --- !u!65 &778047884948910781
 BoxCollider:
   m_ObjectHideFlags: 0

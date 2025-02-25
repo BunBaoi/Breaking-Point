@@ -21,7 +21,7 @@ public class PlayerStats : MonoBehaviour
     public bool QTEState = false;
     public PlayerStatus stateOfPlayer;
 
-    private PlayerController playerController;
+    private PlayerMovement playerMovement;
     public QTEMechanic qTEMechanic;
 
     [Header("Timer")]
@@ -35,8 +35,8 @@ public class PlayerStats : MonoBehaviour
     void Start()
     {
         controller = GetComponent<CharacterController>();
-        playerControls = GetComponent<PlayerControls>();
-        CurrentStamina = MaxStamina;
+        playerMovement = GetComponent<PlayerMovement>();
+
         controller.slopeLimit = 45.0f;
     }
 
@@ -83,34 +83,9 @@ public class PlayerStats : MonoBehaviour
         }
     }
 
-
+    
     void DeadZone ()
     {
-        if (!playerControls.IsHolding() && !playerControls.IsSprint)
-        {
-            CurrentStamina = Mathf.Min(MaxStamina, CurrentStamina + amount);
-        }
-    }
-
-    private void UpdateStamina()
-    {
-        if (playerControls.IsHolding())
-        {
-            DrainStamina(ClimbingStaminaDrain * Time.deltaTime);
-        }
-        else if (playerControls.IsSprint)
-        {
-            DrainStamina(SprintStaminaDrain * Time.deltaTime);
-        }
-        else
-        {
-            RegenerateStamina(StaminaRegenRate * Time.deltaTime);
-        }
-    }
-
-    void DeadZone()
-    {
-        //
         if (stateOfPlayer == PlayerStatus.DeadZone)
         {
             // Tick Rate
@@ -123,20 +98,28 @@ public class PlayerStats : MonoBehaviour
                 // Oxygen Deduction Rate
                 Oxygen = Oxygen - OxygenDeductionRate;
 
-                // Tank Replanish Oxygen
-                if (OxygenTankRefillRate > OxygenTank) // Step 1: Checks rate enough in Tank
+                if (Oxygen < 25) // This should play an effect to signafy low oxygen & oxygen rate
+                {
+
+                }
+
+                // Tank replanish Oxygen
+                if (OxygenTankRefillRate > OxygenTank) // Step 1: Refill rate bigger then tank
+                                                       // When the Tank is less then the rate itself
+                                                       // It would equal the remaing tank to the rate just so the player doesn't get extra
                 {
                     OxygenTankRefillRate = OxygenTank;
                 }
                 else if (Oxygen < 100 && OxygenTank > 0) //Step 2: Checks there is oxygen in Tank
                 {
+
                     Oxygen = Oxygen + OxygenTankRefillRate;
                     OxygenTank = OxygenTank - OxygenTankRefillRate;
                 }
             }
-
-            // PlayerSprint Consume more Oxygen
-            if (playerControls.IsSprint == true)
+            
+            // PlayerSprint consume more oxygen
+            if (playerMovement.IsSprint == true)
             {
                 Debug.Log("Player Consumption Rate Increase");
                 OxygenDeductionRate = 12f;
@@ -149,7 +132,7 @@ public class PlayerStats : MonoBehaviour
         }
     }
 
-    public void OnTriggerEnter(Collider collision)
+    public void OnTriggerEnter(Collider collision) // Problem with multiple collider with arms; To fix is disable arms
     {
         if(collision.gameObject.tag == "Level4Zone")
         {
@@ -162,19 +145,29 @@ public class PlayerStats : MonoBehaviour
             Debug.Log("Level2QTE.1 Enter");
         }
     }
-    public void OnTriggerExit(Collider collision)
+    
+    public void OnTriggerExit(Collider collision) // Problem of multiple collider arms auto colliding
     {
         stateOfPlayer = PlayerStatus.FreeRoam;
         Debug.Log("Atmosphere Safe");
         
     }
-
-    public void PlayerAlive()
+    
+    public void PlayerAlive() // Ways of player Died
     {
-        if (Oxygen <= 0)
+
+
+        // Oxygen Death
+        if (Oxygen <= 0 && OxygenTank > 0)
+        {
+            IsAlive = false;
+            Debug.Log("Player Died From Low Oxygen Output");
+        }
+        else if (Oxygen <= 0 && OxygenTank <= 0)
         {
             IsAlive = false;
             Debug.Log("Player Died From Oxygen Starvation");
         }
     }
+    
 }

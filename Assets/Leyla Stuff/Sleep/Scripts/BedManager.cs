@@ -1,0 +1,479 @@
+using System.Collections;
+using UnityEngine;
+using System.Collections.Generic;
+using TMPro;
+using UnityEngine.InputSystem;
+
+public class BedManager : MonoBehaviour
+{
+    [Header("References")]
+    [SerializeField] private Transform player;
+    [SerializeField] private Transform bed;
+    [SerializeField] private string bedTag = "Bed";
+    [SerializeField] private string playerTag = "Player";
+    [SerializeField] private CanvasGroup fadeCanvas; // CanvasGroup for fading effect
+    [SerializeField] private float fadeDuration = 0.5f;
+    [SerializeField] private float rotationSpeed = 2f;
+    [SerializeField] private string boolKey = "SleptInBed";
+    [SerializeField] private CinematicSequence cinematicSequence;
+    [SerializeField] private CameraController cameraController;
+    [SerializeField] private PlayerMovement playerMovement;
+    [SerializeField] private DayNightCycle dayNightCycle;
+
+    [Header("Keybinds")]
+    [SerializeField] private InputActionAsset inputActions; // Reference to the Input Action Asset
+    [SerializeField] private string interactActionName = "Interact";
+    [SerializeField] private GameObject interactTextPrefab; // Prefab for interaction text
+    private GameObject interactTextInstance;
+    private GameObject iconObject;
+    private InputAction interactAction;
+
+    [Header("Bool Conditions")]
+    [SerializeField] private List<string> requiredBoolKeysTrue = new List<string>(); // List of bool keys that should be true
+    [SerializeField] private List<string> requiredBoolKeysFalse = new List<string>(); // List of bool keys that should be false
+    [SerializeField] private bool hasSetTime = false;
+    [SerializeField] private bool isInteracting = false;
+    [SerializeField] private bool inTrigger = false;
+
+    private Camera playerCamera;
+
+    void Awake()
+    {
+        // If inputActions is not assigned via the inspector, load it from the Resources/Keybinds folder
+        if (inputActions == null)
+        {
+            // Load from the "Keybinds" folder in Resources
+            inputActions = Resources.Load<InputActionAsset>("Keybinds/PlayerInputs");
+
+            if (inputActions == null)
+            {
+                Debug.LogError("PlayerInputs asset not found in Resources/Keybinds folder!");
+            }
+        }
+    }
+
+    private void Start()
+    {
+        playerCamera = GameObject.FindGameObjectWithTag("PlayerCamera")?.GetComponent<Camera>();
+
+        if (playerCamera == null)
+        {
+            Debug.LogError("PlayerCamera not found! Make sure the camera is tagged correctly.");
+        }
+
+        if (player == null)
+        {
+            player = GameObject.FindGameObjectWithTag(playerTag)?.transform;
+        }
+
+        // Find the action dynamically using the interactActionName string
+        interactAction = inputActions.FindAction(interactActionName);
+
+        if (interactAction != null)
+        {
+            interactAction.Enable(); // Enable the action
+        }
+        else
+        {
+            Debug.LogError($"Input action '{interactActionName}' not found in Input Action Asset!");
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player") && !isInteracting)
+        {
+            inTrigger = true;
+            player = GameObject.FindGameObjectWithTag(playerTag)?.transform;
+
+            if (interactTextPrefab != null && interactTextInstance == null)
+            {
+                interactTextInstance = Instantiate(interactTextPrefab);
+                interactTextInstance.transform.SetParent(transform, false);
+                interactTextInstance.transform.localPosition = new Vector3(0, 0.5f, 0);
+
+                // Declare the interactText variable
+                string interactText = "to Sleep"; // Default text
+
+                // Get the keybinding data for "Interact"
+                KeyBinding keyBinding = KeyBindingManager.Instance.GetKeybinding(interactActionName);
+
+                // Update text dynamically to match the correct keybinding based on input device
+                TextMeshPro textMesh = interactTextInstance.GetComponent<TextMeshPro>();
+                if (textMesh != null)
+                {
+                    textMesh.text = "to Sleep";
+
+                    // Now check if we have a keybinding sprite
+                    if (keyBinding != null)
+                    {
+                        Sprite icon = KeyBindingManager.Instance.IsUsingController() ? keyBinding.controllerSprite : keyBinding.keySprite;
+
+                        // If the sprite exists, display it next to the text
+                        if (icon != null)
+                        {
+                            // Create a object for the sprite and set it next to the text
+                            iconObject = new GameObject("KeybindIcon");
+                            iconObject.transform.SetParent(interactTextInstance.transform); // Make it a child of the text
+
+                            // Position sprite to left of text
+                            // Increase the horizontal space by adjusting the x-position further
+                            float horizontalOffset = -textMesh.preferredWidth / 2 - 0.5f; // Increased offset to add more space
+                            iconObject.transform.localPosition = new Vector3(horizontalOffset, 0.7f, 0);
+
+                            // Add a SpriteRenderer to display the icon
+                            SpriteRenderer spriteRenderer = iconObject.AddComponent<SpriteRenderer>();
+                            spriteRenderer.sprite = icon;
+                            spriteRenderer.sortingOrder = 1; // Ensure the sprite is above the text
+
+                            spriteRenderer.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+
+                            UpdateSprite(iconObject.gameObject, interactActionName);
+                        }
+                        else
+                        {
+                            // Get the first binding for keyboard and second for controller directly from the InputActionAsset
+                            string keyText = "";
+
+                            // Get the "Interact" action
+                            var interactAction = inputActions.FindAction(interactActionName);
+
+                            if (interactAction != null)
+                            {
+                                // If using a controller, get the second binding (controller binding)
+                                if (KeyBindingManager.Instance.IsUsingController())
+                                {
+                                    keyText = interactAction.bindings[1].ToDisplayString();  // Second binding (controller)
+                                }
+                                else
+                                {
+                                    keyText = interactAction.bindings[0].ToDisplayString();  // First binding (keyboard)
+                                }
+
+                                // Remove the word "Press" from the keyText if it exists
+                                keyText = keyText.Replace("Press ", "").Trim(); // Removes "Press" and any extra spaces
+
+                                // Set the fallback text to show the keybinding for "Interact"
+                                interactText = $"[{keyText}] to Sleep";
+                            }
+                            else
+                            {
+                                Debug.LogError("Interact action not found in InputActionAsset");
+                            }
+                        }
+
+                        // Set the updated text (with sprite or keybinding fallback)
+                        textMesh.text = interactText;
+                    }
+                }
+            }
+        }
+    }
+
+    private void UpdateSprite(GameObject iconObject, string actionName)
+    {
+        if (KeyBindingManager.Instance == null || iconObject == null || inputActions == null) return;
+
+        InputAction action = inputActions.FindAction(actionName);
+        if (action == null) return;
+
+        int bindingIndex = KeyBindingManager.Instance.IsUsingController() ? 1 : 0;
+        if (action.bindings.Count <= bindingIndex) return;
+
+        InputBinding binding = action.bindings[bindingIndex];
+
+        string boundKeyOrButton = KeyBindingManager.Instance.GetSanitisedKeyName(binding.effectivePath);
+        if (string.IsNullOrEmpty(boundKeyOrButton))
+        {
+            Debug.LogWarning($"No key binding found for action: {actionName}");
+            return;
+        }
+
+        bool isUsingController = KeyBindingManager.Instance.IsUsingController();
+
+        KeyBinding keyBinding = KeyBindingManager.Instance.GetKeybinding(actionName);
+        if (keyBinding == null) return;
+
+        SpriteRenderer spriteRenderer = iconObject.GetComponent<SpriteRenderer>();
+
+        spriteRenderer.sprite = KeyBindingManager.Instance.IsUsingController() ? keyBinding.controllerSprite : keyBinding.keySprite;
+
+        Animator animator = iconObject.GetComponent<Animator>();
+        if (animator == null)
+        {
+            animator = iconObject.AddComponent<Animator>();
+        }
+
+        animator.enabled = true; // Ensure animator is enabled
+
+        string folderPath = isUsingController ? "UI/Controller/" : "UI/Keyboard/";
+        string animatorName = KeyBindingManager.Instance.GetSanitisedKeyName(boundKeyOrButton) + ".sprite";
+        RuntimeAnimatorController assignedAnimator = Resources.Load<RuntimeAnimatorController>(folderPath + animatorName);
+
+        if (assignedAnimator != null)
+        {
+            animator.runtimeAnimatorController = assignedAnimator;
+            Debug.Log($"Assigned animator '{animatorName}' to {iconObject.name}");
+        }
+        else
+        {
+            Debug.LogError($"Animator '{animatorName}' not found in {folderPath}");
+        }
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.CompareTag("Player") && inTrigger)
+        {
+            UpdateSprite(iconObject.gameObject, interactActionName);
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            inTrigger = false;
+            player = null;
+
+            if (interactTextInstance != null)
+            {
+                Destroy(interactTextInstance);
+                interactTextInstance = null;
+            }
+        }
+    }
+
+    private void Update()
+    {
+        if (inTrigger && interactTextInstance != null && player != null)
+        {
+            // Make the text only rotate left and right (Y-axis only)
+            Vector3 lookDirection = player.position - interactTextInstance.transform.position;
+            lookDirection.y = 0; // Ignore vertical rotation
+            interactTextInstance.transform.forward = -lookDirection.normalized; // Fix backwards issue
+        }
+
+        if (interactAction.triggered && inTrigger)
+        {
+            if (playerCamera == null)
+            {
+                Debug.LogError("PlayerCamera is null! Raycast cannot proceed.");
+                return;
+            }
+
+            RaycastHit hit;
+            Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
+
+            Debug.DrawRay(ray.origin, ray.direction * 3f, Color.red, 1f); // Visualise the ray
+
+            if (Physics.Raycast(ray, out hit, 3f))
+            {
+                Debug.Log("Raycast hit: " + hit.collider.name); // Check what is hit
+
+                if (hit.collider.CompareTag(bedTag) && !isInteracting)
+                {
+                    Debug.Log("Bed detected! Starting interaction.");
+                    bed = hit.collider.transform;
+                    // Remove interact text when dialogue starts
+                    if (interactTextInstance != null)
+                    {
+                        Debug.Log("destroy text");
+                        Destroy(interactTextInstance);
+                        interactTextInstance = null;
+                    }
+                    StartCoroutine(HandleBedInteraction());
+                }
+                else
+                {
+                    Debug.Log("Raycast hit, but not a bed.");
+                }
+            }
+            else
+            {
+                Debug.Log("No object hit by the raycast.");
+            }
+        }
+    }
+
+    private IEnumerator HandleBedInteraction()
+    {
+        isInteracting = true;
+        cameraController.SetLookState(false);
+        playerMovement.SetMovementState(false);
+
+        // Get the collider of the bed to determine the height for positioning
+        Collider bedCollider = bed.GetComponent<Collider>();
+        if (bedCollider == null)
+        {
+            Debug.LogError("No collider found on the bed object!");
+            yield break;
+        }
+
+        // Teleport player to the center of the bed's collider but slightly above it (use the collider's center)
+        Vector3 colliderCenter = bedCollider.bounds.center; // Center of the collider
+        Vector3 targetPosition = new Vector3(colliderCenter.x, colliderCenter.y + bedCollider.bounds.extents.y + 1f, colliderCenter.z); // Adjusted height above the bed
+
+        // Disable the CharacterController while teleporting the player
+        CharacterController characterController = player.GetComponent<CharacterController>();
+        if (characterController != null)
+        {
+            characterController.enabled = false; // Disable to avoid collision or unwanted behavior
+        }
+
+        // Set the new position for the player
+        player.position = targetPosition;
+
+        // Re-enable the CharacterController
+        if (characterController != null)
+        {
+            characterController.enabled = true;
+        }
+
+        // Align player's Y rotation to match the bed's Y rotation (keeping the player's original X and Z rotations intact)
+        player.rotation = Quaternion.Euler(player.eulerAngles.x, bed.rotation.eulerAngles.y, player.eulerAngles.z); // Align Y rotation with the bed's rotation
+
+        // Adjust player's rotation to make them lie flat on their back (90 degrees around the X-axis)
+        Quaternion targetRotation = Quaternion.Euler(-90, player.rotation.eulerAngles.y, player.rotation.eulerAngles.z);
+        while (Quaternion.Angle(player.rotation, targetRotation) > 0.1f)
+        {
+            player.rotation = Quaternion.Slerp(player.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            yield return null;
+        }
+
+        // Start blink effect
+        yield return StartCoroutine(BlinkScreen());
+
+        if (CanStartCinematic())
+        {
+            // Set bool in BoolManager
+            BoolManager.Instance.SetBool(boolKey, true);
+        }
+
+        yield return new WaitForSeconds(0.5f); // Small delay before checking bool
+
+        if (BoolManager.Instance.GetBool(boolKey))
+        {
+            // Start cinematic sequence if the bool is true
+            cinematicSequence.StartCinematic();
+            cinematicSequence.OnCinematicFinished += RotatePlayerUpright;
+            cinematicSequence.OnCinematicStarted += FadeOutBlack;
+        }
+        else
+        {
+            yield return StartCoroutine(FadeScreen(false));
+
+            Quaternion uprightRotation = Quaternion.Euler(0, player.eulerAngles.y, 0);
+            while (Quaternion.Angle(player.rotation, uprightRotation) > 0.1f)
+            {
+                cameraController.SetLookState(false);
+                playerMovement.SetMovementState(false);
+                player.rotation = Quaternion.Slerp(player.rotation, uprightRotation, rotationSpeed * Time.deltaTime);
+                yield return null;
+            }
+
+            dayNightCycle.StartTime();
+            cameraController.SetLookState(true);
+            playerMovement.SetMovementState(true);
+        }
+
+        isInteracting = false;
+    }
+
+    private bool CanStartCinematic()
+    {
+        // Check if all required bool conditions are met (true or false based on lists)
+        foreach (string boolKey in requiredBoolKeysTrue)
+        {
+            if (!BoolManager.Instance.GetBool(boolKey))
+            {
+                return false; // If any bool is false when it should be true, return false
+            }
+        }
+
+        foreach (string boolKey in requiredBoolKeysFalse)
+        {
+            if (BoolManager.Instance.GetBool(boolKey))
+            {
+                return false; // If any bool is true when it should be false, return false
+            }
+        }
+
+        return true; // All conditions are met, return true
+    }
+
+    private void FadeOutBlack()
+    {
+        StartCoroutine(FadeOutBlackCoroutine());
+    }
+
+    private IEnumerator FadeOutBlackCoroutine()
+    {
+        yield return StartCoroutine(FadeScreen(false));
+        cinematicSequence.OnCinematicStarted -= FadeOutBlack;
+    }
+
+    private void RotatePlayerUpright()
+    {
+        StartCoroutine(RotatePlayerUprightCoroutine());
+    }
+
+    private IEnumerator RotatePlayerUprightCoroutine()
+    {
+        Quaternion uprightRotation = Quaternion.Euler(0, player.eulerAngles.y, 0);
+        while (Quaternion.Angle(player.rotation, uprightRotation) > 0.1f)
+        {
+            cameraController.SetLookState(false);
+            playerMovement.SetMovementState(false);
+            player.rotation = Quaternion.Slerp(player.rotation, uprightRotation, rotationSpeed * Time.deltaTime);
+            yield return null;
+        }
+
+        // Unsubscribe from the event to avoid duplicate calls
+        cinematicSequence.OnCinematicFinished -= RotatePlayerUpright;
+
+        cameraController.SetLookState(true);
+        playerMovement.SetMovementState(true);
+        dayNightCycle.StartTime();
+
+        isInteracting = false; // Allow new interactions
+    }
+
+    private IEnumerator BlinkScreen()
+    {
+        yield return StartCoroutine(FadeScreen(true));
+        yield return new WaitForSeconds(0.2f);
+        yield return StartCoroutine(FadeScreen(false));
+        yield return new WaitForSeconds(0.2f);
+
+        // Final fade to black
+        yield return StartCoroutine(FadeScreen(true));
+
+        // Stay on black screen for a longer time
+        yield return new WaitForSeconds(1f);
+
+        if (!hasSetTime)
+        {
+            // ADD REPLENISH STAMINA HERE
+            dayNightCycle.SetTime(6, 00, true); // Set time
+            dayNightCycle.StopTime();
+            hasSetTime = true;
+        }
+    }
+
+    private IEnumerator FadeScreen(bool fadeToBlack)
+    {
+        float targetAlpha = fadeToBlack ? 1f : 0f;
+        float startAlpha = fadeCanvas.alpha;
+        float elapsedTime = 0f;
+
+        while (elapsedTime < fadeDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            fadeCanvas.alpha = Mathf.Lerp(startAlpha, targetAlpha, elapsedTime / fadeDuration);
+            yield return null;
+        }
+
+        fadeCanvas.alpha = targetAlpha;
+    }
+}
