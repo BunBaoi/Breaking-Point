@@ -16,7 +16,7 @@ public class QTEMechanic : MonoBehaviour
     public float CHKCounter = 0f;
 
     public QTEvent qTEvent;
-    public PlayerController playerController;
+    public PlayerMovement playerMovement;
     public GameObject objectPlayer;
     public PlayerStats playerStats;
 
@@ -127,7 +127,7 @@ public class QTEMechanic : MonoBehaviour
                 QTEMechanicScriptActive = false;
                 playerStats.QTEState = false;
                 CHKPos4 = true;
-                playerController.canMove = true;
+                playerMovement.canMove = true;
                 Debug.Log("Player Movement Unlocked");
             }
 
