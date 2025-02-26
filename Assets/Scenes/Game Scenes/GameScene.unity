@@ -573,6 +573,111 @@ Transform:
   - {fileID: 1754534834}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &373422016
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 373422020}
+  - component: {fileID: 373422019}
+  - component: {fileID: 373422018}
+  - component: {fileID: 373422017}
+  m_Layer: 0
+  m_Name: Cube
+  m_TagString: Climbable
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!65 &373422017
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 373422016}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &373422018
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 373422016}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &373422019
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 373422016}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &373422020
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 373422016}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 232.17747, y: 12.59, z: -105.580185}
+  m_LocalScale: {x: 10, y: 10, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &396994942
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2096,9 +2201,8 @@ GameObject:
   m_Component:
   - component: {fileID: 964754508}
   - component: {fileID: 964754510}
-  - component: {fileID: 964754509}
   - component: {fileID: 964754511}
-  - component: {fileID: 964754512}
+  - component: {fileID: 964754513}
   m_Layer: 0
   m_Name: Dialogue Trigger
   m_TagString: Untagged
@@ -2121,29 +2225,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1751339100}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &964754509
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 964754507}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 825288afbac9b475889aed2f6f6ed5c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  npcDialogueTree: {fileID: 11400000, guid: 1790a612e9a5b4547a7e1d340d5ae6af, type: 2}
-  dialogueKey: ClimberNearTentsStartDialogue
-  playerInRange: 0
-  isDialoguePressed: 0
-  inputActions: {fileID: -944628639613478452, guid: 5ec57af691e024f5495721c1aec07891, type: 3}
-  interactActionName: Interact
-  clearPlayerPrefs: 99
-  interactTextPrefab: {fileID: 95194169440117963, guid: 15891119156aa4ae388994054e96a4c5, type: 3}
-  requiredBoolKeysTrue:
-  - EntranceAfterWelcomeDialogueFinished
-  requiredBoolKeysFalse: []
 --- !u!65 &964754510
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2180,7 +2261,7 @@ MonoBehaviour:
   playableDirector: {fileID: 966132572}
   playerCamera: {fileID: 1722593383}
   cutsceneCamera: {fileID: 240963889}
---- !u!114 &964754512
+--- !u!114 &964754513
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2189,11 +2270,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 964754507}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a5cb8e2c19054134a72bce394e9bc35, type: 3}
+  m_Script: {fileID: 11500000, guid: 51af9770f0e4cb842995dffbb7a9f292, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  npcDialogueTree: {fileID: 11400000, guid: 1790a612e9a5b4547a7e1d340d5ae6af, type: 2}
-  dialogueKey: DialogueTriggered
+  automaticDialogue: {fileID: 11400000, guid: fc865a1142133014ca107756d029de0d, type: 2}
+  dialogueKey: AutoDialogueTriggered
+  triggerOnce: 1
+  triggerOnStart: 0
+  triggerOnEnter: 1
+  allowManualTrigger: 0
+  inputActions: {fileID: 0}
+  interactActionName: Interact
+  checkBoolConditions: 0
   requiredBoolKeysTrue: []
   requiredBoolKeysFalse: []
 --- !u!1 &966132571
@@ -2736,9 +2824,9 @@ MonoBehaviour:
   cameraTransform: {fileID: 857086516}
   leftHandTransform: {fileID: 857086515}
   rightHandTransform: {fileID: 857086514}
-  pullForce: 20
-  maxPullDistance: 4
-  handReachOffset: 1
+  pullForce: 10
+  maxPullDistance: 2
+  handReachOffset: 2
   pullUpForce: 15
   movementSmoothing: 8
   climbableTag: Climbable
@@ -6008,3 +6096,4 @@ SceneRoots:
   - {fileID: 861036462}
   - {fileID: 966132573}
   - {fileID: 240963890}
+  - {fileID: 373422020}

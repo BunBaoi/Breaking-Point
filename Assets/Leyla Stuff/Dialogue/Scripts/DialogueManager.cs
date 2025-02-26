@@ -86,6 +86,16 @@ public class DialogueManager : MonoBehaviour
 
     private PlayerMovement playerMovement;
 
+    [Header("Automatic Dialogue")]
+    [SerializeField] private bool isAutomaticDialogueActive = false;
+    public bool IsAutomaticDialogueActive => isAutomaticDialogueActive;
+
+    // access the status variables
+    public bool IsTextScrolling() => isTextScrolling;
+    public bool IsFullTextShown() => isFullTextShown;
+    public bool OptionsAreVisible() => optionsAreVisible;
+    public bool IsDialogueActive() => isDialogueActive;
+
     private void Awake()
     {
         // Find the action dynamically using the interactActionName string
@@ -182,16 +192,19 @@ public class DialogueManager : MonoBehaviour
             indicatorCoroutine = null; // Clear reference
             nextDialogueIndicatorCanvasGroup.alpha = 0f;
         }
+
         if (optionsAreVisible)
         {
             HandleOptionSelection();
             if (!isOptionKeyPressed)
-                {
+            {
                 UpdateSelectOptionIndicatorPosition();
                 UpdateScrollIndicatorPosition();
             }
         }
-        if (!optionsAreVisible)
+
+        // Only process manual dialogue advancement if not in automatic dialogue mode
+        if (!isAutomaticDialogueActive && !optionsAreVisible)
         {
             if (advanceDialogue.triggered && isDialogueActive)
             {
@@ -209,6 +222,7 @@ public class DialogueManager : MonoBehaviour
                 }
             }
         }
+
         if (SettingsManager.Instance != null)
         {
             scrollSpeed = SettingsManager.Instance.GetScrollSpeed();
@@ -546,6 +560,7 @@ public class DialogueManager : MonoBehaviour
         {
             // No more dialogue, end conversation
             isDialogueActive = false;
+            isAutomaticDialogueActive = false;
             nextDialogueIndicatorCanvasGroup.alpha = 0f;
             nextDialogueIndicatorImage.gameObject.SetActive(false);
             dialogueCanvas.enabled = false;
@@ -873,5 +888,23 @@ public class DialogueManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;*/
 
         optionsAreVisible = false;
+    }
+
+    //======AutoDialogueFunctions=======//
+
+    //allow external option selection
+    public void SelectOption(int optionIndex)
+    {
+        if (optionsAreVisible && optionIndex >= 0 && optionIndex < instantiatedButtons.Count)
+        {
+            selectedOptionIndex = optionIndex;
+            UpdateHighlightedOption();
+            instantiatedButtons[selectedOptionIndex].GetComponent<Button>().onClick.Invoke();
+        }
+    }
+
+    public void SetAutomaticDialogueState(bool isAutomatic)
+    {
+        isAutomaticDialogueActive = isAutomatic;
     }
 }
