@@ -679,6 +679,8 @@ MonoBehaviour:
   EnergyDrainRate: 0.3
   SprintEnergyDrainRate: 1
   isInEnergyDrainZone: 0
+  canvasGroup: {fileID: 4060235049330513953}
+  fadeDuration: 1
   oxygenRadialFill: {fileID: 751894270304544611}
   energyRadialFill: {fileID: 1202605452239386675}
   oxygenText: {fileID: 2625472292970880161}
@@ -1904,6 +1906,7 @@ GameObject:
   - component: {fileID: 6459773301589840679}
   - component: {fileID: 9000488408015064748}
   - component: {fileID: 5214923877049227813}
+  - component: {fileID: 4060235049330513953}
   m_Layer: 5
   m_Name: Player Stats Canvas
   m_TagString: Untagged
@@ -1952,7 +1955,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 30
+  m_SortingOrder: 10
   m_TargetDisplay: 0
 --- !u!114 &9000488408015064748
 MonoBehaviour:
@@ -1994,6 +1997,18 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!225 &4060235049330513953
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8326842958711861171}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1 &8390384632666136744
 GameObject:
   m_ObjectHideFlags: 0

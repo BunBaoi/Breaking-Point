@@ -19,6 +19,7 @@ public class BedManager : MonoBehaviour
     [SerializeField] private CameraController cameraController;
     [SerializeField] private PlayerMovement playerMovement;
     [SerializeField] private DayNightCycle dayNightCycle;
+    [SerializeField] private PlayerStats playerStats;
 
     [Header("Keybinds")]
     [SerializeField] private InputActionAsset inputActions; // Reference to the Input Action Asset
@@ -299,6 +300,10 @@ public class BedManager : MonoBehaviour
     private IEnumerator HandleBedInteraction()
     {
         isInteracting = true;
+        if (playerStats != null)
+        {
+            playerStats.FadeOut();
+        }
         cameraController.SetLookState(false);
         playerMovement.SetMovementState(false);
 
@@ -372,11 +377,17 @@ public class BedManager : MonoBehaviour
                 yield return null;
             }
 
+            if (playerStats != null)
+            {
+                playerStats.ReplenishEnergy(100f);
+                playerStats.FadeIn();
+            }
             dayNightCycle.StartTime();
             cameraController.SetLookState(true);
             playerMovement.SetMovementState(true);
         }
 
+        hasSetTime = false;
         isInteracting = false;
     }
 
@@ -432,9 +443,15 @@ public class BedManager : MonoBehaviour
         // Unsubscribe from the event to avoid duplicate calls
         cinematicSequence.OnCinematicFinished -= RotatePlayerUpright;
 
+        if (playerStats != null)
+        {
+            playerStats.ReplenishEnergy(100f);
+            playerStats.FadeIn();
+        }
         cameraController.SetLookState(true);
         playerMovement.SetMovementState(true);
         dayNightCycle.StartTime();
+        hasSetTime = false;
 
         isInteracting = false; // Allow new interactions
     }
@@ -454,7 +471,6 @@ public class BedManager : MonoBehaviour
 
         if (!hasSetTime)
         {
-            // ADD REPLENISH STAMINA HERE
             dayNightCycle.SetTime(6, 00, true); // Set time
             dayNightCycle.StopTime();
             hasSetTime = true;

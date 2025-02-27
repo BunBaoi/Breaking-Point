@@ -25,6 +25,8 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private bool isInEnergyDrainZone = false;
 
     [Header("UI Elements")]
+    [SerializeField] private CanvasGroup canvasGroup;
+    [SerializeField] private float fadeDuration = 1f;
     [SerializeField] private Image oxygenRadialFill;  // Reference to the Oxygen radial fill image
     [SerializeField] private Image energyRadialFill;  // Reference to the Energy radial fill image
     [SerializeField] private TMP_Text oxygenText;
@@ -64,6 +66,30 @@ public class PlayerStats : MonoBehaviour
         HandleEnergyDrain();
         HandleOxygenDrain();
         UpdateUIElements();
+    }
+
+    // Fade in the canvas
+    public void FadeIn()
+    {
+        StartCoroutine(FadeCanvas(0f, 1f));
+    }
+
+    // Fade out the canvas
+    public void FadeOut()
+    {
+        StartCoroutine(FadeCanvas(1f, 0f));
+    }
+
+    private IEnumerator FadeCanvas(float fromAlpha, float toAlpha)
+    {
+        float elapsedTime = 0f;
+        while (elapsedTime < fadeDuration)
+        {
+            canvasGroup.alpha = Mathf.Lerp(fromAlpha, toAlpha, elapsedTime / fadeDuration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        canvasGroup.alpha = toAlpha;
     }
 
     public enum PlayerStatus
@@ -161,6 +187,13 @@ public class PlayerStats : MonoBehaviour
                 Oxygen = Mathf.Min(Oxygen, 100f);
             }
         }
+    }
+
+    public void ReplenishEnergy(float amount)
+    {
+        // Set Energy to the specified value (make sure it doesn't exceed the maximum value of 100)
+        Energy = Mathf.Clamp(amount, 0f, 100f);
+        Debug.Log("Energy replenished to: " + Energy);
     }
 
     void UpdateUIElements()
