@@ -10,6 +10,7 @@ public class Item : ScriptableObject
     public GameObject itemPrefab;
     public float weight; // Weight of the item in kilograms (kg)
     public HandType handType = HandType.SingleHand;
+    public bool isBound = false;  // Whether the item is bound or not
 
     public enum ItemType
     {

@@ -2,16 +2,32 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.UI;
+using TMPro;
 using static PlayerStats;
 
 public class PlayerStats : MonoBehaviour
 {
     [Header("Oxygen Stats")]
-    public float Oxygen;
-    public float OxygenTank;
-    public float OxygenDeductionRate;
+    [SerializeField] private float Oxygen = 100f;
+    [SerializeField] private float OxygenTank;
+    [SerializeField] private float OxygenDeductionRate = 2f;
+    [SerializeField] private float SprintOxygenDrainRate = 12f;
     public float OxygenTankRefillRate;
+    [SerializeField] private bool isInOxygenDrainZone = false;
+    [SerializeField] private Item oxygenTankItem;
+    [SerializeField] private bool HasOxygenTank => inventoryManager.HasItem(oxygenTankItem); // Checks inventory
+
+    [Header("Energy Stats")]
+    [SerializeField] private float Energy = 100f;  // Current Energy
+    [SerializeField] private float EnergyDrainRate = 5f;  // Energy drain per second in an EnergyDrain zone
+    [SerializeField] private float SprintEnergyDrainRate = 10f; // Energy drain when sprinting
+    [SerializeField] private bool isInEnergyDrainZone = false;
+
+    [Header("UI Elements")]
+    [SerializeField] private Image oxygenRadialFill;  // Reference to the Oxygen radial fill image
+    [SerializeField] private Image energyRadialFill;  // Reference to the Energy radial fill image
+    [SerializeField] private TMP_Text oxygenText;
 
     [Header("Player Status")]
     public bool IsAlive = true;
@@ -19,10 +35,11 @@ public class PlayerStats : MonoBehaviour
     public PlayerStatus stateOfPlayer;
 
     private PlayerMovement playerMovement;
-    public QTEMechanic qTEMechanic;
+    [SerializeField] private QTEMechanic qTEMechanic;
+    private InventoryManager inventoryManager;
 
     [Header("Timer")]
-    public const float TickMax = 1;
+    [SerializeField] private const float TickMax = 1;
     private int Tick;
     private float TickTimer;
 
@@ -33,6 +50,7 @@ public class PlayerStats : MonoBehaviour
     {
         controller = GetComponent<CharacterController>();
         playerMovement = GetComponent<PlayerMovement>();
+        inventoryManager = FindObjectOfType<InventoryManager>();
 
         controller.slopeLimit = 45.0f;
 
@@ -41,9 +59,11 @@ public class PlayerStats : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        DeadZone();
+        // DeadZone();
         PlayerAlive();
-
+        HandleEnergyDrain();
+        HandleOxygenDrain();
+        UpdateUIElements();
     }
 
     public enum PlayerStatus
@@ -53,6 +73,133 @@ public class PlayerStats : MonoBehaviour
         RClimbing,
         DeadZone,
         QTE
+    }
+
+    void HandleEnergyDrain()
+    {
+        if (isInEnergyDrainZone) // If the player is inside an EnergyDrain zone
+        {
+            float drainRate = playerMovement.IsSprint ? SprintEnergyDrainRate : EnergyDrainRate;
+            Energy -= drainRate * Time.deltaTime;
+            Energy = Mathf.Max(Energy, 0); // Prevent Energy from going below 0
+
+            if (Energy == 0)
+            {
+                Debug.Log("Player has no energy left");
+                // add pass out here / game over
+            }
+        }
+    }
+
+    void HandleOxygenDrain()
+    {
+        if (stateOfPlayer == PlayerStatus.DeadZone)
+        {
+            if (isInOxygenDrainZone)
+            {
+                // If no oxygen tank is present, do not allow oxygen to drain
+                if (!HasOxygenTank)
+                {
+                    Debug.Log("No Oxygen Tank: Oxygen drain is stopped.");
+                    return;
+                }
+
+                // Oxygen deduction based on sprinting
+                float currentOxygenDrainRate = playerMovement.IsSprint ? SprintOxygenDrainRate : OxygenDeductionRate;
+                Oxygen -= currentOxygenDrainRate * Time.deltaTime;
+                Oxygen = Mathf.Max(Oxygen, 0); // Prevent Oxygen from going below 0
+
+                // Death
+                if (Oxygen == 0 && HasOxygenTank)
+                {
+                    Debug.Log("Player has no oxygen left");
+                    // add pass out or game over logic
+                }
+
+                if (Oxygen < 25) // This should play an effect to signify low oxygen & oxygen rate
+                {
+                    
+                }
+
+                // Tank replenish Oxygen
+                if (OxygenTankRefillRate > OxygenTank && HasOxygenTank) // Step 1: Refill rate bigger than tank
+                {
+                    OxygenTankRefillRate = OxygenTank;
+                }
+                else if (Oxygen < 100 && OxygenTank > 0 && HasOxygenTank) // Step 2: Checks there is oxygen in tank
+                {
+                    Oxygen += OxygenTankRefillRate;
+                    OxygenTank -= OxygenTankRefillRate;
+
+                    // Ensure Oxygen doesn't go above 100
+                    Oxygen = Mathf.Min(Oxygen, 100f);
+                }
+            }
+        }
+        else
+        {
+            RefillingOxygenFromTank();
+        }
+    }
+
+    void RefillingOxygenFromTank()
+    {
+        if (HasOxygenTank)
+        {
+            // If the player has an oxygen tank, refill oxygen based on what's available in the tank
+            if (Oxygen < 100 && OxygenTank > 0)
+            {
+                // Determine the amount to replenish, which is either the remaining oxygen needed or the amount in the tank
+                float oxygenNeeded = 100 - Oxygen;
+                float oxygenToReplenish = Mathf.Min(oxygenNeeded, OxygenTank);
+
+                // Refill oxygen and reduce the oxygen tank
+                Oxygen += oxygenToReplenish;
+                OxygenTank -= oxygenToReplenish;
+
+                // Ensure Oxygen doesn't go above 100
+                Oxygen = Mathf.Min(Oxygen, 100f);
+            }
+        }
+    }
+
+    void UpdateUIElements()
+    {
+        // Update the oxygen radial fill
+        if (oxygenRadialFill != null)
+        {
+            if (HasOxygenTank)
+            {
+                // If the player has an oxygen tank, display oxygen based on tank amount
+                oxygenRadialFill.fillAmount = Oxygen / 100f;
+            }
+            else
+            {
+                // If the player doesn't have an oxygen tank, display a warning or specific text
+                oxygenRadialFill.fillAmount = 0f;
+            }
+        }
+
+        // Update the energy radial fill (already handled in the existing code)
+        if (energyRadialFill != null)
+        {
+            energyRadialFill.fillAmount = Energy / 100f;  // Update based on Energy level
+        }
+
+        // Update the oxygen text to display the whole number oxygen value
+        if (oxygenText != null)
+        {
+            if (HasOxygenTank)
+            {
+                // If the player has an oxygen tank, display oxygen based on tank amount
+                oxygenText.text = Mathf.RoundToInt(Oxygen).ToString();
+            }
+            else
+            {
+                // If the player doesn't have an oxygen tank, display a warning or specific text
+                oxygenText.text = "No Tank";
+            }
+        }
     }
 
     // PRINT ENUM STATUS//
@@ -84,10 +231,17 @@ public class PlayerStats : MonoBehaviour
     }
 
     
-    void DeadZone ()
+    /*void DeadZone ()
     {
         if (stateOfPlayer == PlayerStatus.DeadZone)
         {
+            if (!HasOxygenTank)
+            {
+                // Instant death if no Oxygen Tank
+                IsAlive = false;
+                Debug.Log("Player Died: No Oxygen Tank in Dead Zone");
+                return;
+            }
             // Tick Rate
             TickTimer += Time.deltaTime;
             if (TickTimer >= TickMax && IsAlive == true)
@@ -104,13 +258,13 @@ public class PlayerStats : MonoBehaviour
                 }
 
                 // Tank replanish Oxygen
-                if (OxygenTankRefillRate > OxygenTank) // Step 1: Refill rate bigger then tank
+                if (OxygenTankRefillRate > OxygenTank && HasOxygenTank) // Step 1: Refill rate bigger then tank
                                                        // When the Tank is less then the rate itself
                                                        // It would equal the remaing tank to the rate just so the player doesn't get extra
                 {
                     OxygenTankRefillRate = OxygenTank;
                 }
-                else if (Oxygen < 100 && OxygenTank > 0) // Step 2: Checks there is oxygen in tank
+                else if (Oxygen < 100 && OxygenTank > 0 && HasOxygenTank) // Step 2: Checks there is oxygen in tank
                 {
 
                     Oxygen = Oxygen + OxygenTankRefillRate;
@@ -129,33 +283,49 @@ public class PlayerStats : MonoBehaviour
                 OxygenDeductionRate = 2f;
             }
         }
-    }
+    }*/
 
-    public void OnTriggerEnter(Collider collision) // Problem with multiple collider with arms; To fix is disable arms
+    private void OnTriggerEnter(Collider other)
     {
-        if(collision.gameObject.tag == "Level4Zone")
+        Debug.Log($"Entered Trigger: {other.gameObject.name}");
+
+        if (other.CompareTag("OxygenZone"))
         {
             stateOfPlayer = PlayerStatus.DeadZone;
+            isInOxygenDrainZone = true;
             Debug.Log("Atmosphere Danger");
         }
-        if (collision.gameObject.tag == "Level2QTE.1")
+        else if (other.CompareTag("Level2QTE.1"))
         {
             stateOfPlayer = PlayerStatus.QTE;
             Debug.Log("Level2QTE.1 Enter");
         }
+        else if (other.CompareTag("EnergyDrain")) // Energy drain trigger
+        {
+            isInEnergyDrainZone = true;
+            Debug.Log("Energy Drain Zone Entered");
+        }
     }
-    
-    public void OnTriggerExit(Collider collision) // Problem of multiple collider arms auto colliding
+
+    private void OnTriggerExit(Collider other)
     {
-        stateOfPlayer = PlayerStatus.FreeRoam;
-        Debug.Log("Atmosphere Safe");
-        
+        Debug.Log($"Exited Trigger: {other.gameObject.name}");
+
+        if (other.CompareTag("OxygenZone") || other.CompareTag("Level2QTE.1"))
+        {
+            stateOfPlayer = PlayerStatus.FreeRoam;
+            isInOxygenDrainZone = false;
+            Debug.Log("Atmosphere Safe");
+        }
+        else if (other.CompareTag("EnergyDrain")) // Stop draining energy when leaving
+        {
+            isInEnergyDrainZone = false;
+            Debug.Log("Exited Energy Drain Zone");
+        }
     }
     
     public void PlayerAlive() // Ways of player Died
     {
-
-
         // Oxygen Death
         if (Oxygen <= 0 && OxygenTank > 0)
         {
