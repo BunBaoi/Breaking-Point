@@ -11,7 +11,6 @@ public class ItemPickUp : MonoBehaviour
     [SerializeField] private string playerTag = "Player"; // Tag for the player object
     [SerializeField] private LayerMask itemLayer; // Layer mask to specify which layers are considered as items
     [SerializeField] private LayerMask pickUpColliderLayer; // Layer mask to specify which layers are considered as pick-up colliders
-    [SerializeField] private string uniqueItemID;
 
     [SerializeField] private bool canPickUp = false; // Flag to check if the player is in range
     [SerializeField] private bool isPickingUp = false; // Flag to prevent picking up multiple items at once
