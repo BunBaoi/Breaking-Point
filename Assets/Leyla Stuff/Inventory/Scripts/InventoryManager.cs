@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TMPro;
+using System.Collections;
 
 public class InventoryManager : MonoBehaviour
 {
@@ -16,7 +18,7 @@ public class InventoryManager : MonoBehaviour
     private const float WeightThreshold2 = 15.0f; // Weight threshold for second action
 
     private GameObject playerController; // CHANGE TO ACTUAL PLAYER MOVEMENT SCRIPT LATER
-    private PlayerClimbingState playerClimbingState;
+    // private PlayerClimbingState playerClimbingState;
 
     [Header("Setup Settings")]
     public int defaultSlotCount = 4;  // Default number of inventory slots
@@ -24,6 +26,8 @@ public class InventoryManager : MonoBehaviour
     public Transform inventoryPanel;  // UI panel for inventory display
     public Transform leftHandPosition;  // Position for left hand item
     public Transform rightHandPosition;  // Position for right hand item
+    [SerializeField] private TMP_Text updateText;
+    private Coroutine currentCoroutine;
     // public KeyCode dropKey = KeyCode.Q; // Key to drop an item
 
     [Header("Layer Setup")]
@@ -60,12 +64,8 @@ public class InventoryManager : MonoBehaviour
 
     private void Start()
     {
-        climbingSystem = GetComponent<ClimbingSystem>();
         DisableScriptsOnInventoryItems();
         CreateSlots(defaultSlotCount);
-
-        // Retrieve the PlayerClimbingState component instead of using GetComponent in the method call
-        playerClimbingState = GetComponent<PlayerClimbingState>();
 
         scrollAction = inputActions.FindAction(scrollActionName);
         dropAction = inputActions.FindAction(dropActionName);
@@ -200,10 +200,6 @@ public class InventoryManager : MonoBehaviour
     {
         Debug.Log($"Attempting to add item: {item.name}");
 
-        // Check for ice pick when item is first picked up
-        bool isIcePick = item.name.ToLower().Contains("icepick");
-        Debug.Log($"Item pickup - Is ice pick detected? {isIcePick}");
-
         // Prevent adding new items if a heavy item is already equipped
         if (isSwitchingDisabled)
         {
@@ -221,11 +217,6 @@ public class InventoryManager : MonoBehaviour
         if (slots[selectedSlotIndex].GetItem() == null)
         {
             slots[selectedSlotIndex].AddItem(item);
-            if (isIcePick && climbingSystem != null)
-            {
-                Debug.Log("Ice pick added - Enabling climbing system");
-                climbingSystem.enabled = true;
-            }
             EquipItem(item);
             DisableItemPickup(item);
             return true;
@@ -240,13 +231,6 @@ public class InventoryManager : MonoBehaviour
                 slots[slotIndex].AddItem(item);
                 // Update selected slot index to the slot where the item was added
                 selectedSlotIndex = slotIndex;
-
-                // Check for ice pick again when adding to a different slot
-                if (isIcePick && climbingSystem != null)
-                {
-                    Debug.Log("Ice pick added to alternate slot - Enabling climbing system");
-                    climbingSystem.enabled = true;
-                }
 
                 // Equip the item if added to the selected slot
                 EquipItem(item);
@@ -343,7 +327,6 @@ public class InventoryManager : MonoBehaviour
         return null;
     }
 
-    // Drops the currently selected item
     public void DropItem()
     {
         InventorySlot selectedSlot = slots[selectedSlotIndex];
@@ -351,13 +334,21 @@ public class InventoryManager : MonoBehaviour
 
         if (itemToDrop != null)
         {
+            // Check if the item is bound and prevent dropping if it is
+            if (itemToDrop.isBound)
+            {
+                if (currentCoroutine != null)
+                {
+                    StopCoroutine(currentCoroutine);
+                }
+                updateText.text = "";
+                currentCoroutine = StartCoroutine(DisplayUpdateMessage("Item cannot be dropped, it's bound!"));
+                Debug.Log("This item is bound and cannot be dropped.");
+                return;  // Exit the method without dropping the item
+            }
+
             // Clear the slot
             selectedSlot.ClearSlot();
-
-            if (itemToDrop.name.ToLower().Contains("icepick") && climbingSystem != null)
-            {
-                climbingSystem.enabled = false;
-            }
 
             // Destroy left hand item
             if (heldLeftHandItemInstance != null)
@@ -373,16 +364,19 @@ public class InventoryManager : MonoBehaviour
                 heldRightHandItemInstance = null;
             }
 
-            // Reset climbing state if exists and component is available
-            if (playerClimbingState != null)
-            {
-                playerClimbingState.ExitClimbingState(); // Use ExitClimbingState() method instead
-            }
-
             SpawnDroppedItem(itemToDrop);
             currentItem = null;
             isSwitchingDisabled = false;
         }
+    }
+
+    private IEnumerator DisplayUpdateMessage(string message)
+    {
+        updateText.text = message;  // Set the text
+        updateText.gameObject.SetActive(true);  // Make sure the text is visible
+        yield return new WaitForSeconds(1.5f);  // Display for 2 seconds
+        updateText.text = "";
+        updateText.gameObject.SetActive(false);  // Hide the text
     }
 
     private void SpawnDroppedItem(Item item)
@@ -454,35 +448,23 @@ public class InventoryManager : MonoBehaviour
 
         if (currentItem != null)
         {
-            // Check if the current item is an ice pick
-            bool hasIcePick = currentItem.name.ToLower().Contains("icepick");
 
-            // Add debug logs
-            Debug.Log($"Current item: {currentItem.name}");
-            Debug.Log($"Is ice pick detected? {hasIcePick}");
-
-            // Enable/disable climbing based on ice pick
-            if (climbingSystem != null)
-            {
-                climbingSystem.enabled = hasIcePick;
-                Debug.Log($"Climbing system enabled: {hasIcePick}");
-            }
-            else
-            {
-                Debug.LogWarning("ClimbingSystem component not found!");
-            }
-        }
-        else
-        {
-            // Disable climbing when no item is equipped
-            if (climbingSystem != null)
-            {
-                climbingSystem.enabled = false;
-                Debug.Log("No item equipped - Climbing system disabled");
-            }
         }
 
         EquipItem(currentItem);
+    }
+
+    public Item GetEquippedItem()
+    {
+        InventorySlot selectedSlot = slots[selectedSlotIndex];
+        // Ensure the index is within bounds
+        if (currentItem != null)
+        {
+            return selectedSlot.GetItem();  // Return the item in the selected slot
+        }
+
+        Debug.LogWarning("Selected slot index is out of range.");
+        return null;  // Return null if the slot index is invalid
     }
 
     // Equips an item to the player's hand(s)
@@ -499,12 +481,6 @@ public class InventoryManager : MonoBehaviour
         {
             Destroy(heldRightHandItemInstance);
             heldRightHandItemInstance = null;
-        }
-
-        // Reset climbing state if exists
-        if (playerClimbingState != null)
-        {
-            playerClimbingState.ExitClimbingState(); // Use ExitClimbingState() method
         }
 
         if (item != null)
