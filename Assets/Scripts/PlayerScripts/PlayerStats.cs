@@ -19,7 +19,7 @@ public class PlayerStats : MonoBehaviour
     public PlayerStatus stateOfPlayer;
 
     private PlayerMovement playerMovement;
-    public QTEMechanic qTEMechanic;
+    //public QTEMechanicScript qTEMechanicScript;
 
     [Header("Timer")]
     public const float TickMax = 1;
