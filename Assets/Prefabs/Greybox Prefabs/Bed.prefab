@@ -54,8 +54,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 5, y: 1, z: 5}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 3.2463684, y: 1, z: 5}
+  m_Center: {x: -0.8768158, y: 0, z: 0}
 --- !u!114 &2880428877973528562
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -85,11 +85,13 @@ MonoBehaviour:
   interactActionName: Interact
   interactTextPrefab: {fileID: 95194169440117963, guid: 15891119156aa4ae388994054e96a4c5, type: 3}
   requiredBoolKeysTrue:
-  - yesyes
+  - BaseCampGoToSleepDialogue
   requiredBoolKeysFalse: []
   hasSetTime: 0
   isInteracting: 0
   inTrigger: 0
+  inventoryManager: {fileID: 0}
+  inventoryCanvas: {fileID: 0}
 --- !u!1 &5899837123489790386
 GameObject:
   m_ObjectHideFlags: 0
@@ -207,7 +209,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2, y: 0.5, z: 4}
+  m_LocalScale: {x: 1.5, y: 0.5, z: 3}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7204685475145536357}

@@ -187,7 +187,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &50884925
 Transform:
   m_ObjectHideFlags: 0
@@ -1436,6 +1436,52 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1214023700341058216, guid: e5639dd03509a4232bf27778ce41da80, type: 3}
   m_PrefabInstance: {fileID: 695858367}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &737598462
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 737598464}
+  - component: {fileID: 737598463}
+  m_Layer: 0
+  m_Name: Test
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &737598463
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 737598462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f08ac33d51a4945339b6155459032a7d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  key: 112
+  boolName: BaseCampTrainingCompleted
+--- !u!4 &737598464
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 737598462}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 186.01057, y: 9.383074, z: -124.17888}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &738325993
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1873,38 +1919,6 @@ PrefabInstance:
     - target: {fileID: 1804318439799572251, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 2206885108856580092, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
-      propertyPath: field of view
-      value: 40
-      objectReference: {fileID: 0}
-    - target: {fileID: 4116197491859869406, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0.0000067055225
-      objectReference: {fileID: 0}
-    - target: {fileID: 4116197491859869406, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.49800014
-      objectReference: {fileID: 0}
-    - target: {fileID: 4116197491859869406, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0.40600103
-      objectReference: {fileID: 0}
-    - target: {fileID: 4116197491859869406, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4116197491859869406, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4116197491859869406, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4116197491859869406, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3068,10 +3082,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Journal
       objectReference: {fileID: 0}
-    - target: {fileID: 4208634193636873749, guid: e30d62d1874f04b2ea0a8dc47469bc01, type: 3}
-      propertyPath: inputActions
+    - target: {fileID: 2552522528520688558, guid: e30d62d1874f04b2ea0a8dc47469bc01, type: 3}
+      propertyPath: inventoryCanvas
       value: 
-      objectReference: {fileID: -944628639613478452, guid: 5ec57af691e024f5495721c1aec07891, type: 3}
+      objectReference: {fileID: 2067882751}
+    - target: {fileID: 2552522528520688558, guid: e30d62d1874f04b2ea0a8dc47469bc01, type: 3}
+      propertyPath: inventoryManager
+      value: 
+      objectReference: {fileID: 1114315170}
     - target: {fileID: 7807269928673555792, guid: e30d62d1874f04b2ea0a8dc47469bc01, type: 3}
       propertyPath: m_LocalPosition.x
       value: 233.30566
@@ -5818,14 +5836,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1717040939}
     m_Modifications:
-    - target: {fileID: 1998933148391649073, guid: 1a7c33efe8cd742d98de760985fe3a04, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 1998933148391649073, guid: 1a7c33efe8cd742d98de760985fe3a04, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 3
-      objectReference: {fileID: 0}
     - target: {fileID: 2880428877973528562, guid: 1a7c33efe8cd742d98de760985fe3a04, type: 3}
       propertyPath: player
       value: 
@@ -5843,25 +5853,21 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 857086515}
     - target: {fileID: 2880428877973528562, guid: 1a7c33efe8cd742d98de760985fe3a04, type: 3}
+      propertyPath: inventoryCanvas
+      value: 
+      objectReference: {fileID: 2067882751}
+    - target: {fileID: 2880428877973528562, guid: 1a7c33efe8cd742d98de760985fe3a04, type: 3}
       propertyPath: cameraController
       value: 
       objectReference: {fileID: 857086520}
     - target: {fileID: 2880428877973528562, guid: 1a7c33efe8cd742d98de760985fe3a04, type: 3}
+      propertyPath: inventoryManager
+      value: 
+      objectReference: {fileID: 1114315170}
+    - target: {fileID: 2880428877973528562, guid: 1a7c33efe8cd742d98de760985fe3a04, type: 3}
       propertyPath: cinematicSequence
       value: 
       objectReference: {fileID: 2045135159}
-    - target: {fileID: 2880428877973528562, guid: 1a7c33efe8cd742d98de760985fe3a04, type: 3}
-      propertyPath: requiredBoolKeysTrue.Array.data[0]
-      value: BaseCampGoToSleepDialogue
-      objectReference: {fileID: 0}
-    - target: {fileID: 4664249966508989784, guid: 1a7c33efe8cd742d98de760985fe3a04, type: 3}
-      propertyPath: m_Size.x
-      value: 3.2463684
-      objectReference: {fileID: 0}
-    - target: {fileID: 4664249966508989784, guid: 1a7c33efe8cd742d98de760985fe3a04, type: 3}
-      propertyPath: m_Center.x
-      value: -0.8768158
-      objectReference: {fileID: 0}
     - target: {fileID: 5615946121690676060, guid: 1a7c33efe8cd742d98de760985fe3a04, type: 3}
       propertyPath: m_Name
       value: Bed
@@ -5943,3 +5949,4 @@ SceneRoots:
   - {fileID: 966132573}
   - {fileID: 240963890}
   - {fileID: 373422020}
+  - {fileID: 737598464}
