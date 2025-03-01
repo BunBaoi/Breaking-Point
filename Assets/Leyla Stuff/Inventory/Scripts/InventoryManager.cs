@@ -51,6 +51,7 @@ public class InventoryManager : MonoBehaviour
 
     private void Awake()
     {
+        DisableScriptsOnInventoryItems();
         if (inputActions == null)
         {
             inputActions = Resources.Load<InputActionAsset>("Keybinds/PlayerInputs");

@@ -36,6 +36,10 @@ public class BedManager : MonoBehaviour
     [SerializeField] private bool isInteracting = false;
     [SerializeField] private bool inTrigger = false;
 
+    [Header("Inventory Setups")]
+    [SerializeField] private InventoryManager inventoryManager;
+    [SerializeField] private Canvas inventoryCanvas;
+
     private Camera playerCamera;
 
     void Awake()
@@ -235,7 +239,7 @@ public class BedManager : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             inTrigger = false;
-            player = null;
+            // player = null;
 
             if (interactTextInstance != null)
             {
@@ -304,8 +308,19 @@ public class BedManager : MonoBehaviour
         {
             playerStats.FadeOut();
         }
-        cameraController.SetLookState(false);
-        playerMovement.SetMovementState(false);
+        if (inventoryManager != null)
+        {
+            inventoryManager.enabled = false;
+            inventoryCanvas.gameObject.SetActive(false);
+        }
+        if (cameraController != null)
+        {
+            cameraController.SetLookState(false);
+        }
+        if (playerMovement != null)
+        {
+            playerMovement.SetMovementState(false);
+        }
 
         // Get the collider of the bed to determine the height for positioning
         Collider bedCollider = bed.GetComponent<Collider>();
@@ -371,6 +386,11 @@ public class BedManager : MonoBehaviour
             Quaternion uprightRotation = Quaternion.Euler(0, player.eulerAngles.y, 0);
             while (Quaternion.Angle(player.rotation, uprightRotation) > 0.1f)
             {
+                if (inventoryManager != null)
+                {
+                    inventoryManager.enabled = false;
+                    inventoryCanvas.gameObject.SetActive(false);
+                }
                 cameraController.SetLookState(false);
                 playerMovement.SetMovementState(false);
                 player.rotation = Quaternion.Slerp(player.rotation, uprightRotation, rotationSpeed * Time.deltaTime);
@@ -385,6 +405,11 @@ public class BedManager : MonoBehaviour
             dayNightCycle.StartTime();
             cameraController.SetLookState(true);
             playerMovement.SetMovementState(true);
+            if (inventoryManager != null)
+            {
+                inventoryManager.enabled = true;
+                inventoryCanvas.gameObject.SetActive(true);
+            }
         }
 
         hasSetTime = false;
@@ -447,6 +472,11 @@ public class BedManager : MonoBehaviour
         {
             playerStats.ReplenishEnergy(100f);
             playerStats.FadeIn();
+        }
+        if (inventoryManager != null)
+        {
+            inventoryManager.enabled = true;
+            inventoryCanvas.gameObject.SetActive(true);
         }
         cameraController.SetLookState(true);
         playerMovement.SetMovementState(true);

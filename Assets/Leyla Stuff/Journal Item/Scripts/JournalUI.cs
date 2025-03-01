@@ -44,6 +44,10 @@ public class JournalUI : MonoBehaviour
     // [Header("Journal Pages")]
     [SerializeField] private List<JournalPage> pages => PageTracker.Instance != null ? PageTracker.Instance.Pages : new List<JournalPage>();
 
+    [Header("Inventory Setups")]
+    [SerializeField] private InventoryManager inventoryManager;
+    [SerializeField] private Canvas inventoryCanvas;
+
     private int currentPageIndex = 0;
     private bool isJournalOpen = false;
 
@@ -66,6 +70,13 @@ public class JournalUI : MonoBehaviour
 
     private void Start()
     {
+        // Find the InventoryManager and Inventory Canvas by names
+        GameObject player = GameObject.Find("Player");
+        if (player != null)
+        {
+            inventoryManager = player.GetComponent<InventoryManager>(); // Get InventoryManager attached to "Player"
+            inventoryCanvas = player.transform.Find("Inventory Canvas")?.GetComponent<Canvas>(); // Get Inventory Canvas child
+        }
         journalUI.SetActive(false); // Ensure journal is hidden at start
         nextPageButton.onClick.AddListener(NextPage);
         prevPageButton.onClick.AddListener(PreviousPage);
@@ -115,6 +126,11 @@ public class JournalUI : MonoBehaviour
                 // Disable movement and camera when journal is open
                 if (playerMovement != null) playerMovement.SetMovementState(false);
                 if (cameraController != null) cameraController.enabled = false;
+                if (inventoryManager != null)
+                {
+                    inventoryManager.enabled = false;
+                    inventoryCanvas.gameObject.SetActive(false);
+                }
 
                 Cursor.visible = true;
                 Cursor.lockState = CursorLockMode.None;
@@ -251,6 +267,11 @@ public class JournalUI : MonoBehaviour
             // Disable movement and camera when journal is open
             if (playerMovement != null) playerMovement.SetMovementState(false);
             if (cameraController != null) cameraController.enabled = false;
+            if (inventoryManager != null)
+            {
+                inventoryManager.enabled = false;
+                inventoryCanvas.gameObject.SetActive(false);
+            }
 
             UpdateNextPrevPageImage(nextPageImage.gameObject, nextPageName);
             UpdateNextPrevPageImage(prevPageImage.gameObject, previousPageName);
@@ -263,6 +284,11 @@ public class JournalUI : MonoBehaviour
         }
         else
         {
+            if (inventoryManager != null)
+            {
+                inventoryManager.enabled = true;
+                inventoryCanvas.gameObject.SetActive(true);
+            }
             // Re-enable movement and camera when journal is closed
             if (playerMovement != null) playerMovement.SetMovementState(true);
             if (cameraController != null) cameraController.enabled = true;

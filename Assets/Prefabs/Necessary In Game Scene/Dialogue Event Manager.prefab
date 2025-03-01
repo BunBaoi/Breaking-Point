@@ -61,10 +61,6 @@ MonoBehaviour:
             m_StringArgument: BaseCampArrivalDialogueFinished
             m_BoolArgument: 0
           m_CallState: 2
-  - eventId: BaseCampArrivalObjectives
-    onDialogueTriggered:
-      m_PersistentCalls:
-        m_Calls:
         - m_Target: {fileID: 0}
           m_TargetAssemblyTypeName: JournalPageAdder, Assembly-CSharp
           m_MethodName: AddObjectivesPage
@@ -74,7 +70,7 @@ MonoBehaviour:
             m_ObjectArgumentAssemblyTypeName: ObjectivesPage, Assembly-CSharp
             m_IntArgument: 0
             m_FloatArgument: 0
-            m_StringArgument: EntranceWelcomeDialogueFinished
+            m_StringArgument: BaseCampArrivalDialogueFinished
             m_BoolArgument: 0
           m_CallState: 2
   - eventId: EntranceWelcomeDialogueFinished
@@ -150,7 +146,7 @@ MonoBehaviour:
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
-            m_StringArgument: 'BaseCampAfterClimberNearTentDialogueCompleted '
+            m_StringArgument: BaseCampAfterClimberNearTentDialogueCompleted
             m_BoolArgument: 0
           m_CallState: 2
   - eventId: BaseCampOliverDialogueCompleted
@@ -199,5 +195,21 @@ MonoBehaviour:
             m_IntArgument: 0
             m_FloatArgument: 0
             m_StringArgument: BaseCampClimberNearExplorationAreaDialogueCompleted
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventId: BaseCampGoToSleepDialogue
+    onDialogueTriggered:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: ForBoolManager, Assembly-CSharp
+          m_MethodName: SetBoolVariable
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: BaseCampGoToSleepDialogue
             m_BoolArgument: 0
           m_CallState: 2

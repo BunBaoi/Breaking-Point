@@ -90,6 +90,11 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private bool isAutomaticDialogueActive = false;
     public bool IsAutomaticDialogueActive => isAutomaticDialogueActive;
 
+    [Header("Cooldown Settings")]
+    [SerializeField] private float cooldownTime = 1f;  // Cooldown time in seconds.
+    private float cooldownTimer = 0f;  // Timer to track the cooldown
+    public bool canStartDialogue = true;  // Flag to check if dialogue can start
+
     // access the status variables
     public bool IsTextScrolling() => isTextScrolling;
     public bool IsFullTextShown() => isFullTextShown;
@@ -182,6 +187,16 @@ public class DialogueManager : MonoBehaviour
 
     private void Update()
     {
+        if (!canStartDialogue)
+        {
+            cooldownTimer -= Time.deltaTime;
+
+            if (cooldownTimer <= 0f)
+            {
+                canStartDialogue = true;  // Allow dialogue to start again
+            }
+        }
+
         if (isFullTextShown && indicatorCoroutine == null)
         {
             indicatorCoroutine = StartCoroutine(FadeInAndOutIndicator());
@@ -559,6 +574,7 @@ public class DialogueManager : MonoBehaviour
         else
         {
             // No more dialogue, end conversation
+            StartCooldown();
             isDialogueActive = false;
             isAutomaticDialogueActive = false;
             nextDialogueIndicatorCanvasGroup.alpha = 0f;
@@ -583,6 +599,12 @@ public class DialogueManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void StartCooldown()
+    {
+        cooldownTimer = cooldownTime;
+        canStartDialogue = false;  // Disable starting new dialogue
     }
 
     private void DisplayDialogue(DialogueNode node)
