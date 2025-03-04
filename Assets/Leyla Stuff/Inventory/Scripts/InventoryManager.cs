@@ -502,27 +502,67 @@ public class InventoryManager : MonoBehaviour
 
     private void EquipNormalItem(Item item)
     {
-        // For single-hand items, equip on left hand
         if (item.handType == Item.HandType.SingleHand)
         {
             heldLeftHandItemInstance = Instantiate(item.itemPrefab, leftHandPosition.position, leftHandPosition.rotation);
             heldLeftHandItemInstance.transform.SetParent(leftHandPosition);
+
+            DisablePickUpCollider(heldLeftHandItemInstance);
         }
-        // For double-hand items, equip on both hands
         else if (item.handType == Item.HandType.DoubleHand)
         {
-            // Left hand item
             heldLeftHandItemInstance = Instantiate(item.itemPrefab, leftHandPosition.position, leftHandPosition.rotation);
             heldLeftHandItemInstance.transform.SetParent(leftHandPosition);
 
-            // Right hand item
             heldRightHandItemInstance = Instantiate(item.itemPrefab, rightHandPosition.position, rightHandPosition.rotation);
             heldRightHandItemInstance.transform.SetParent(rightHandPosition);
+
+            DisablePickUpCollider(heldLeftHandItemInstance);
+            DisablePickUpCollider(heldRightHandItemInstance);
         }
 
         currentItem = item;
-        isSwitchingDisabled = false; // Enable switching if the item is light
+        isSwitchingDisabled = false;
     }
+
+    private void DisablePickUpCollider(GameObject itemInstance)
+    {
+        if (itemInstance != null)
+        {
+            // Check for the collider on the parent object
+            Collider parentCollider = itemInstance.GetComponent<Collider>();
+            if (parentCollider != null)
+            {
+                parentCollider.enabled = false;  // Disable the collider on the parent object
+                Debug.Log($"Disabled collider on parent: {itemInstance.name}");
+            }
+            else
+            {
+                Debug.LogWarning("No collider found on parent " + itemInstance.name);
+            }
+
+            // Also, check and disable the collider on the child (if it exists)
+            Transform pickupColliderTransform = itemInstance.transform.Find("Pick Up Collider");
+            if (pickupColliderTransform != null)
+            {
+                Collider pickupCollider = pickupColliderTransform.GetComponent<Collider>();
+                if (pickupCollider != null)
+                {
+                    pickupCollider.enabled = false;
+                    Debug.Log($"Disabled 'Pick Up Collider' on child: {pickupColliderTransform.name}");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("No 'Pick Up Collider' found on " + itemInstance.name);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("itemInstance is null");
+        }
+    }
+
 
     private void EquipItemWithWeightRestrictions(Item item)
     {

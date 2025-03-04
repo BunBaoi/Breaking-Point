@@ -23,7 +23,7 @@ MonoBehaviour:
       Path: 
     eventIds: []
     options: []
-    npcName: 
+    npcName: Sherpa Employee
     npcTag: 
   - dialogueText: Now that you've learnt how to climb, you'll be able to climb places
       where you can't make it on foot.
@@ -36,7 +36,7 @@ MonoBehaviour:
       Path: 
     eventIds: []
     options: []
-    npcName: 
+    npcName: Sherpa Employee
     npcTag: 
   - dialogueText: Be safe out there!
     fmodAudioEvent:
@@ -46,7 +46,8 @@ MonoBehaviour:
         Data3: 0
         Data4: 0
       Path: 
-    eventIds: []
+    eventIds:
+    - BaseCampTrainingCompleted
     options: []
-    npcName: 
+    npcName: Sherpa Employee
     npcTag: 

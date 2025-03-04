@@ -405,6 +405,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 45917523}
+  - {fileID: 481541620}
   m_Father: {fileID: 1717040939}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &119046104 stripped
@@ -1069,6 +1070,76 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 30, y: 5, z: 10}
   m_Center: {x: 0, y: 0, z: -15}
+--- !u!1001 &481541619
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 81495356}
+    m_Modifications:
+    - target: {fileID: 5035189705473903095, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 193.53
+      objectReference: {fileID: 0}
+    - target: {fileID: 5035189705473903095, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 8.47
+      objectReference: {fileID: 0}
+    - target: {fileID: 5035189705473903095, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -135.76
+      objectReference: {fileID: 0}
+    - target: {fileID: 5035189705473903095, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5035189705473903095, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5035189705473903095, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5035189705473903095, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5035189705473903095, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5035189705473903095, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5035189705473903095, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6153531203544138019, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
+      propertyPath: playerStats
+      value: 
+      objectReference: {fileID: 857086514}
+    - target: {fileID: 6153531203544138019, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
+      propertyPath: inventoryManager
+      value: 
+      objectReference: {fileID: 1114315170}
+    - target: {fileID: 7347471784184561044, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
+      propertyPath: m_Name
+      value: Refill Oxygen Tank Trigger
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
+--- !u!4 &481541620 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5035189705473903095, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
+  m_PrefabInstance: {fileID: 481541619}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &526615129
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1579,6 +1650,10 @@ PrefabInstance:
       propertyPath: dialogueEvents.Array.data[8].onDialogueTriggered.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 769949663}
+    - target: {fileID: 7202121951982960492, guid: 43ae13c6e7898486fbf40a56c3fc3fd9, type: 3}
+      propertyPath: dialogueEvents.Array.data[9].onDialogueTriggered.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 769949663}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1921,6 +1996,38 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 2206885108856580092, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
+      propertyPath: field of view
+      value: 60.000004
+      objectReference: {fileID: 0}
+    - target: {fileID: 4116197491859869406, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 213.71812
+      objectReference: {fileID: 0}
+    - target: {fileID: 4116197491859869406, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 13.282013
+      objectReference: {fileID: 0}
+    - target: {fileID: 4116197491859869406, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 79.85162
+      objectReference: {fileID: 0}
+    - target: {fileID: 4116197491859869406, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.47065675
+      objectReference: {fileID: 0}
+    - target: {fileID: 4116197491859869406, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.23631535
+      objectReference: {fileID: 0}
+    - target: {fileID: 4116197491859869406, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.8456261
+      objectReference: {fileID: 0}
+    - target: {fileID: 4116197491859869406, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.08691304
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2187,7 +2294,7 @@ MonoBehaviour:
   triggerOnStart: 0
   triggerOnEnter: 1
   allowManualTrigger: 0
-  inputActions: {fileID: 0}
+  inputActions: {fileID: -944628639613478452, guid: 5ec57af691e024f5495721c1aec07891, type: 3}
   interactActionName: Interact
   checkBoolConditions: 0
   requiredBoolKeysTrue: []
@@ -3484,12 +3591,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   automaticDialogue: {fileID: 11400000, guid: 7ccd4c247a6e85140b24dcd811d0c1fe, type: 2}
-  dialogueKey: AutoDialogueTriggered
+  dialogueKey: AutoDialogueTriggered2
   triggerOnce: 1
   triggerOnStart: 0
   triggerOnEnter: 1
   allowManualTrigger: 0
-  inputActions: {fileID: 0}
+  inputActions: {fileID: -944628639613478452, guid: 5ec57af691e024f5495721c1aec07891, type: 3}
   interactActionName: Interact
   checkBoolConditions: 0
   requiredBoolKeysTrue: []

@@ -10,7 +10,7 @@ public class PlayerStats : MonoBehaviour
 {
     [Header("Oxygen Stats")]
     [SerializeField] private float Oxygen = 100f;
-    [SerializeField] private float OxygenTank;
+    public float OxygenTank;
     [SerializeField] private float OxygenDeductionRate = 2f;
     [SerializeField] private float SprintOxygenDrainRate = 12f;
     public float OxygenTankRefillRate;
