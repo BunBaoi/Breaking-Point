@@ -15,7 +15,7 @@ public class QTEMechanicScript : MonoBehaviour
     public float CHKCounter = 0f;
 
     public QTEvent qTEvent;
-    public GameObject objectPlayer;
+    public Transform objectPlayer;
     public PlayerStats playerStats;
     public PlayerMovement playerMovement;
 
@@ -68,7 +68,7 @@ public class QTEMechanicScript : MonoBehaviour
                     Vector3 target = Pos2.transform.position;// Update target position to Pos 2
                     PositionOfPlayer = PlayerPos.PlayerPos2; // Update Switch
                     CHKCounter++;
-                    StartCoroutine(MoveCube(target));
+                    StartCoroutine(MoveCube(target)); // Move to -> "target"
                     CHKPos1 = true;
                 }
                 break;
@@ -112,20 +112,17 @@ public class QTEMechanicScript : MonoBehaviour
         // Need to change one of the properties to move the player instead of the the bridge
         IEnumerator MoveCube(Vector3 targetPosition) // targetPosition = Player <-
         {
-            Vector3 startPosition = objectPlayer.transform.position; // NEED TO FIND WHAT STARTPOSITION IS AND TRANSFORM.POSITION
+            Vector3 startPosition = objectPlayer.position;
             float timeElapsed = 0;
-            Debug.Log(startPosition);
-            Debug.Log("Checkpoint Pos" ,targetPosition);
+            Debug.Log(startPosition); // The start position is where the game object starts and leave off from. From testing the qte object moves starts and moves from the player to "targeted position"
+            Debug.Log("Checkpoint Pos" + targetPosition); // "target" = "targetPosition"
             
             while (timeElapsed < MoTSpeed)
             {
-                transform.position = Vector3.Lerp(startPosition, targetPosition, timeElapsed / MoTSpeed);
+                transform.position = Vector3.Lerp(startPosition, targetPosition, timeElapsed / MoTSpeed); // "startPosition" -> "targetPosition" + speed overtime
                 timeElapsed += Time.deltaTime;
                 yield return null;
             }
-            transform.position = targetPosition;
-            Debug.Log("After Move: ", targetPosition);
-            //Debug.Log("Position arrived");
 
             if (PositionOfPlayer != PlayerPos.PlayerPos4)
             {
