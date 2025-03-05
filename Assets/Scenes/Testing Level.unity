@@ -1325,8 +1325,8 @@ MonoBehaviour:
   CHKCounter: 0
   qTEvent: {fileID: 877724999}
   objectPlayer: {fileID: 1665698389}
-  playerStats: {fileID: 1665698385}
-  playerMovement: {fileID: 1665698393}
+  playerStats: {fileID: 1665698393}
+  playerMovement: {fileID: 1665698394}
   PositionOfPlayer: 0
   QTEMechanicScriptActive: 0
   CHKPos1: 0
@@ -3363,7 +3363,7 @@ MonoBehaviour:
   - {fileID: 785786486}
   - {fileID: 1983949403}
   - {fileID: 1468207447}
-  playerStats: {fileID: 1665698385}
+  playerStats: {fileID: 1665698393}
   qTEMechanicScript: {fileID: 250155173}
   WaitingKeyLoad: 0
   CorrectKeyCounter: 0
@@ -5959,8 +5959,8 @@ GameObject:
   - component: {fileID: 1665698388}
   - component: {fileID: 1665698392}
   - component: {fileID: 1665698391}
+  - component: {fileID: 1665698394}
   - component: {fileID: 1665698393}
-  - component: {fileID: 1665698385}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -5968,28 +5968,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1665698385
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1665698384}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3f2da04fd11fe2643b75789b0a7059fc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Oxygen: 100
-  OxygenTank: 200
-  OxygenDeductionRate: 2
-  OxygenTankRefillRate: 2
-  IsAlive: 1
-  QTEState: 0
-  stateOfPlayer: 0
-  qTEMechanicScript: {fileID: 250155173}
-  qTEvent: {fileID: 877724999}
-  targetPosition: {x: 0, y: 0, z: 0}
 --- !u!143 &1665698388
 CharacterController:
   m_ObjectHideFlags: 0
@@ -6084,6 +6062,40 @@ Rigidbody:
   m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &1665698393
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1665698384}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f2da04fd11fe2643b75789b0a7059fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Oxygen: 100
+  OxygenTank: 0
+  OxygenDeductionRate: 2
+  SprintOxygenDrainRate: 12
+  OxygenTankRefillRate: 0
+  isInOxygenDrainZone: 0
+  oxygenTankItem: {fileID: 11400000, guid: 6715ea5907d7446e0b9069e1f81dba41, type: 2}
+  Energy: 100
+  EnergyDrainRate: 5
+  SprintEnergyDrainRate: 10
+  isInEnergyDrainZone: 0
+  canvasGroup: {fileID: 0}
+  fadeDuration: 1
+  oxygenRadialFill: {fileID: 785786488}
+  energyRadialFill: {fileID: 0}
+  oxygenText: {fileID: 0}
+  IsAlive: 1
+  QTEState: 0
+  stateOfPlayer: 0
+  qTEMechanicScript: {fileID: 250155173}
+  qTEvent: {fileID: 877724999}
+  targetPosition: {x: 0, y: 0, z: 0}
+--- !u!114 &1665698394
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

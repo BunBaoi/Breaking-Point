@@ -37,8 +37,10 @@ public class PlayerStats : MonoBehaviour
     public PlayerStatus stateOfPlayer;
 
     private PlayerMovement playerMovement;
-    [SerializeField] private QTEMechanic qTEMechanic;
     private InventoryManager inventoryManager;
+    [SerializeField] public QTEMechanicScript qTEMechanicScript;
+    public QTEvent qTEvent;
+    public Vector3 targetPosition;
 
     [Header("Timer")]
     [SerializeField] private const float TickMax = 1;
@@ -371,34 +373,34 @@ public class PlayerStats : MonoBehaviour
         }
     }
 
-        public IEnumerator MoveCube(Vector3 targetPosition) // targetPosition = Player <-
+    public IEnumerator MoveCube(Vector3 targetPosition) // targetPosition = Player <-
+    {
+        Vector3 startPosition = qTEMechanicScript.objectPlayer.position;
+        float timeElapsed = 0;
+        Debug.Log(startPosition); // The start position is where the game object starts and leave off from. From testing the qte object moves starts and moves from the player to "targeted position"
+        Debug.Log("Checkpoint Pos" + targetPosition); // "target" = "targetPosition"
+
+        while (timeElapsed < qTEMechanicScript.MoTSpeed)
         {
-            Vector3 startPosition = qTEMechanicScript.objectPlayer.position;
-            float timeElapsed = 0;
-            Debug.Log(startPosition); // The start position is where the game object starts and leave off from. From testing the qte object moves starts and moves from the player to "targeted position"
-            Debug.Log("Checkpoint Pos" + targetPosition); // "target" = "targetPosition"
-
-            while (timeElapsed < qTEMechanicScript.MoTSpeed)
-            {
-                transform.position = Vector3.Lerp(startPosition, targetPosition, timeElapsed / qTEMechanicScript.MoTSpeed); // "startPosition" -> "targetPosition" + speed overtime
-                timeElapsed += Time.deltaTime;
-                yield return null;
-            }
-
-            if (qTEMechanicScript.PositionOfPlayer != QTEMechanicScript.PlayerPos.PlayerPos4)
-            {
-                qTEvent.OpenreloadUI(); // PLAYING TWICE UPON QTE COMPLETION AND MOVE COMPLETION // UPDATE may not need to be fixed
-                qTEMechanicScript.QTEMechanicScriptActive = true; // KEY TO ACTIVATINE TIMER 
-            }
-            else
-            {
-                qTEMechanicScript.QTEMechanicScriptActive = false;
-                QTEState = false;
-                qTEMechanicScript.CHKPos4 = true;
-                qTEMechanicScript.playerMovement.canMove = true;
-                Debug.Log("Player Movement Unlocked");
-            }
-
+            transform.position = Vector3.Lerp(startPosition, targetPosition, timeElapsed / qTEMechanicScript.MoTSpeed); // "startPosition" -> "targetPosition" + speed overtime
+            timeElapsed += Time.deltaTime;
+            yield return null;
         }
-        
+
+        if (qTEMechanicScript.PositionOfPlayer != QTEMechanicScript.PlayerPos.PlayerPos4)
+        {
+            qTEvent.OpenreloadUI(); // PLAYING TWICE UPON QTE COMPLETION AND MOVE COMPLETION // UPDATE may not need to be fixed
+            qTEMechanicScript.QTEMechanicScriptActive = true; // KEY TO ACTIVATINE TIMER 
+        }
+        else
+        {
+            qTEMechanicScript.QTEMechanicScriptActive = false;
+            QTEState = false;
+            qTEMechanicScript.CHKPos4 = true;
+            qTEMechanicScript.playerMovement.canMove = true;
+            Debug.Log("Player Movement Unlocked");
+        }
+
     }
+
+}
