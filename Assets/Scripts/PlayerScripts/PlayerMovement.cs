@@ -7,7 +7,7 @@ public class PlayerMovement : MonoBehaviour
 {
     [Header("Player")]
     public QTEvent qTEvent;
-    public QTEMechanic qTEMechanic;
+    public QTEMechanicScript qTEMechanicScript;
     public CharacterController controller;
     private PlayerStats playerStats;
 
@@ -137,7 +137,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.F) && playerStats.stateOfPlayer == PlayerStatus.QTE)
         {
-            qTEMechanic.QTEMove();
+            qTEMechanicScript.QTEMove();
             canMove = false;
             Debug.Log("Player Movement Locked");
             playerStats.QTEState = true;
