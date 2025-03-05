@@ -1321,6 +1321,7 @@ MonoBehaviour:
   Pos2: {fileID: 2126617249}
   Pos3: {fileID: 600759269}
   Pos4: {fileID: 1086125980}
+  MoTSpeed: 2
   CHKCounter: 0
   qTEvent: {fileID: 877724999}
   objectPlayer: {fileID: 1665698389}
@@ -5986,6 +5987,9 @@ MonoBehaviour:
   IsAlive: 1
   QTEState: 0
   stateOfPlayer: 0
+  qTEMechanicScript: {fileID: 250155173}
+  qTEvent: {fileID: 877724999}
+  targetPosition: {x: 0, y: 0, z: 0}
 --- !u!143 &1665698388
 CharacterController:
   m_ObjectHideFlags: 0

@@ -19,21 +19,21 @@ public class PlayerStats : MonoBehaviour
     public PlayerStatus stateOfPlayer;
 
     private PlayerMovement playerMovement;
-    //public QTEMechanicScript qTEMechanicScript;
+    public QTEMechanicScript qTEMechanicScript;
+    public QTEvent qTEvent;
+    public Vector3 targetPosition;
 
     [Header("Timer")]
     public const float TickMax = 1;
     private int Tick;
     private float TickTimer;
 
-    // Slope Climb // Double check if needed for slope stuff
     CharacterController controller;
 
     void Start()
     {
         controller = GetComponent<CharacterController>();
         playerMovement = GetComponent<PlayerMovement>();
-
         controller.slopeLimit = 45.0f;
 
     }
@@ -168,5 +168,35 @@ public class PlayerStats : MonoBehaviour
             Debug.Log("Player Died From Oxygen Starvation");
         }
     }
-    
-}
+
+        public IEnumerator MoveCube(Vector3 targetPosition) // targetPosition = Player <-
+        {
+            Vector3 startPosition = qTEMechanicScript.objectPlayer.position;
+            float timeElapsed = 0;
+            Debug.Log(startPosition); // The start position is where the game object starts and leave off from. From testing the qte object moves starts and moves from the player to "targeted position"
+            Debug.Log("Checkpoint Pos" + targetPosition); // "target" = "targetPosition"
+
+            while (timeElapsed < qTEMechanicScript.MoTSpeed)
+            {
+                transform.position = Vector3.Lerp(startPosition, targetPosition, timeElapsed / qTEMechanicScript.MoTSpeed); // "startPosition" -> "targetPosition" + speed overtime
+                timeElapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            if (qTEMechanicScript.PositionOfPlayer != QTEMechanicScript.PlayerPos.PlayerPos4)
+            {
+                qTEvent.OpenreloadUI(); // PLAYING TWICE UPON QTE COMPLETION AND MOVE COMPLETION // UPDATE may not need to be fixed
+                qTEMechanicScript.QTEMechanicScriptActive = true; // KEY TO ACTIVATINE TIMER 
+            }
+            else
+            {
+                qTEMechanicScript.QTEMechanicScriptActive = false;
+                QTEState = false;
+                qTEMechanicScript.CHKPos4 = true;
+                qTEMechanicScript.playerMovement.canMove = true;
+                Debug.Log("Player Movement Unlocked");
+            }
+
+        }
+        
+    }

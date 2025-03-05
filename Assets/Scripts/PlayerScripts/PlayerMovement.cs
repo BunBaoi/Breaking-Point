@@ -138,9 +138,9 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F) && playerStats.stateOfPlayer == PlayerStatus.QTE)
         {
             qTEMechanicScript.QTEMove();
-            //canMove = false;
-            //Debug.Log("Player Movement Locked");
-            //playerStats.QTEState = true;
+            canMove = false;
+            Debug.Log("Player Movement Locked");
+            playerStats.QTEState = true;
 
         }
     }
