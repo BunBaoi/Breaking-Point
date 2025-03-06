@@ -684,65 +684,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &385073716 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1804318439799572251, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
-  m_PrefabInstance: {fileID: 687781375}
-  m_PrefabAsset: {fileID: 0}
---- !u!143 &385073718 stripped
-CharacterController:
-  m_CorrespondingSourceObject: {fileID: 897709939373269665, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
-  m_PrefabInstance: {fileID: 687781375}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &385073725
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 385073716}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b7222f8c17dd0bb4e8843592de4ae71d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  controller: {fileID: 385073718}
-  cameraTransform: {fileID: 1469908725}
-  leftHandTransform: {fileID: 1370040402}
-  rightHandTransform: {fileID: 480329443}
-  pullForce: 40
-  maxPullDistance: 1.5
-  handReachOffset: 1.5
-  pullUpForce: 40
-  movementSmoothing: 8
-  climbableTag: Climbable
-  handSwayAmount: 0.1
-  handReturnSpeed: 10
-  handStabilityMultiplier: 0.5
-  staminaDrainRate: 10
-  handSlipThreshold: 20
-  slipProbability: 0.1
-  inputActions: {fileID: -944628639613478452, guid: 5ec57af691e024f5495721c1aec07891, type: 3}
-  leftGrabActionName: LeftGrab
-  rightGrabActionName: RightGrab
---- !u!114 &385073726
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 385073716}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3f2da04fd11fe2643b75789b0a7059fc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Oxygen: 100
-  OxygenTank: 100
-  OxygenDeductionRate: 10
-  OxygenTankRefillRate: 10
-  Atmosphere: 0
-  IsAlive: 1
 --- !u!1 &431700538
 GameObject:
   m_ObjectHideFlags: 0
@@ -1133,6 +1074,46 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1044431239221895828, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1278238817659047079, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
+      propertyPath: pullForce
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1278238817659047079, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
+      propertyPath: climbSpeed
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 1278238817659047079, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
+      propertyPath: upwardBias
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1278238817659047079, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
+      propertyPath: leftIcePick
+      value: 
+      objectReference: {fileID: 1370040402}
+    - target: {fileID: 1278238817659047079, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
+      propertyPath: pullUpForce
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1278238817659047079, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
+      propertyPath: rightIcePick
+      value: 
+      objectReference: {fileID: 480329443}
+    - target: {fileID: 1278238817659047079, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
+      propertyPath: movementSmoothTime
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1278238817659047079, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
+      propertyPath: directionSmoothTime
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1300195702366156244, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1694757373622639524, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1177,20 +1158,30 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 2841370886391303198, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5861964805009779517, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
+      propertyPath: IsSprint
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6253224402217177760, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
       propertyPath: gravity
       value: -9.81
       objectReference: {fileID: 0}
+    - target: {fileID: 6885791762203668991, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8519684001432960098, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
+      propertyPath: m_UseGravity
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1804318439799572251, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 385073725}
-    - targetCorrespondingSourceObject: {fileID: 1804318439799572251, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 385073726}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
 --- !u!1 &738882445
 GameObject:
@@ -1938,11 +1929,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
---- !u!4 &1469908725 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4116197491859869406, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
-  m_PrefabInstance: {fileID: 687781375}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1914232655 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3859812622371921254, guid: eae525995f0d24e51bf1975e1d4f4f04, type: 3}
