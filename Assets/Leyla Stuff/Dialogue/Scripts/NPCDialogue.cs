@@ -211,7 +211,6 @@ public class NPCDialogue : MonoBehaviour
     {
         if (other.CompareTag("Player") && playerInRange)
         {
-
             UpdateSprite(iconObject.gameObject, interactActionName);
         }
     }

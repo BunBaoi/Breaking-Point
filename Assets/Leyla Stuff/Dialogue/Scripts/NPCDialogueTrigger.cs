@@ -57,6 +57,10 @@ public class NPCDialogueTrigger : MonoBehaviour
 
     private bool CanStartDialogue()
     {
+        if (!DialogueManager.Instance.canStartDialogue)
+        {
+            return false;
+        }
         // Check if all required bool conditions are met (true or false)
         foreach (string boolKey in requiredBoolKeysTrue)
         {
@@ -70,7 +74,7 @@ public class NPCDialogueTrigger : MonoBehaviour
         {
             if (BoolManager.Instance.GetBool(boolKey))
             {
-                return false; // If any bool is true when it should be false, return false
+                return false;
             }
         }
 

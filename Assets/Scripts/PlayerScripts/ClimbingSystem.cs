@@ -105,10 +105,6 @@ public class ClimbingSystem : MonoBehaviour
             HandlePulling();
             CheckForSlipping();
         }
-        else
-        {
-            playerMovement.SetMovementState(true);
-        }
 
         UpdateHandPositions();
     }

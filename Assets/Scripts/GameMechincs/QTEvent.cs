@@ -6,7 +6,6 @@ using TMPro;
 using JetBrains.Annotations;
 using UnityEngine.Events;
 using Unity.VisualScripting;
-using static QTEMechanic;
 
 // ^^^^^Check if need this USING
 
@@ -24,7 +23,7 @@ public class QTEvent : MonoBehaviour
     public KeyCode _Key;
     public UI_ReloadButton[] KeyTextBox;
     public PlayerStats playerStats;
-    public QTEMechanic qTEMechanic;
+    public QTEMechanicScript qTEMechanicScript;
 
     public int WaitingKeyLoad;
     public int CorrectKeyCounter;
@@ -42,7 +41,7 @@ public class QTEvent : MonoBehaviour
 
     void Update()
     {
-        if (qTEMechanic.QTEMechanicScriptActive == true && CountDownTimer >= 0)
+        if (qTEMechanicScript.QTEMechanicScriptActive == true && CountDownTimer >= 0)
         {
             updateTimer();
         }
@@ -75,7 +74,7 @@ public class QTEvent : MonoBehaviour
             WaitingKeyLoad = 0;
             CorrectKeyCounter = 0;
 
-            qTEMechanic.QTEMove(); // Moves Player to Pos
+            qTEMechanicScript.QTEMove(); // Moves Player to Pos
             //qTEMechanic.QTEMechanicScriptActive = false; // Can't remember why this was needed might delete it
 
         }

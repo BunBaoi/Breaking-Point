@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc052d520a75b9442a01011e5a33945f, type: 3}
+  m_Name: Onboarding2AutoStart
+  m_EditorClassIdentifier: 
+  dialogueTree: {fileID: 11400000, guid: b58a50bd73c3e844789e737b1c03f14d, type: 2}
+  timeBetweenDialogues: 2
+  waitForFullTextBeforeProceeding: 1
+  additionalPauseAfterText: 2
+  autoSelectFirstOption: 1
+  timeBeforeAutoSelectingOption: 2

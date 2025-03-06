@@ -258,7 +258,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "LeftGrab",
+                    "name": "Climb Left Grab",
                     "type": "Button",
                     "id": "1424868a-7669-42fb-81d6-c6f90fcb3079",
                     "expectedControlType": "Button",
@@ -267,7 +267,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "RightGrab",
+                    "name": "Climb Right Grab",
                     "type": "Button",
                     "id": "6274004d-0000-4a3b-831c-2fdf318c74a3",
                     "expectedControlType": "Button",
@@ -437,8 +437,19 @@
                     "path": "<Mouse>/leftButton",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
-                    "action": "LeftGrab",
+                    "groups": "Keyboard",
+                    "action": "Climb Left Grab",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9d3b68e0-36eb-4734-95eb-73cea5f58dc6",
+                    "path": "<Gamepad>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Controller",
+                    "action": "Climb Left Grab",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -449,7 +460,18 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "RightGrab",
+                    "action": "Climb Right Grab",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6b52ea43-444d-42d5-9a2e-ed5adb7e933f",
+                    "path": "<Gamepad>/rightShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Controller",
+                    "action": "Climb Right Grab",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

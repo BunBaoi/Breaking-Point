@@ -1,20 +1,29 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static PlayerStats;
+//using static QTEMechanic;
 
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Player")]
+    public QTEvent qTEvent;
+    public QTEMechanicScript qTEMechanicScript;
     public CharacterController controller;
     private PlayerStats playerStats;
 
+    public GameObject targetPos;
+    public GameObject playerPos;
+
     [Header("Settings")]
+    public float objectSpeed = 3;
     public float walkSpeed = 12f;
     public float sprintSpeed = 20f;
     public float gravity = -9.81f;
     public bool IsSprint = false;
+    public float playerHeight;
 
     [Header("Testing Purposes")]
-    [SerializeField] private bool canMove = true;
+    public bool canMove = true;
 
     [Header("Keybinds")]
     [SerializeField] private InputActionAsset inputActions;
@@ -80,6 +89,7 @@ public class PlayerMovement : MonoBehaviour
 
         ApplyGravity();
         OxyOutputRate();
+        QTEControl();
     }
 
     void HandleGroundMovement()
@@ -123,15 +133,32 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    public void QTEControl()
+    {
+        if (Input.GetKeyDown(KeyCode.F) && playerStats.stateOfPlayer == PlayerStatus.QTE)
+        {
+            qTEMechanicScript.QTEMove();
+            canMove = false;
+            Debug.Log("Player Movement Locked");
+            playerStats.QTEState = true;
+
+        }
+    }
+
     public void OxyOutputRate()
     {
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (Input.GetKeyDown(KeyCode.E))
         {
             playerStats.OxygenTankRefillRate++;
+            //Debug.log("Rate Up");
         }
-        else if (Input.GetKeyDown(KeyCode.R))
+        else if (Input.GetKeyDown(KeyCode.Q))
         {
             playerStats.OxygenTankRefillRate--;
+            //Debug.log("Rate Down");
+
+            // Need to add condition that the rate can't go negative
+
         }
     }
 
