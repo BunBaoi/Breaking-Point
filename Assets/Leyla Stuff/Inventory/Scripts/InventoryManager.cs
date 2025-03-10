@@ -61,11 +61,38 @@ public class InventoryManager : MonoBehaviour
                 Debug.LogError("PlayerInputs asset not found in Resources/Keybinds folder!");
             }
         }
+
+        DisableScriptsOnInventoryItems();
+        CreateSlots(defaultSlotCount);
+
+        scrollAction = inputActions.FindAction(scrollActionName);
+        dropAction = inputActions.FindAction(dropActionName);
+
+        if (scrollAction != null)
+        {
+            scrollAction.Enable();
+        }
+
+        if (dropAction != null)
+        {
+            dropAction.Enable();
+        }
+
+        for (int i = 0; i < defaultSlotCount; i++)
+        {
+            string actionName = slotActionsName + (i + 1);
+            InputAction slotAction = inputActions.FindAction(actionName);
+            if (slotAction != null)
+            {
+                slotActions.Add(slotAction);
+                slotAction.Enable();
+            }
+        }
     }
 
     private void Start()
     {
-        DisableScriptsOnInventoryItems();
+        /*DisableScriptsOnInventoryItems();
         CreateSlots(defaultSlotCount);
 
         scrollAction = inputActions.FindAction(scrollActionName);
@@ -90,7 +117,7 @@ public class InventoryManager : MonoBehaviour
                 slotActions.Add(slotAction);
                 slotAction.Enable();
             }
-        }
+        }*/
     }
 
     private void Update()

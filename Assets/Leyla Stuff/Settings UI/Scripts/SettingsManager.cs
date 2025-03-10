@@ -61,7 +61,7 @@ public class SettingsManager : MonoBehaviour
     public static SettingsManager Instance;
 
     private InputAction pauseAction;
-    private bool isMenuOpen = false;
+    public bool isMenuOpen = false;
     private int activePanelIndex = -1;
 
     void Awake()

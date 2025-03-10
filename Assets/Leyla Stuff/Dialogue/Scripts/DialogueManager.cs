@@ -187,6 +187,11 @@ public class DialogueManager : MonoBehaviour
 
     private void Update()
     {
+        if (SettingsManager.Instance != null && SettingsManager.Instance.isMenuOpen)
+        {
+            return; // Prevent dialogue from advancing while the settings menu is open
+        }
+
         if (!canStartDialogue)
         {
             cooldownTimer -= Time.deltaTime;
@@ -493,6 +498,11 @@ public class DialogueManager : MonoBehaviour
 
     public void StartDialogue(DialogueTree dialogueTree)
     {
+        if (SettingsManager.Instance != null && SettingsManager.Instance.isMenuOpen)
+        {
+            return; // Prevent dialogue from advancing while the settings menu is open
+        }
+
         // Disable the InventoryManager when dialogue starts
         if (inventoryManager != null)
         {
@@ -539,6 +549,11 @@ public class DialogueManager : MonoBehaviour
 
     public void ShowNextDialogue()
     {
+        if (SettingsManager.Instance != null && SettingsManager.Instance.isMenuOpen)
+        {
+            return; // Prevent dialogue from advancing while the settings menu is open
+        }
+
         StopCoroutine(FadeInAndOutIndicator());
         nextDialogueIndicatorCanvasGroup.alpha = 0f;
         ClearOptions();

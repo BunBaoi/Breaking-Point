@@ -590,7 +590,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   qTEvent: {fileID: 0}
-  qTEMechanic: {fileID: 0}
+  qTEMechanicScript: {fileID: 0}
   controller: {fileID: 897709939373269665}
   targetPos: {fileID: 0}
   playerPos: {fileID: 0}
@@ -641,18 +641,12 @@ MonoBehaviour:
   cameraTransform: {fileID: 4116197491859869406}
   leftHandTransform: {fileID: 3250508413225319028}
   rightHandTransform: {fileID: 6812937287833296610}
-  pullForce: 20
-  maxPullDistance: 4
-  handReachOffset: 1
-  pullUpForce: 15
-  movementSmoothing: 8
+  climbSpeed: 3
+  maxClimbDistance: 4
   climbableTag: Climbable
-  handSwayAmount: 0.1
-  handReturnSpeed: 10
-  handStabilityMultiplier: 0.5
-  staminaDrainRate: 10
-  handSlipThreshold: 20
-  slipProbability: 0.1
+  movementSmoothTime: 0.15
+  directionSmoothTime: 0.1
+  upwardBias: 0.1
   inputActions: {fileID: -944628639613478452, guid: 5ec57af691e024f5495721c1aec07891, type: 3}
   leftGrabActionName: Climb Left Grab
   rightGrabActionName: Climb Right Grab
@@ -668,7 +662,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f2da04fd11fe2643b75789b0a7059fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Oxygen: 0
+  Oxygen: 50
   OxygenTank: 100
   OxygenDeductionRate: 2
   SprintOxygenDrainRate: 12
@@ -687,7 +681,9 @@ MonoBehaviour:
   IsAlive: 1
   QTEState: 0
   stateOfPlayer: 0
-  qTEMechanic: {fileID: 0}
+  qTEMechanicScript: {fileID: 0}
+  qTEvent: {fileID: 0}
+  targetPosition: {x: 0, y: 0, z: 0}
 --- !u!114 &2841370886391303198
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1609,7 +1605,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 1032247
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0

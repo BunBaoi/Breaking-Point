@@ -195,9 +195,8 @@ public class CinematicSequence : MonoBehaviour
                 Debug.LogWarning($"Random text for dialogue index {i} is null.");
             }
 
-            // Check if there is an FMOD event assigned before playing it
             FMOD.Studio.EventInstance audioEventInstance;
-            if (!string.IsNullOrEmpty(dialogueAudio.fmodAudioEvent.Path))
+            if (!dialogueAudio.fmodAudioEvent.IsNull)
             {
                 audioEventInstance = RuntimeManager.CreateInstance(dialogueAudio.fmodAudioEvent);
                 audioEventInstance.start();
@@ -540,6 +539,10 @@ public class CinematicSequence : MonoBehaviour
         if (cameraController != null)
         {
             cameraController.SetLookState(true);
+        }
+        if (dayNightCycle != null)
+        {
+            dayNightCycle.StartTime();
         }
 
         OnCinematicFinished?.Invoke();
