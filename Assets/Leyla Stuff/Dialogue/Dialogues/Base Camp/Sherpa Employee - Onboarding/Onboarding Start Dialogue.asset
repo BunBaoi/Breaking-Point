@@ -37,8 +37,21 @@ MonoBehaviour:
     options: []
     npcName: Sherpa Employee
     npcTag: 
-  - dialogueText: Grab those ice picks there and try climbing by pressing left and
-      right click.
+  - dialogueText: First lets grab those ice picks there and the oxygen tank
+    fmodAudioEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+    eventIds: []
+    options: []
+    npcName: Sherpa Employee
+    npcTag: 
+  - dialogueText: With the ice pick you'll be able to climb parts you're not able
+      to walk. To climb, left-click to grab with your left hand, right-click for
+      your right. You'll need to alternate between them to make progress.
     fmodAudioEvent:
       Guid:
         Data1: 0

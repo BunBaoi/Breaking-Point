@@ -10,32 +10,17 @@ public class ClimbingSystem : MonoBehaviour
     public Transform cameraTransform;
     public Transform leftHandTransform;
     public Transform rightHandTransform;
-    private PlayerStats playerStats;
     private PlayerMovement playerMovement;
 
-    [Header("Pull Settings")]
-    public float pullForce = 20f;
-    public float maxPullDistance = 4f;
-    public float handReachOffset = 1f;
-    public float pullUpForce = 15f;
-    public float movementSmoothing = 8f;
-
-    private Vector3 currentVelocity;
-    private Vector3 lastMoveDirection;
-
-    private float originalGravity;
-
+    [Header("Climbing Settings")]
+    public float climbSpeed = 3f;
+    public float maxClimbDistance = 4f;
     public string climbableTag = "Climbable";
 
-    [Header("Hand Physics")]
-    public float handSwayAmount = 0.1f;
-    public float handReturnSpeed = 10f;
-    public float handStabilityMultiplier = 0.5f;
-
-    [Header("Stamina Settings")]
-    public float staminaDrainRate = 10f;
-    public float handSlipThreshold = 20f;
-    public float slipProbability = 0.1f;
+    [Header("Smoothing Settings")]
+    public float movementSmoothTime = 0.15f; // Controls how quickly movement is smoothed
+    public float directionSmoothTime = 0.1f; // Controls how quickly direction changes are smoothed
+    public float upwardBias = 0.1f; // Small upward force for natural climbing feel
 
     [Header("Input Actions")]
     [SerializeField] private InputActionAsset inputActions;
@@ -43,16 +28,22 @@ public class ClimbingSystem : MonoBehaviour
     [SerializeField] private string rightGrabActionName = "RightGrab";
     private InputAction leftGrab;
     private InputAction rightGrab;
-    private InputAction movement;
 
-    // Private variables
-    private bool leftHandHolding = false;
-    private bool rightHandHolding = false;
-    private Vector3 leftHandHoldPosition;
-    private Vector3 rightHandHoldPosition;
+    // Climbing state
+    private bool leftHandAttached = false;
+    private bool rightHandAttached = false;
+    private Vector3 leftHandPosition;
+    private Vector3 rightHandPosition;
     private Vector3 leftHandOriginalLocalPos;
     private Vector3 rightHandOriginalLocalPos;
-    private bool isExhausted = false;
+
+    // Smoothing variables
+    private Vector3 currentMoveVelocity = Vector3.zero;
+    private Vector3 smoothedMoveDirection = Vector3.zero;
+    private Vector3 directionSmoothVelocity = Vector3.zero;
+
+    // Debug and state management
+    private bool isActivelyClimbing = false;
 
     private void Awake()
     {
@@ -68,242 +59,303 @@ public class ClimbingSystem : MonoBehaviour
 
     void Start()
     {
-        playerStats = GetComponent<PlayerStats>();
+        // Get player movement component
         playerMovement = GetComponent<PlayerMovement>();
-        originalGravity = playerMovement.gravity; // Store original gravity value
-        SetupInputActions();
 
-        // Store the original local positions of hands
+        if (!controller)
+        {
+            controller = GetComponent<CharacterController>();
+            if (!controller)
+            {
+                Debug.LogError("No CharacterController found on the player!");
+                enabled = false;
+                return;
+            }
+        }
+
+        if (!cameraTransform)
+        {
+            Camera mainCamera = Camera.main;
+            if (mainCamera)
+            {
+                cameraTransform = mainCamera.transform;
+            }
+            else
+            {
+                Debug.LogError("No camera reference found!");
+                enabled = false;
+                return;
+            }
+        }
+
+        // Store original hand positions
         leftHandOriginalLocalPos = leftHandTransform.localPosition;
         rightHandOriginalLocalPos = rightHandTransform.localPosition;
+
+        SetupInputActions();
     }
 
     void SetupInputActions()
     {
         leftGrab = inputActions.FindAction(leftGrabActionName);
         rightGrab = inputActions.FindAction(rightGrabActionName);
-        movement = inputActions.FindAction("Move");
 
         if (leftGrab != null) leftGrab.Enable();
         if (rightGrab != null) rightGrab.Enable();
-        if (movement != null) movement.Enable();
 
-        // Subscribe to input events
-        if (leftGrab != null) leftGrab.performed += _ => TryGrab(true);
-        if (rightGrab != null) rightGrab.performed += _ => TryGrab(false);
-        if (leftGrab != null) leftGrab.canceled += _ => Release(true);
-        if (rightGrab != null) rightGrab.canceled += _ => Release(false);
+        // Set up event handlers for input
+        if (leftGrab != null) leftGrab.performed += _ => AttachIcepick(true);
+        if (rightGrab != null) rightGrab.performed += _ => AttachIcepick(false);
+        if (leftGrab != null) leftGrab.canceled += _ => DetachIcepick(true);
+        if (rightGrab != null) rightGrab.canceled += _ => DetachIcepick(false);
+    }
+
+    void FixedUpdate()
+    {
+        // Simple climbing check
+        if (IsClimbing())
+        {
+            SmoothClimbToIcepicks();
+        }
+        else
+        {
+            // Reset smoothing variables when not climbing
+            currentMoveVelocity = Vector3.zero;
+            smoothedMoveDirection = Vector3.zero;
+            directionSmoothVelocity = Vector3.zero;
+        }
     }
 
     void Update()
     {
-        if (!playerStats.IsAlive) return;
-
-        if (IsHolding())
-        {
-            playerMovement.SetMovementState(false);
-            HandlePulling();
-            CheckForSlipping();
-        }
-
-        UpdateHandPositions();
+        UpdateHandVisuals();
     }
 
-    void TryGrab(bool isLeftHand)
+    void AttachIcepick(bool isLeftHand)
     {
+        // Fire a raycast from the camera center
         Ray ray = new Ray(cameraTransform.position, cameraTransform.forward);
         RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, maxPullDistance))
+        if (Physics.Raycast(ray, out hit, maxClimbDistance))
         {
+            // Check if we hit a climbable surface
             if (hit.collider.CompareTag(climbableTag))
             {
-                Vector3 handPosition = isLeftHand ? leftHandTransform.position : rightHandTransform.position;
-
-                if (Vector3.Distance(handPosition, hit.point) <= handReachOffset)
+                // Attach the icepick
+                if (isLeftHand)
                 {
-                    if (isLeftHand)
-                    {
-                        leftHandHolding = true;
-                        leftHandHoldPosition = hit.point;
-                    }
-                    else
-                    {
-                        rightHandHolding = true;
-                        rightHandHoldPosition = hit.point;
-                    }
+                    leftHandAttached = true;
+                    leftHandPosition = hit.point;
+                }
+                else
+                {
+                    rightHandAttached = true;
+                    rightHandPosition = hit.point;
+                }
 
-                    // Disable gravity when grabbing
-                    playerMovement.SetApplyGravity(false);
+                // Disable normal movement and gravity when climbing
+                if (IsClimbing() && !isActivelyClimbing)
+                {
                     playerMovement.SetMovementState(false);
+                    playerMovement.SetApplyGravity(false);
+                    isActivelyClimbing = true;
+
+                    // Reset smoothing variables when starting to climb
+                    currentMoveVelocity = Vector3.zero;
+                    smoothedMoveDirection = Vector3.zero;
+                    directionSmoothVelocity = Vector3.zero;
+
+                    Debug.Log("Started climbing");
                 }
             }
         }
     }
 
-    void Release(bool isLeftHand)
+    void DetachIcepick(bool isLeftHand)
     {
+        // Detach the icepick
         if (isLeftHand)
         {
-            leftHandHolding = false;
+            leftHandAttached = false;
         }
         else
         {
-            rightHandHolding = false;
+            rightHandAttached = false;
         }
 
-        if (!IsHolding())
+        // If no longer climbing, restore normal movement
+        if (!IsClimbing() && isActivelyClimbing)
         {
-            playerMovement.SetApplyGravity(true);
             playerMovement.SetMovementState(true);
-            lastMoveDirection = Vector3.zero;
+            playerMovement.SetApplyGravity(true);
+            isActivelyClimbing = false;
+
+            Debug.Log("Stopped climbing");
         }
     }
 
-    void HandlePulling()
+    void DetachAllIcepicks()
     {
-        if (!IsHolding()) return;
+        leftHandAttached = false;
+        rightHandAttached = false;
 
-        Vector3 pullPoint = Vector3.zero;
-        int activeHands = 0;
+        // Restore normal movement
+        playerMovement.SetMovementState(true);
+        playerMovement.SetApplyGravity(true);
+        isActivelyClimbing = false;
+    }
 
-        if (leftHandHolding)
+    bool IsClimbing()
+    {
+        return leftHandAttached || rightHandAttached;
+    }
+
+    void SmoothClimbToIcepicks()
+    {
+        // Get the target position (average of attached icepicks)
+        Vector3 targetPosition = Vector3.zero;
+        int attachedCount = 0;
+
+        if (leftHandAttached)
         {
-            pullPoint += leftHandHoldPosition;
-            activeHands++;
+            targetPosition += leftHandPosition;
+            attachedCount++;
         }
-        if (rightHandHolding)
+
+        if (rightHandAttached)
         {
-            pullPoint += rightHandHoldPosition;
-            activeHands++;
+            targetPosition += rightHandPosition;
+            attachedCount++;
         }
 
-        if (activeHands > 0)
+        if (attachedCount > 0)
         {
-            pullPoint /= activeHands;
-            Vector3 toPoint = pullPoint - transform.position;
-            float distance = toPoint.magnitude;
+            // Calculate the average position
+            targetPosition /= attachedCount;
 
-            if (distance > 0.1f)
+            // Get vector to target
+            Vector3 toTarget = targetPosition - transform.position;
+
+            // Only climb if we're not too close
+            if (toTarget.magnitude > 0.1f)
             {
-                // Calculate basic pull direction
-                Vector3 pullDirection = toPoint.normalized;
-                pullDirection.y += pullUpForce * Time.deltaTime;
-                pullDirection = Vector3.Lerp(lastMoveDirection, pullDirection.normalized, Time.deltaTime * movementSmoothing);
+                // Calculate raw direction
+                Vector3 rawDirection = toTarget.normalized;
 
-                // Simple distance-based force calculation
-                float pullStrength = Mathf.Clamp01(1f - (distance / maxPullDistance));
-                Vector3 moveVector = pullDirection * pullForce * pullStrength * Time.deltaTime;
+                // Add slight upward bias for natural climbing
+                rawDirection.y += upwardBias;
+                rawDirection.Normalize();
 
-                // Apply movement directly with minimal smoothing
-                controller.Move(moveVector);
-                lastMoveDirection = pullDirection;
+                // Smooth the direction changes
+                smoothedMoveDirection = Vector3.SmoothDamp(
+                    smoothedMoveDirection,
+                    rawDirection,
+                    ref directionSmoothVelocity,
+                    directionSmoothTime
+                );
+
+                // Calculate desired movement with speed
+                Vector3 desiredMove = smoothedMoveDirection * climbSpeed;
+
+                // Smooth the movement and apply
+                Vector3 smoothedMove = Vector3.SmoothDamp(
+                    controller.velocity,
+                    desiredMove,
+                    ref currentMoveVelocity,
+                    movementSmoothTime
+                );
+
+                // Prevent overshooting by reducing speed when close
+                float distanceRatio = Mathf.Clamp01(toTarget.magnitude / 1.5f);
+                smoothedMove *= distanceRatio;
+
+                // Apply a maximum speed limit to prevent any potential flying
+                float maxSpeed = 5f;
+                if (smoothedMove.magnitude > maxSpeed)
+                {
+                    smoothedMove = smoothedMove.normalized * maxSpeed;
+                }
+
+                // Apply the smoothed movement
+                controller.Move(smoothedMove * Time.fixedDeltaTime);
+
+                // Visualization for debugging
+                Debug.DrawLine(transform.position, targetPosition, Color.yellow);
+                Debug.DrawRay(transform.position, smoothedMove.normalized * 2f, Color.green);
             }
         }
     }
 
-    void CheckForSlipping()
+    void UpdateHandVisuals()
     {
-        if (isExhausted)
+        // Smooth hand visual updates for left hand
+        if (leftHandAttached)
         {
-            if (Random.value < slipProbability * Time.deltaTime)
-            {
-                if (leftHandHolding && Random.value > 0.5f)
-                {
-                    Release(true);
-                    Debug.Log("Left hand slipped!");
-                }
-                else if (rightHandHolding)
-                {
-                    Release(false);
-                    Debug.Log("Right hand slipped!");
-                }
-            }
-        }
-    }
-
-    void UpdateHandPositions()
-    {
-        if (leftHandHolding)
-        {
+            // Move hand to icepick position
             leftHandTransform.position = Vector3.Lerp(
                 leftHandTransform.position,
-                leftHandHoldPosition,
-                Time.deltaTime * handReturnSpeed
+                leftHandPosition,
+                Time.deltaTime * 10f
             );
         }
         else
         {
+            // Return hand to original position
             leftHandTransform.localPosition = Vector3.Lerp(
                 leftHandTransform.localPosition,
                 leftHandOriginalLocalPos,
-                Time.deltaTime * handReturnSpeed
+                Time.deltaTime * 10f
             );
         }
 
-        if (rightHandHolding)
+        // Smooth hand visual updates for right hand
+        if (rightHandAttached)
         {
+            // Move hand to icepick position
             rightHandTransform.position = Vector3.Lerp(
                 rightHandTransform.position,
-                rightHandHoldPosition,
-                Time.deltaTime * handReturnSpeed
+                rightHandPosition,
+                Time.deltaTime * 10f
             );
         }
         else
         {
+            // Return hand to original position
             rightHandTransform.localPosition = Vector3.Lerp(
                 rightHandTransform.localPosition,
                 rightHandOriginalLocalPos,
-                Time.deltaTime * handReturnSpeed
+                Time.deltaTime * 10f
             );
         }
-    }
-
-    public bool IsHolding()
-    {
-        return leftHandHolding || rightHandHolding;
     }
 
     private void OnEnable()
     {
         SetupInputActions();
-        if (playerMovement != null)
-        {
-            playerMovement.SetMovementState(true);
-        }
     }
 
     private void OnDisable()
     {
-        // Release both hands when system is disabled
-        if (leftHandHolding)
+        // Clean up and reset when disabled
+        if (leftHandAttached || rightHandAttached)
         {
-            Release(true);
-        }
-        if (rightHandHolding)
-        {
-            Release(false);
+            DetachAllIcepicks();
         }
 
-        // Disable input actions
+        // Unsubscribe from events
         if (leftGrab != null)
         {
             leftGrab.Disable();
-            leftGrab.performed -= _ => TryGrab(true);
-            leftGrab.canceled -= _ => Release(true);
+            leftGrab.performed -= _ => AttachIcepick(true);
+            leftGrab.canceled -= _ => DetachIcepick(true);
         }
+
         if (rightGrab != null)
         {
             rightGrab.Disable();
-            rightGrab.performed -= _ => TryGrab(false);
-            rightGrab.canceled -= _ => Release(false);
-        }
-
-        // Ensure normal movement is restored
-        if (playerMovement != null)
-        {
-            playerMovement.SetMovementState(true);
-            playerMovement.SetApplyGravity(true);
+            rightGrab.performed -= _ => AttachIcepick(false);
+            rightGrab.canceled -= _ => DetachIcepick(false);
         }
     }
 }
