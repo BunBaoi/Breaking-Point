@@ -403,4 +403,29 @@ public class PlayerStats : MonoBehaviour
 
     }
 
+    // Public method to drain energy (can be called from other scripts)
+    public void DrainEnergy(float amount)
+    {
+        Energy -= amount;
+        Energy = Mathf.Max(Energy, 0); // Prevent Energy from going below 0
+
+        if (Energy == 0)
+        {
+            Debug.Log("Player has no energy left");
+            // Handle zero energy state
+        }
+    }
+
+    // Public method to get energy percentage (0-100)
+    public float GetEnergyPercentage()
+    {
+        return Energy;
+    }
+
+    // Method to check if player has enough energy
+    public bool HasEnoughEnergy(float threshold)
+    {
+        return Energy >= threshold;
+    }
+
 }

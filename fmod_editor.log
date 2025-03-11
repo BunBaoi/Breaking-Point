@@ -1,12 +1,13 @@
 [LOG] System::create                           : Header version = 2.02.24. Current version = 2.02.24.
-[LOG] Manager::init                            : maxchannels = 256 studioflags = 00000006 flags 00000000 extradriverdata 0x0.
+[LOG] Manager::init                            : maxchannels = 256 studioflags = 00000006 flags 00000000 extradriverdata 0000000000000000.
 [LOG] SystemI::init                            : Initialize version=20224 (146338), maxchannels=256, flags=0x00020000
-[LOG] SystemI::setOutputInternal               : Setting output to 'FMOD Core Audio Output'
-[LOG] OutputCoreAudio::init                    : Output running 2 channels at 48000Hz sample rate.
-[LOG] OutputCoreAudio::init                    : Maximum hardware read size: 512 samples, Software buffer size: 512 samples, Number of software buffers: 4.
+[LOG] SystemI::setOutputInternal               : Setting output to 'FMOD WASAPI Output'
+[LOG] OutputWASAPI::init                       : Mix Format (WAVEFORMATEX): wFormatTag=0xFFFE, nChannels=2, nSamplesPerSec=48000, nAvgBytesPerSec=384000, nBlockAlign=8, wBitsPerSample=32, cbSize=22.
+[LOG] OutputWASAPI::init                       : Mix Format (WAVEFORMATEXTENSIBLE): wValidBitsPerSample=32, dwChannelMask=0x00000003, SubFormat=00000003-0000-0010-8000-00AA00389B71.
+[LOG] OutputWASAPI::init                       : Output buffer size: 4096 samples, latency: 0.00ms, period: 10.00ms, DSP buffer: 1024 * 4
 [LOG] Thread::initThread                       : Init FMOD stream thread. Affinity: 0x4000000000000003, Priority: 0xFFFF7FFB, Stack Size: 98304, Semaphore: No, Sleep Time: 10, Looping: Yes.
-[LOG] Thread::initThread                       : Init FMOD mixer thread. Affinity: 0x4000000000000001, Priority: 0xFFFF7FFA, Stack Size: 81920, Semaphore: Yes, Sleep Time: 0, Looping: Yes.
-[LOG] AsyncManager::init                       : manager 0x156f5f208 isAsync 0 updatePeriod 0.02
+[LOG] Thread::initThread                       : Init FMOD mixer thread. Affinity: 0x4000000000000001, Priority: 0xFFFF7FFA, Stack Size: 81920, Semaphore: No, Sleep Time: 0, Looping: Yes.
+[LOG] AsyncManager::init                       : manager 000001BF7532A9B8 isAsync 0 updatePeriod 0.02
 [LOG] AsyncManager::init                       : done
 [LOG] PlaybackSystem::init                     : 
 [LOG] Thread::initThread                       : Init FMOD Studio sample load thread. Affinity: 0x4000000000000003, Priority: 0xFFFF7FFD, Stack Size: 98304, Semaphore: No, Sleep Time: 1, Looping: No.
@@ -18,52 +19,6 @@
 [LOG] Manager::readBank                        : fileversion = 142, compatVersion = 140 (oldest = 44, newest = 142)
 [LOG] Manager::readBank                        : fileversion = 142, compatVersion = 140 (oldest = 44, newest = 142)
 [LOG] PlaybackSystem::acquireMasterBus         : Setting master channel group format to 6
-[LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
-[LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 224
-[LOG] SystemI::createSoundInternal             : exinfo->length             = 124416
-[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 3296
-[LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0x17e0ce7f4
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
-[LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
-[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 0x3bf0afb30
-[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 0x3bf0afc00
-[LOG] SystemI::createSoundInternal             : exinfo->userread           = 0x3bf0afc3c
-[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 0x3bf0afd0c
-[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 0x37966f648
-[LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
-[LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
-[LOG] SystemI::createSoundInternal             : Sample 0/1: name='Bonk Sound Effect', format=5, channels=2, frequency=48000, lengthbytes=4288, lengthpcm=47647, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.978516.
-[LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
-[LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 224
-[LOG] SystemI::createSoundInternal             : exinfo->length             = 124416
-[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 3296
-[LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0x17e0ce7f4
-[LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
-[LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
-[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 0x3bf0afb30
-[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 0x3bf0afc00
-[LOG] SystemI::createSoundInternal             : exinfo->userread           = 0x3bf0afc3c
-[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 0x3bf0afd0c
-[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 0x140e896e8
-[LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
-[LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
-[LOG] SystemI::createSoundInternal             : Sample 0/1: name='Witch Laugh - Halloween Scary Sounds (Sound Effect)', format=5, channels=2, frequency=48000, lengthbytes=119840, lengthpcm=450142, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.996368.
-[LOG] SoundI::release                          :  (0x140e77728)
-[LOG] SoundI::release                          :     Bonk Sound Effect (0x3793b5d38)
-[LOG] SoundI::release                          :  (0x140ec1718)
-[LOG] SoundI::release                          :     Witch Laugh - Halloween Scary Sounds (Sound Effect) (0x140eda648)
-[LOG] Thread::callback                         : FMOD Studio update thread finished.
-[LOG] Thread::callback                         : FMOD Studio bank load thread finished.
-[LOG] Profile::disconnectAll                   : Profiler disconnecting all clients
-[LOG] Thread::callback                         : FMOD Studio sample load thread finished.
-[LOG] LiveUpdate::release                      : 
-[LOG] LiveUpdate::reset                        : Reset connection (reason Disconnected)
-[LOG] Thread::callback                         : FMOD stream thread finished.
-[LOG] Thread::callback                         : FMOD mixer thread finished.
-[LOG] Profile::disconnectAll                   : Profiler disconnecting all clients
-[LOG] SystemI::close                           : Closed.
 [LOG] Thread::callback                         : FMOD Studio bank load thread finished.
 [LOG] Thread::callback                         : FMOD Studio sample load thread finished.
 [LOG] LiveUpdate::release                      : 

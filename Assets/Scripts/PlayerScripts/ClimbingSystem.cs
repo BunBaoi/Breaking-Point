@@ -11,11 +11,17 @@ public class ClimbingSystem : MonoBehaviour
     public Transform leftHandTransform;
     public Transform rightHandTransform;
     private PlayerMovement playerMovement;
+    private PlayerStats playerStats; // Reference to PlayerStats
 
     [Header("Climbing Settings")]
     public float climbSpeed = 3f;
     public float maxClimbDistance = 4f;
     public string climbableTag = "Climbable";
+
+    [Header("Energy Settings")]
+    public float climbingEnergyDrainRate = 1f; // Energy drain per second while climbing
+    public float lowEnergyClimbSpeedMultiplier = 0.5f; // Climbing speed multiplier when low on energy
+    public float lowEnergyThreshold = 20f; // Threshold for low energy
 
     [Header("Smoothing Settings")]
     public float movementSmoothTime = 0.15f; // Controls how quickly movement is smoothed
@@ -61,6 +67,13 @@ public class ClimbingSystem : MonoBehaviour
     {
         // Get player movement component
         playerMovement = GetComponent<PlayerMovement>();
+
+        // Get player stats component
+        playerStats = GetComponent<PlayerStats>();
+        if (!playerStats)
+        {
+            Debug.LogWarning("PlayerStats component not found. Energy drain while climbing will not work.");
+        }
 
         if (!controller)
         {
@@ -116,6 +129,7 @@ public class ClimbingSystem : MonoBehaviour
         if (IsClimbing())
         {
             SmoothClimbToIcepicks();
+            DrainEnergyWhileClimbing();
         }
         else
         {
@@ -129,6 +143,21 @@ public class ClimbingSystem : MonoBehaviour
     void Update()
     {
         UpdateHandVisuals();
+    }
+
+    void DrainEnergyWhileClimbing()
+    {
+        if (playerStats != null && isActivelyClimbing)
+        {
+            // Apply the configured energy drain rate
+            playerStats.DrainEnergy(climbingEnergyDrainRate * Time.deltaTime);
+
+            // Debug output for energy consumption
+            if (Time.frameCount % 60 == 0) // Log once per second (approximately)
+            {
+                Debug.Log($"Climbing energy consumption: {climbingEnergyDrainRate} per second");
+            }
+        }
     }
 
     void AttachIcepick(bool isLeftHand)
@@ -166,6 +195,12 @@ public class ClimbingSystem : MonoBehaviour
                     smoothedMoveDirection = Vector3.zero;
                     directionSmoothVelocity = Vector3.zero;
 
+                    // Set player status to climbing if PlayerStats exists
+                    if (playerStats != null)
+                    {
+                        playerStats.stateOfPlayer = PlayerStats.PlayerStatus.RClimbing;
+                    }
+
                     Debug.Log("Started climbing");
                 }
             }
@@ -191,6 +226,12 @@ public class ClimbingSystem : MonoBehaviour
             playerMovement.SetApplyGravity(true);
             isActivelyClimbing = false;
 
+            // Reset player status to free roam if PlayerStats exists
+            if (playerStats != null)
+            {
+                playerStats.stateOfPlayer = PlayerStats.PlayerStatus.FreeRoam;
+            }
+
             Debug.Log("Stopped climbing");
         }
     }
@@ -204,6 +245,12 @@ public class ClimbingSystem : MonoBehaviour
         playerMovement.SetMovementState(true);
         playerMovement.SetApplyGravity(true);
         isActivelyClimbing = false;
+
+        // Reset player status to free roam if PlayerStats exists
+        if (playerStats != null)
+        {
+            playerStats.stateOfPlayer = PlayerStats.PlayerStatus.FreeRoam;
+        }
     }
 
     bool IsClimbing()
@@ -255,8 +302,21 @@ public class ClimbingSystem : MonoBehaviour
                     directionSmoothTime
                 );
 
+                // Calculate effective climb speed based on energy levels
+                float effectiveClimbSpeed = climbSpeed;
+                if (playerStats != null && playerStats.GetEnergyPercentage() < lowEnergyThreshold)
+                {
+                    effectiveClimbSpeed *= lowEnergyClimbSpeedMultiplier;
+                    if (Time.frameCount % 60 == 0) // Log once per second (approximately)
+                    {
+                        Debug.Log("Low energy affecting climbing speed");
+                    }
+                }
+
+                // Adjust climbing speed based only on energy levels
+
                 // Calculate desired movement with speed
-                Vector3 desiredMove = smoothedMoveDirection * climbSpeed;
+                Vector3 desiredMove = smoothedMoveDirection * effectiveClimbSpeed;
 
                 // Smooth the movement and apply
                 Vector3 smoothedMove = Vector3.SmoothDamp(
