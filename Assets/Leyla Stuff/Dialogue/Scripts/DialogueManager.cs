@@ -21,7 +21,7 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private Camera mainCamera;  // Player camera
     [SerializeField] private float scrollSpeed = 0.05f;
 
-    [Header("Colour Settings")]
+   [Header("Colour Settings")]
     [SerializeField] private string npcNameColorHex = "#D95959"; // Default colour
     [SerializeField] private string dialogueTextColorHex = "#4DB7C0"; // Default colour
 
@@ -71,6 +71,7 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private Canvas inventoryCanvas;
     [SerializeField] private GameObject[] playerHands;
 
+    private Coroutine currentLookAtNpcCoroutine;
     private Coroutine scrollingCoroutine;
     private Coroutine indicatorCoroutine;
 
@@ -595,6 +596,11 @@ public class DialogueManager : MonoBehaviour
             nextDialogueIndicatorCanvasGroup.alpha = 0f;
             nextDialogueIndicatorImage.gameObject.SetActive(false);
             dialogueCanvas.enabled = false;
+            // Stop the previous coroutine if it's running
+            if (currentLookAtNpcCoroutine != null)
+            {
+                StopCoroutine(currentLookAtNpcCoroutine);
+            }
             if (playerMovement != null)
             {
                 playerMovement.SetMovementState(true);
@@ -706,7 +712,14 @@ public class DialogueManager : MonoBehaviour
                 // If closest NPC found, start the look at NPC process
                 if (closestNpc != null)
                 {
-                    StartCoroutine(SmoothLookAtNpc(closestNpc));
+                    // Stop the previous coroutine if it's running
+                    if (currentLookAtNpcCoroutine != null)
+                    {
+                        StopCoroutine(currentLookAtNpcCoroutine);
+                    }
+
+                    // Start a new coroutine to look at the closest NPC
+                    currentLookAtNpcCoroutine = StartCoroutine(SmoothLookAtNpc(closestNpc));
                 }
             }
         }
@@ -745,9 +758,6 @@ public class DialogueManager : MonoBehaviour
                 player.transform.rotation = Quaternion.Euler(0, currentRotation.eulerAngles.y, 0);
 
                 // Update the camera's xRotation to reflect the smooth pitch (vertical rotation)
-                cameraController.xRotation = targetPitch;
-
-                // Adjust the mouseY position in the CameraController to match the xRotation for consistency
                 cameraController.xRotation = targetPitch;
 
                 yield return null;

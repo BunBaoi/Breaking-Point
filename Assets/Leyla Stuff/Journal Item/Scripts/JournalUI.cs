@@ -101,6 +101,8 @@ public class JournalUI : MonoBehaviour
 
     private void Update()
     {
+        if (CinematicSequence.IsCinematicActive) return;
+
         // Right-click to toggle journal visibility
         if (useItem.triggered)
         {
@@ -247,6 +249,7 @@ public class JournalUI : MonoBehaviour
 
     private void ToggleJournal()
     {
+        if (CinematicSequence.IsCinematicActive) return;
         isJournalOpen = !isJournalOpen;
         journalUI.SetActive(isJournalOpen);
 

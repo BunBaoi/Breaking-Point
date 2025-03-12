@@ -48,6 +48,7 @@ public class CinematicSequence : MonoBehaviour
 
     public event System.Action OnCinematicFinished;
     public event System.Action OnCinematicStarted;
+    public static bool IsCinematicActive { get; private set; } = false;
 
     public void StartCinematic()
     {
@@ -94,6 +95,7 @@ public class CinematicSequence : MonoBehaviour
                 }
             }
             // DisableAllCameras();
+            IsCinematicActive = true;
             StartCoroutine(PlayCinematic());
             // Instantiate the cinematic camera
             instantiatedCamera = Instantiate(cinematicCameraPrefab);
@@ -545,6 +547,7 @@ public class CinematicSequence : MonoBehaviour
             dayNightCycle.StartTime();
         }
 
+        IsCinematicActive = false;
         OnCinematicFinished?.Invoke();
     }
 }

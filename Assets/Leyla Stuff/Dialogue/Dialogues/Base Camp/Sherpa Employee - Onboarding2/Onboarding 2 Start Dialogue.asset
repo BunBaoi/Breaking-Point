@@ -64,8 +64,8 @@ MonoBehaviour:
     options: []
     npcName: Sherpa Employee
     npcTag: 
-  - dialogueText: 'Once that gets to 0, you''ll die so make sure to keep a look out
-      for it '
+  - dialogueText: Once that gets to 0, you'll die so make sure to keep a look out
+      for it. Don't worry! You won't die right now as we are at a safe altitude.
     fmodAudioEvent:
       Guid:
         Data1: 0
@@ -90,8 +90,22 @@ MonoBehaviour:
     options: []
     npcName: Sherpa Employee
     npcTag: 
-  - dialogueText: The refill station at this camp is back at where Sherpa was, lets
-      go back and fill it up!
+  - dialogueText: Once you leave a camp, your energy levels next to your oxygen levels
+      will also start to drain which can cause you to pass out, especilly if you
+      are climbing. Having a good night sleep will fix that right up though!
+    fmodAudioEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+    eventIds: []
+    options: []
+    npcName: Sherpa Employee
+    npcTag: 
+  - dialogueText: The refill station at this camp is back at where Sherpa was where
+      the blue flag is, lets go back and fill it up!
     fmodAudioEvent:
       Guid:
         Data1: 0
