@@ -8,6 +8,12 @@ public class GameManager : MonoBehaviour
     [SerializeField] private InventoryManager inventoryManager;
     [SerializeField] private Item journalItem;
 
+    private void Awake()
+    {
+        // Clear all PlayerPrefs
+        PlayerPrefs.DeleteAll();
+    }
+
     void Start()
     {
         if (inventoryManager == null)

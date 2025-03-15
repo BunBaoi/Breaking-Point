@@ -100,7 +100,7 @@ public class AutomaticDialogueTrigger : MonoBehaviour
     // Check if dialogue can be triggered based on bool conditions
     private bool CanTriggerDialogue()
     {
-        if (!checkBoolConditions) return true;
+        if (!checkBoolConditions) return false;
 
         // Check all required TRUE conditions
         foreach (string boolKey in requiredBoolKeysTrue)

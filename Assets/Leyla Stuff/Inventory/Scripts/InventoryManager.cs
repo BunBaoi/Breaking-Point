@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
 using System.Collections;
+using System.Linq;
 
 public class InventoryManager : MonoBehaviour
 {
@@ -36,6 +37,7 @@ public class InventoryManager : MonoBehaviour
 
     [Header("Keybinds")]
     [SerializeField] private InputActionAsset inputActions;  // Input Action Asset
+    [SerializeField] private TMP_Text equippedItemText;
     [SerializeField] private string scrollActionName = "Inventory Scroll";
     [SerializeField] private string dropActionName = "Drop";
     [SerializeField] private string slotActionsName = "Slot";
@@ -516,14 +518,60 @@ public class InventoryManager : MonoBehaviour
             // Check if the item is too heavy to switch
             if (item.weight > MaxSwitchableWeight)
             {
-                // Equip with weight-based switching restrictions
                 EquipItemWithWeightRestrictions(item);
             }
             else
             {
-                // Normal item equipping
                 EquipNormalItem(item);
             }
+
+            // Update UI text with rebound key names only if the item has playerInputs
+            if (item.playerInputs != null && item.playerInputs.Length > 0)
+            {
+                equippedItemText.text = "Item Keybind: " + GetReboundKeyNames(item);
+            }
+            else
+            {
+                equippedItemText.text = ""; // No input bindings, clear the text
+            }
+        }
+        else
+        {
+            equippedItemText.text = ""; // Clear text when no item is equipped
+        }
+    }
+
+    private string GetReboundKeyNames(Item item)
+    {
+        if (item.playerInputs == null || item.playerInputs.Length == 0) return "Unknown Input";
+
+        string[] keyNames = item.playerInputs
+            .Select(inputName =>
+            {
+                InputAction action = inputActions.FindAction(inputName);
+                if (action != null && action.controls.Count > 0)
+                {
+                    return action.controls[0].displayName; // Get rebounded key name
+            }
+                return inputName; // Default to action name if no binding exists
+        })
+            .ToArray();
+
+        // Handle the formatting for 2 or more actions
+        if (keyNames.Length == 1)
+        {
+            return keyNames[0]; // Single action name
+        }
+        else if (keyNames.Length == 2)
+        {
+            return keyNames[0] + " & " + keyNames[1]; // Two actions with "&" in the middle
+        }
+        else
+        {
+            // More than two actions, put "&" before the last action
+            string lastAction = keyNames[keyNames.Length - 1];
+            string actionsExceptLast = string.Join(", ", keyNames.Take(keyNames.Length - 1));
+            return actionsExceptLast + " & " + lastAction;
         }
     }
 
