@@ -88,7 +88,7 @@ public class DialogueManager : MonoBehaviour
     private PlayerMovement playerMovement;
 
     [Header("Automatic Dialogue")]
-    [SerializeField] private bool isAutomaticDialogueActive = false;
+    public bool isAutomaticDialogueActive = false;
     public bool IsAutomaticDialogueActive => isAutomaticDialogueActive;
 
     [Header("Cooldown Settings")]
@@ -186,6 +186,25 @@ public class DialogueManager : MonoBehaviour
         UpdateSelectOptionIndicatorSprite();
     }
 
+    public void SetInventoryActive(bool isActive)
+    {
+        // Activate or deactivate the InventoryManager script itself
+        if (inventoryManager != null)
+        {
+            inventoryManager.enabled = isActive;  // Enable/disable the script based on isActive
+        }
+
+        // Also manage the other objects
+        if (inventoryCanvas != null)
+            inventoryCanvas.gameObject.SetActive(isActive);   // Set to true or false based on isActive
+
+        foreach (var hand in playerHands)
+        {
+            if (hand != null)
+                hand.SetActive(isActive);  // Set to true or false based on isActive
+        }
+    }
+
     private void Update()
     {
         if (SettingsManager.Instance != null && SettingsManager.Instance.isMenuOpen)
@@ -203,7 +222,7 @@ public class DialogueManager : MonoBehaviour
             }
         }
 
-        if (isFullTextShown && indicatorCoroutine == null)
+        if (isFullTextShown && indicatorCoroutine == null && !isAutomaticDialogueActive)
         {
             indicatorCoroutine = StartCoroutine(FadeInAndOutIndicator());
         }
@@ -540,6 +559,8 @@ public class DialogueManager : MonoBehaviour
         {
             Debug.LogWarning("Player object not found with tag 'Player'.");
         }
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
         isDialogueActive = true;
         nextDialogueIndicatorCanvasGroup.alpha = 0f;
         currentDialogueTree = dialogueTree;

@@ -65,6 +65,8 @@ public class ActivateCutScene : MonoBehaviour
             // Play the cutscene
             playableDirector.Play();
 
+            DialogueManager.Instance.SetInventoryActive(false);
+
             // Subscribe to the stopped event
             playableDirector.stopped += OnCutsceneFinished;
 

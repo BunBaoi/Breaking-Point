@@ -120,8 +120,6 @@ public class PlayerStats : MonoBehaviour
 
     void HandleOxygenDrain()
     {
-        if (stateOfPlayer == PlayerStatus.DeadZone)
-        {
             if (isInOxygenDrainZone)
             {
                 // If no oxygen tank is present, do not allow oxygen to drain
@@ -162,7 +160,6 @@ public class PlayerStats : MonoBehaviour
                     Oxygen = Mathf.Min(Oxygen, 100f);
                 }
             }
-        }
         else
         {
             RefillingOxygenFromTank();

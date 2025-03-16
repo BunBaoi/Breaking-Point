@@ -49,7 +49,7 @@ public class JournalUI : MonoBehaviour
     [SerializeField] private Canvas inventoryCanvas;
 
     private int currentPageIndex = 0;
-    private bool isJournalOpen = false;
+    [SerializeField] private bool isJournalOpen = false;
 
     private void Awake()
     {
@@ -195,6 +195,11 @@ public class JournalUI : MonoBehaviour
                 Debug.Log("PageTracker.Instance is null.");
             }
         }
+    }
+
+    public void SetJournalState(bool state)
+    {
+        isJournalOpen = state;
     }
 
     private void UpdateNextPrevPageImage(GameObject imageObject, string actionName)
