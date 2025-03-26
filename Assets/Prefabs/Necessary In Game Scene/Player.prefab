@@ -2926,8 +2926,8 @@ MonoBehaviour:
   defaultSlotCount: 4
   inventorySlotPrefab: {fileID: 5735570166801149588, guid: 3201d870346264af99b1292678d5e5a0, type: 3}
   inventoryPanel: {fileID: 6267325978070755587}
-  leftHandPosition: {fileID: 8878805742853524143}
-  rightHandPosition: {fileID: 8445268755860771900}
+  leftHandPosition: {fileID: 3250508413225319028}
+  rightHandPosition: {fileID: 6812937287833296610}
   updateText: {fileID: 1283847626880823192}
   groundLayer:
     serializedVersion: 2
@@ -3056,8 +3056,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   controller: {fileID: 897709939373269665}
   cameraTransform: {fileID: 4116197491859869406}
-  leftHandTransform: {fileID: 8878805742853524143}
-  rightHandTransform: {fileID: 8445268755860771900}
+  leftHandTransform: {fileID: 3250508413225319028}
+  rightHandTransform: {fileID: 6812937287833296610}
   climbSpeed: 3
   maxClimbDistance: 4
   climbableTag: Climbable
@@ -10945,8 +10945,8 @@ GameObject:
   - component: {fileID: 2206885108856580092}
   - component: {fileID: 1836200151866219520}
   - component: {fileID: 2435927527163000300}
-  - component: {fileID: 1263580144268604745}
   - component: {fileID: 6110577722203977042}
+  - component: {fileID: 1348936654399459933}
   m_Layer: 0
   m_Name: Camera
   m_TagString: PlayerCamera
@@ -10962,8 +10962,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6689434991776137215}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.6915503, z: 0.28769904}
+  m_LocalRotation: {x: -0, y: 0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.0000013262033, y: 1.6915503, z: 0.28769323}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11087,7 +11087,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nonRigidbodyVelocity: 0
   attenuationObject: {fileID: 6689434991776137215}
---- !u!114 &1263580144268604745
+--- !u!114 &6110577722203977042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6689434991776137215}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IsGlobal: 1
+  priority: 0
+  blendDistance: 0
+  weight: 1
+  sharedProfile: {fileID: 11400000, guid: d63528d4754cf4360af55e936e54b992, type: 2}
+--- !u!114 &1348936654399459933
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -11110,7 +11127,7 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 1
+  m_RenderPostProcessing: 0
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
@@ -11131,23 +11148,6 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
---- !u!114 &6110577722203977042
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6689434991776137215}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IsGlobal: 1
-  priority: 0
-  blendDistance: 0
-  weight: 1
-  sharedProfile: {fileID: 11400000, guid: d63528d4754cf4360af55e936e54b992, type: 2}
 --- !u!1 &6696840270730919720
 GameObject:
   m_ObjectHideFlags: 0
