@@ -88,7 +88,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         ApplyGravity();
-        OxyOutputRate();
+        // OxyOutputRate();
         QTEControl();
     }
 
@@ -145,7 +145,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    public void OxyOutputRate()
+    /*public void OxyOutputRate()
     {
         if (Input.GetKeyDown(KeyCode.E))
         {
@@ -160,7 +160,7 @@ public class PlayerMovement : MonoBehaviour
             // Need to add condition that the rate can't go negative
 
         }
-    }
+    }*/
 
     public void SetMovementState(bool state)
     {

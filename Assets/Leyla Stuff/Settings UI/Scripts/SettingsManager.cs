@@ -2,7 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using TMPro;
-using UnityEngine.Rendering.PostProcessing;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using System.Collections;
 using FMOD.Studio;
 using FMODUnity;
@@ -33,7 +34,7 @@ public class SettingsManager : MonoBehaviour
 
     [Header("Brightness Settings")]
     [SerializeField] private Slider brightnessSlider;
-    [SerializeField] private PostProcessVolume postProcessingVolume;
+    [SerializeField] private Volume volume;
 
     [Header("Mouse Sensitivity Settings")]
     [SerializeField] private TMP_InputField sensitivityInputField;
@@ -57,11 +58,11 @@ public class SettingsManager : MonoBehaviour
     [SerializeField] private TMP_Text resetMessageText;
     private Coroutine resetMessageCoroutine;
 
-    private ColorGrading colorGrading;
+    private ColorAdjustments colorAdjustments;
     public static SettingsManager Instance;
 
     private InputAction pauseAction;
-    private bool isMenuOpen = false;
+    public bool isMenuOpen = false;
     private int activePanelIndex = -1;
 
     void Awake()
@@ -162,8 +163,7 @@ public class SettingsManager : MonoBehaviour
         }
 
         // Brightness settings
-        colorGrading = postProcessingVolume.profile.GetSetting<ColorGrading>();
-        if (colorGrading != null)
+        if (volume.profile.TryGet(out ColorAdjustments colorAdjustments))
         {
             float savedBrightness = PlayerPrefs.GetFloat("Brightness", 0.5f);
             brightnessSlider.value = savedBrightness;
@@ -171,7 +171,17 @@ public class SettingsManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("ColorGrading effect not found in the PostProcessVolume profile.");
+            Debug.LogError("Color Adjustments effect not found in the Volume profile.");
+        }
+        if (volume.profile.TryGet(out colorAdjustments))
+        {
+            float savedBrightness = PlayerPrefs.GetFloat("Brightness", 0.5f);
+            brightnessSlider.value = savedBrightness;
+            UpdateBrightness(savedBrightness);
+        }
+        else
+        {
+            Debug.LogError("Color Adjustments effect not found in the Volume profile.");
         }
 
         if (brightnessSlider != null)
@@ -329,14 +339,14 @@ public class SettingsManager : MonoBehaviour
         return scrollSpeed;
     }
 
-    public void UpdateBrightness(float value)
+    void UpdateBrightness(float value)
+{
+    if (volume.profile.TryGet(out ColorAdjustments colorAdjustments))
     {
-        if (colorGrading != null)
-        {
-            colorGrading.postExposure.value = Mathf.Lerp(-2f, 2f, value);  // Adjust the brightness curve
-            PlayerPrefs.SetFloat("Brightness", value);  // Save brightness to PlayerPrefs
-        }
+        colorAdjustments.postExposure.value = Mathf.Lerp(-2f, 2f, value);
+        PlayerPrefs.SetFloat("Brightness", value);
     }
+}
 
     public void UpdateSensitivity(string input)
     {

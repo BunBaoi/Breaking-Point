@@ -49,7 +49,7 @@ public class JournalUI : MonoBehaviour
     [SerializeField] private Canvas inventoryCanvas;
 
     private int currentPageIndex = 0;
-    private bool isJournalOpen = false;
+    [SerializeField] private bool isJournalOpen = false;
 
     private void Awake()
     {
@@ -101,6 +101,8 @@ public class JournalUI : MonoBehaviour
 
     private void Update()
     {
+        if (CinematicSequence.IsCinematicActive) return;
+
         // Right-click to toggle journal visibility
         if (useItem.triggered)
         {
@@ -195,6 +197,11 @@ public class JournalUI : MonoBehaviour
         }
     }
 
+    public void SetJournalState(bool state)
+    {
+        isJournalOpen = state;
+    }
+
     private void UpdateNextPrevPageImage(GameObject imageObject, string actionName)
     {
         if (KeyBindingManager.Instance == null || imageObject == null || inputActions == null) return;
@@ -247,6 +254,7 @@ public class JournalUI : MonoBehaviour
 
     private void ToggleJournal()
     {
+        if (CinematicSequence.IsCinematicActive) return;
         isJournalOpen = !isJournalOpen;
         journalUI.SetActive(isJournalOpen);
 

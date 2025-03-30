@@ -8,6 +8,7 @@ public class NPCDialogue : MonoBehaviour
 {
     [Header("Dialogue Settings")]
     [SerializeField] private DialogueTree npcDialogueTree; // NPC's dialogue tree reference
+    [SerializeField] private CompanionScript companionScript;
     [SerializeField] private string dialogueKey = "DialogueTriggered";
 
     [Header("Testing Purposes")]
@@ -290,6 +291,10 @@ public class NPCDialogue : MonoBehaviour
         if (npcDialogueTree != null)
         {
             DialogueManager.Instance.StartDialogue(npcDialogueTree);
+        }
+        if (companionScript != null)
+        {
+            companionScript.TeleportToPlayer();
         }
     }
 

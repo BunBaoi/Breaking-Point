@@ -7,6 +7,7 @@ public class Item : ScriptableObject
     public Sprite itemIcon;  // Icon to display in the inventory
     public ItemType itemType;  // Define the item type
     public string description;
+    public string[] playerInputs;
     public GameObject itemPrefab;
     public float weight; // Weight of the item in kilograms (kg)
     public HandType handType = HandType.SingleHand;

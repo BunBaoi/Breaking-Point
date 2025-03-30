@@ -10,6 +10,10 @@ public class ActivateCutScene : MonoBehaviour
     [SerializeField] private CinemachineVirtualCamera playerCamera;
     [SerializeField] private CinemachineVirtualCamera cutsceneCamera;
 
+    [Header("Bool Conditions")]
+    [SerializeField] private List<string> requiredBoolKeysTrue = new List<string>(); // List of bool keys that should be true
+    [SerializeField] private List<string> requiredBoolKeysFalse = new List<string>(); // List of bool keys that should be false
+
     // Store the original priority to restore it later
     private int originalPlayerPriority;
 
@@ -22,9 +26,35 @@ public class ActivateCutScene : MonoBehaviour
         cutsceneCamera.Priority = 0;
     }
 
+    private bool CanStartCutscene()
+    {
+        if (!DialogueManager.Instance.canStartDialogue)
+        {
+            return false;
+        }
+        // Check if all required bool conditions are met (true or false)
+        foreach (string boolKey in requiredBoolKeysTrue)
+        {
+            if (!BoolManager.Instance.GetBool(boolKey))
+            {
+                return false; // If any bool is false when it should be true, return false
+            }
+        }
+
+        foreach (string boolKey in requiredBoolKeysFalse)
+        {
+            if (BoolManager.Instance.GetBool(boolKey))
+            {
+                return false;
+            }
+        }
+
+        return true; // All conditions are met, return true
+    }
+
     private void OnTriggerEnter(Collider collision)
     {
-        if (collision.CompareTag("Player"))
+        if (collision.CompareTag("Player") && CanStartCutscene())
         {
             // Disable player camera by setting its priority to 0
             playerCamera.Priority = 0;
@@ -34,6 +64,8 @@ public class ActivateCutScene : MonoBehaviour
 
             // Play the cutscene
             playableDirector.Play();
+
+            DialogueManager.Instance.SetInventoryActive(false);
 
             // Subscribe to the stopped event
             playableDirector.stopped += OnCutsceneFinished;

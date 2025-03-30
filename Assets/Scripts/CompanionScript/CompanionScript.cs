@@ -22,14 +22,14 @@ public class CompanionScript : MonoBehaviour
     public AudioClip[] companionSounds;
 
     [Header("Keybindings")]
-    [Tooltip("Key to toggle talking state")]
+    /*[Tooltip("Key to toggle talking state")]
     public KeyCode talkKey = KeyCode.F;
     [Tooltip("Key to toggle visibility")]
     public KeyCode visibilityKey = KeyCode.H;
     [Tooltip("Key to teleport to player")]
     public KeyCode teleportKey = KeyCode.T;
     [Tooltip("Key to toggle following")]
-    public KeyCode followKey = KeyCode.S;
+    public KeyCode followKey = KeyCode.S;*/
 
     private Vector3 lastPosition;
     private Vector3 destination;
@@ -93,11 +93,11 @@ public class CompanionScript : MonoBehaviour
         }
 
         // Check for key inputs using the customizable keys
-        CheckKeyInputs();
+        // CheckKeyInputs();
     }
 
     // Handle custom key inputs
-    private void CheckKeyInputs()
+    /*private void CheckKeyInputs()
     {
         // Talk key
         if (Input.GetKeyDown(talkKey))
@@ -122,7 +122,7 @@ public class CompanionScript : MonoBehaviour
         {
             ToggleFollowing();
         }
-    }
+    }*/
 
     public void FollowPlayer()
     {

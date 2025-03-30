@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
 using System.Collections;
+using System.Linq;
 
 public class InventoryManager : MonoBehaviour
 {
@@ -36,6 +37,7 @@ public class InventoryManager : MonoBehaviour
 
     [Header("Keybinds")]
     [SerializeField] private InputActionAsset inputActions;  // Input Action Asset
+    [SerializeField] private TMP_Text equippedItemText;
     [SerializeField] private string scrollActionName = "Inventory Scroll";
     [SerializeField] private string dropActionName = "Drop";
     [SerializeField] private string slotActionsName = "Slot";
@@ -61,11 +63,38 @@ public class InventoryManager : MonoBehaviour
                 Debug.LogError("PlayerInputs asset not found in Resources/Keybinds folder!");
             }
         }
+
+        DisableScriptsOnInventoryItems();
+        CreateSlots(defaultSlotCount);
+
+        scrollAction = inputActions.FindAction(scrollActionName);
+        dropAction = inputActions.FindAction(dropActionName);
+
+        if (scrollAction != null)
+        {
+            scrollAction.Enable();
+        }
+
+        if (dropAction != null)
+        {
+            dropAction.Enable();
+        }
+
+        for (int i = 0; i < defaultSlotCount; i++)
+        {
+            string actionName = slotActionsName + (i + 1);
+            InputAction slotAction = inputActions.FindAction(actionName);
+            if (slotAction != null)
+            {
+                slotActions.Add(slotAction);
+                slotAction.Enable();
+            }
+        }
     }
 
     private void Start()
     {
-        DisableScriptsOnInventoryItems();
+        /*DisableScriptsOnInventoryItems();
         CreateSlots(defaultSlotCount);
 
         scrollAction = inputActions.FindAction(scrollActionName);
@@ -90,7 +119,7 @@ public class InventoryManager : MonoBehaviour
                 slotActions.Add(slotAction);
                 slotAction.Enable();
             }
-        }
+        }*/
     }
 
     private void Update()
@@ -126,40 +155,95 @@ public class InventoryManager : MonoBehaviour
             if (slotActions[i].triggered)
             {
                 SelectSlot(i);
+
+                UpdateSlotImageForAllSlots(i);
+
                 break; // Exit after triggering the first matching slot action
             }
         }
     }
 
-        // Selects the inventory slot by index
-        private void SelectSlot(int index)
+    private void UpdateSlotImageForAllSlots(int selectedSlotIndex)
+    {
+        // Loop through all the slots and update their images based on whether they are selected or not
+        for (int i = 0; i < slots.Count; i++)
         {
-            // Check if the index is within valid range
-            if (index >= 0 && index < slots.Count)
+            if (i == selectedSlotIndex)
             {
-                // Prevent switching if switching is disabled
-                if (isSwitchingDisabled)
-                {
-                    Debug.Log("Cannot switch items. The currently equipped item is too heavy!");
-                    return;
-                }
-
-                // Log the correct selected slot index
-                Debug.Log("Selecting Slot: " + index);
-
-                // Now actually set the selected slot index
-                selectedSlotIndex = index;
-
-                // Update the equipped item (optional, based on your implementation)
-                UpdateEquippedItem();
+                // Update the selected slot
+                slots[i].UpdateSlotImage(true);  // Set the selected slot image
+                slots[i].UpdateSelection(true);  // Mark it as selected
             }
             else
             {
-                Debug.LogWarning("Invalid slot index: " + index + ". Available slots: " + slots.Count);
+                // Update the non-selected slots
+                slots[i].UpdateSlotImage(false); // Set the default slot image
+                slots[i].UpdateSelection(false); // Deselect the slot
             }
         }
+    }
 
-        public void CreateSlots(int slotCount)
+    private void SelectSlot(int index)
+    {
+        if (index >= 0 && index < slots.Count)
+        {
+            if (isSwitchingDisabled)
+            {
+                Debug.Log("Cannot switch items. The currently equipped item is too heavy!");
+                return;
+            }
+
+            // Update the previous slot to show as unequipped and return to original scale
+            if (selectedSlotIndex >= 0 && selectedSlotIndex < slots.Count)
+            {
+                slots[selectedSlotIndex].UpdateSlotImage(false);
+                slots[selectedSlotIndex].UpdateSelection(false);
+
+                // Gradually reset the previous slot scale back to normal (1x)
+                RectTransform prevRect = slots[selectedSlotIndex].GetComponent<RectTransform>();
+                if (prevRect != null)
+                {
+                    StartCoroutine(ScaleSlotOverTime(prevRect, prevRect.localScale, Vector3.one, 0.3f)); // Smoothly scale back to normal size
+                }
+            }
+
+            selectedSlotIndex = index;
+
+            // Update the new selected slot to show as equipped
+            slots[selectedSlotIndex].UpdateSlotImage(true);
+            slots[selectedSlotIndex].UpdateSelection(true);
+
+            // Gradually scale up the selected slot by 1.5x
+            RectTransform selectedRect = slots[selectedSlotIndex].GetComponent<RectTransform>();
+            if (selectedRect != null)
+            {
+                StartCoroutine(ScaleSlotOverTime(selectedRect, selectedRect.localScale, new Vector3(1.5f, 1.5f, 1f), 0.3f)); // Smoothly scale up
+            }
+
+            UpdateEquippedItem();
+        }
+        else
+        {
+            Debug.LogWarning("Invalid slot index: " + index + ". Available slots: " + slots.Count);
+        }
+    }
+
+    // Coroutine to scale the slot over time
+    private IEnumerator ScaleSlotOverTime(RectTransform rectTransform, Vector3 fromScale, Vector3 toScale, float duration)
+    {
+        float elapsedTime = 0f;
+
+        while (elapsedTime < duration)
+        {
+            rectTransform.localScale = Vector3.Lerp(fromScale, toScale, elapsedTime / duration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        rectTransform.localScale = toScale; // Ensure the final scale is set
+    }
+
+    public void CreateSlots(int slotCount)
     {
         for (int i = 0; i < slotCount; i++)
         {
@@ -214,12 +298,30 @@ public class InventoryManager : MonoBehaviour
             Debug.Log($"Slot {selectedSlotIndex} is occupied. Finding next available slot.");
         }
 
+        // Gradually reset the previous slot scale back to normal (1x)
+        if (selectedSlotIndex >= 0 && selectedSlotIndex < slots.Count)
+        {
+            RectTransform prevRect = slots[selectedSlotIndex].GetComponent<RectTransform>();
+            if (prevRect != null)
+            {
+                StartCoroutine(ScaleSlotOverTime(prevRect, prevRect.localScale, Vector3.one, 0.3f)); // Smoothly scale back to normal size
+            }
+        }
+
         // Try to add the item to the currently selected slot first
         if (slots[selectedSlotIndex].GetItem() == null)
         {
             slots[selectedSlotIndex].AddItem(item);
             EquipItem(item);
             DisableItemPickup(item);
+
+            // Gradually scale up the selected slot by 1.5x
+            RectTransform selectedRect = slots[selectedSlotIndex].GetComponent<RectTransform>();
+            if (selectedRect != null)
+            {
+                StartCoroutine(ScaleSlotOverTime(selectedRect, selectedRect.localScale, new Vector3(1.5f, 1.5f, 1f), 0.3f)); // Smoothly scale up
+            }
+
             return true;
         }
 
@@ -230,12 +332,19 @@ public class InventoryManager : MonoBehaviour
             if (slots[slotIndex].GetItem() == null)
             {
                 slots[slotIndex].AddItem(item);
-                // Update selected slot index to the slot where the item was added
                 selectedSlotIndex = slotIndex;
 
                 // Equip the item if added to the selected slot
                 EquipItem(item);
                 DisableItemPickup(item);
+
+                // Gradually scale up the selected slot by 1.5x
+                RectTransform selectedRect = slots[selectedSlotIndex].GetComponent<RectTransform>();
+                if (selectedRect != null)
+                {
+                    StartCoroutine(ScaleSlotOverTime(selectedRect, selectedRect.localScale, new Vector3(1.5f, 1.5f, 1f), 0.3f)); // Smoothly scale up
+                }
+
                 return true;
             }
         }
@@ -457,15 +566,25 @@ public class InventoryManager : MonoBehaviour
 
     public Item GetEquippedItem()
     {
-        InventorySlot selectedSlot = slots[selectedSlotIndex];
-        // Ensure the index is within bounds
-        if (currentItem != null)
+        // Check if the selectedSlotIndex is within the valid range
+        if (selectedSlotIndex >= 0 && selectedSlotIndex < slots.Count)
         {
-            return selectedSlot.GetItem();  // Return the item in the selected slot
+            InventorySlot selectedSlot = slots[selectedSlotIndex];
+            if (selectedSlot != null && selectedSlot.GetItem() != null)
+            {
+                return selectedSlot.GetItem();
+            }
+            else
+            {
+                // Debug.LogWarning("No item equipped in the selected slot.");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Selected slot index is out of range.");
         }
 
-        Debug.LogWarning("Selected slot index is out of range.");
-        return null;  // Return null if the slot index is invalid
+        return null;
     }
 
     // Equips an item to the player's hand(s)
@@ -489,14 +608,72 @@ public class InventoryManager : MonoBehaviour
             // Check if the item is too heavy to switch
             if (item.weight > MaxSwitchableWeight)
             {
-                // Equip with weight-based switching restrictions
+                slots[selectedSlotIndex].UpdateSlotImage(true);
+                slots[selectedSlotIndex].UpdateSelection(true);
                 EquipItemWithWeightRestrictions(item);
             }
             else
             {
-                // Normal item equipping
+                slots[selectedSlotIndex].UpdateSlotImage(true);
+                slots[selectedSlotIndex].UpdateSelection(true);
                 EquipNormalItem(item);
             }
+
+            // Update UI text with rebound key names only if the item has playerInputs
+            if (item.playerInputs != null && item.playerInputs.Length > 0)
+            {
+                equippedItemText.text = "Item Keybind: " + GetReboundKeyNames(item);
+            }
+            else
+            {
+                equippedItemText.text = ""; // No input bindings, clear the text
+            }
+        }
+        else
+        {
+            equippedItemText.text = ""; // Clear text when no item is equipped
+        }
+    }
+
+    private string GetReboundKeyNames(Item item)
+    {
+        if (item.playerInputs == null || item.playerInputs.Length == 0) return "Unknown Input";
+
+        string[] keyNames = item.playerInputs
+            .Select(inputName =>
+            {
+                InputAction action = inputActions.FindAction(inputName);
+                if (action != null && action.controls.Count > 0)
+                {
+                // Determine the control scheme being used (Controller or Keyboard)
+                int bindingIndex = KeyBindingManager.Instance.IsUsingController() ? 1 : 0;
+
+                // Check if the binding exists for the selected control scheme
+                if (action.bindings.Count > bindingIndex)
+                    {
+                        InputBinding binding = action.bindings[bindingIndex];
+                        return KeyBindingManager.Instance.GetSanitisedKeyName(binding.effectivePath); // Get rebounded key name
+                }
+                }
+                return inputName; // Default to action name if no binding exists
+        })
+            .ToArray();
+
+        // Handle the formatting for 2 or more actions
+        if (keyNames.Length == 1)
+        {
+            return keyNames[0]; // Single action name
+        }
+        else if (keyNames.Length == 2)
+        {
+            return keyNames[0] + " & " + keyNames[1]; // Two actions with "&" in the middle
+        }
+        else
+        {
+            // More than two actions, put "&" before the last action
+            string lastAction = keyNames[keyNames.Length - 1];
+            string actionsExceptLast = string.Join(", ", keyNames.Take(keyNames.Length - 1));
+            return actionsExceptLast + " & " + lastAction;
         }
     }
 

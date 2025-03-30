@@ -198,12 +198,97 @@ public class OxygenRechargeStation : MonoBehaviour
     {
         if (other.CompareTag("Player") && IsHoldingRequiredItem())
         {
-            UpdateSprite(iconObject.gameObject, interactActionName);
             playerStats = other.GetComponent<PlayerStats>();
+            player = other.transform;
             isPlayerInTrigger = true;
             Debug.Log("player entered oxygen refill trigger");
+            if (interactTextInstance != null)
+            {
+                UpdateSprite(iconObject.gameObject, interactActionName);
+            }
         }
-        if (interactTextInstance != null && !IsHoldingRequiredItem())
+        if (interactTextPrefab != null && interactTextInstance == null)
+        {
+            interactTextInstance = Instantiate(interactTextPrefab);
+            interactTextInstance.transform.SetParent(transform, false);
+            interactTextInstance.transform.localPosition = new Vector3(0, 0.5f, 0);
+
+            // Declare the interactText variable
+            string interactText = "to Refill"; // Default text
+
+            // Get the keybinding data for "Interact"
+            KeyBinding keyBinding = KeyBindingManager.Instance.GetKeybinding(interactActionName);
+
+            // Update text dynamically to match the correct keybinding based on input device
+            TextMeshPro textMesh = interactTextInstance.GetComponent<TextMeshPro>();
+            if (textMesh != null)
+            {
+                textMesh.text = "to Refill";
+
+                // Now check if we have a keybinding sprite
+                if (keyBinding != null)
+                {
+                    Sprite icon = KeyBindingManager.Instance.IsUsingController() ? keyBinding.controllerSprite : keyBinding.keySprite;
+
+                    // If the sprite exists, display it next to the text
+                    if (icon != null)
+                    {
+                        // Create a object for the sprite and set it next to the text
+                        iconObject = new GameObject("KeybindIcon");
+                        iconObject.transform.SetParent(interactTextInstance.transform); // Make it a child of the text
+
+                        // Position sprite to left of text
+                        // Increase the horizontal space by adjusting the x-position further
+                        float horizontalOffset = -textMesh.preferredWidth / 2 - 0.5f; // Increased offset to add more space
+                        iconObject.transform.localPosition = new Vector3(horizontalOffset, 0.7f, 0);
+
+                        // Add a SpriteRenderer to display the icon
+                        SpriteRenderer spriteRenderer = iconObject.AddComponent<SpriteRenderer>();
+                        spriteRenderer.sprite = icon;
+                        spriteRenderer.sortingOrder = 1; // Ensure the sprite is above the text
+
+                        spriteRenderer.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+
+                        UpdateSprite(iconObject.gameObject, interactActionName);
+                    }
+                    else
+                    {
+                        // Get the first binding for keyboard and second for controller directly from the InputActionAsset
+                        string keyText = "";
+
+                        // Get the "Interact" action
+                        var interactAction = inputActions.FindAction(interactActionName);
+
+                        if (interactAction != null)
+                        {
+                            // If using a controller, get the second binding (controller binding)
+                            if (KeyBindingManager.Instance.IsUsingController())
+                            {
+                                keyText = interactAction.bindings[1].ToDisplayString();  // Second binding (controller)
+                            }
+                            else
+                            {
+                                keyText = interactAction.bindings[0].ToDisplayString();  // First binding (keyboard)
+                            }
+
+                            // Remove the word "Press" from the keyText if it exists
+                            keyText = keyText.Replace("Press ", "").Trim(); // Removes "Press" and any extra spaces
+
+                            // Set the fallback text to show the keybinding for "Interact"
+                            interactText = $"[{keyText}] to Refill";
+                        }
+                        else
+                        {
+                            Debug.LogError("Interact action not found in InputActionAsset");
+                        }
+                    }
+
+                    // Set the updated text (with sprite or keybinding fallback)
+                    textMesh.text = interactText;
+                }
+            }
+        }
+if (interactTextInstance != null && !IsHoldingRequiredItem())
         {
             Destroy(interactTextInstance);
             interactTextInstance = null;

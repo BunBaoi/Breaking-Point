@@ -19,17 +19,25 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private bool HasOxygenTank => inventoryManager.HasItem(oxygenTankItem); // Checks inventory
 
     [Header("Energy Stats")]
+    [SerializeField] private float previousEnergy;
     [SerializeField] private float Energy = 100f;  // Current Energy
     [SerializeField] private float EnergyDrainRate = 5f;  // Energy drain per second in an EnergyDrain zone
     [SerializeField] private float SprintEnergyDrainRate = 10f; // Energy drain when sprinting
     [SerializeField] private bool isInEnergyDrainZone = false;
+    [SerializeField] private bool energyChanged = false;
 
     [Header("UI Elements")]
     [SerializeField] private CanvasGroup canvasGroup;
+    [SerializeField] private CanvasGroup oxygenUIParent;
+    [SerializeField] private CanvasGroup energyUIParent;
+    [SerializeField] private CanvasGroup connectorImage;
     [SerializeField] private float fadeDuration = 1f;
     [SerializeField] private Image oxygenRadialFill;  // Reference to the Oxygen radial fill image
     [SerializeField] private Image energyRadialFill;  // Reference to the Energy radial fill image
     [SerializeField] private TMP_Text oxygenText;
+    private Coroutine oxygenFadeCoroutine;
+    private Coroutine energyFadeCoroutine;
+    private Coroutine connectorFadeCoroutine;
 
     [Header("Player Status")]
     public bool IsAlive = true;
@@ -51,6 +59,8 @@ public class PlayerStats : MonoBehaviour
 
     void Start()
     {
+        previousEnergy = Energy;
+
         controller = GetComponent<CharacterController>();
         playerMovement = GetComponent<PlayerMovement>();
         inventoryManager = FindObjectOfType<InventoryManager>();
@@ -62,11 +72,23 @@ public class PlayerStats : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Energy != previousEnergy)
+        {
+            energyChanged = true;
+        }
+        else
+        {
+            energyChanged = false;
+        }
+
+        previousEnergy = Energy;
+
         // DeadZone();
         PlayerAlive();
         HandleEnergyDrain();
         HandleOxygenDrain();
         UpdateUIElements();
+        HandleUITransitions();
     }
 
     // Fade in the canvas
@@ -79,6 +101,82 @@ public class PlayerStats : MonoBehaviour
     public void FadeOut()
     {
         StartCoroutine(FadeCanvas(1f, 0f));
+    }
+
+    public bool OxygenTankEquipped()
+    {
+        Item equippedItem = inventoryManager.GetEquippedItem();
+        if (equippedItem != null && equippedItem == oxygenTankItem)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    private void HandleUITransitions()
+    {
+        // Handle Oxygen UI Fade
+        if (OxygenTankEquipped())
+        {
+            StartFadeUI(oxygenUIParent, true, 0.5f, ref oxygenFadeCoroutine);
+        }
+        else
+        {
+            StartFadeUI(oxygenUIParent, false, 0.5f, ref oxygenFadeCoroutine);
+        }
+
+        // Handle Energy UI Fade
+        if (energyChanged)  // If the energy is draining
+        {
+            StartFadeUI(energyUIParent, true, 0.5f, ref energyFadeCoroutine);
+        }
+        else
+        {
+            StartFadeUI(energyUIParent, false, 0.5f, ref energyFadeCoroutine);
+        }
+
+        // Handle Connector Image Fade (only if both Oxygen and Energy UI are visible)
+        if (oxygenUIParent.alpha > 0 && energyUIParent.alpha > 0)
+        {
+            StartFadeUI(connectorImage, true, 0.5f, ref connectorFadeCoroutine);
+        }
+        else
+        {
+            StartFadeUI(connectorImage, false, 0.5f, ref connectorFadeCoroutine);
+        }
+    }
+
+    private void StartFadeUI(CanvasGroup parent, bool fadeIn, float duration, ref Coroutine coroutineReference)
+    {
+        // If a fade is already running for this UI element, don't start another coroutine
+        if (coroutineReference != null) return;
+
+        // Start the fade coroutine if one is not already running
+        coroutineReference = StartCoroutine(FadeUI(parent, fadeIn, duration));
+    }
+
+    private IEnumerator FadeUI(CanvasGroup parent, bool fadeIn, float duration)
+    {
+        float targetAlpha = fadeIn ? 1f : 0f;
+        float elapsedTime = 0f;
+
+        // Fade the parent
+        while (elapsedTime < duration)
+        {
+            parent.alpha = Mathf.Lerp(parent.alpha, targetAlpha, elapsedTime / duration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        parent.alpha = targetAlpha;
+
+        // After the coroutine finishes, set the coroutine reference to null
+    if (parent == oxygenUIParent)
+        oxygenFadeCoroutine = null;
+    if (parent == energyUIParent)
+        energyFadeCoroutine = null;
+    if (parent == connectorImage)
+        connectorFadeCoroutine = null;
     }
 
     private IEnumerator FadeCanvas(float fromAlpha, float toAlpha)
@@ -120,8 +218,6 @@ public class PlayerStats : MonoBehaviour
 
     void HandleOxygenDrain()
     {
-        if (stateOfPlayer == PlayerStatus.DeadZone)
-        {
             if (isInOxygenDrainZone)
             {
                 // If no oxygen tank is present, do not allow oxygen to drain
@@ -162,7 +258,6 @@ public class PlayerStats : MonoBehaviour
                     Oxygen = Mathf.Min(Oxygen, 100f);
                 }
             }
-        }
         else
         {
             RefillingOxygenFromTank();
@@ -192,6 +287,7 @@ public class PlayerStats : MonoBehaviour
 
     public void ReplenishEnergy(float amount)
     {
+        energyChanged = true;
         // Set Energy to the specified value (make sure it doesn't exceed the maximum value of 100)
         Energy = Mathf.Clamp(amount, 0f, 100f);
         Debug.Log("Energy replenished to: " + Energy);
@@ -401,6 +497,32 @@ public class PlayerStats : MonoBehaviour
             Debug.Log("Player Movement Unlocked");
         }
 
+    }
+
+    // Public method to drain energy (can be called from other scripts)
+    public void DrainEnergy(float amount)
+    {
+        energyChanged = true;
+        Energy -= amount;
+        Energy = Mathf.Max(Energy, 0); // Prevent Energy from going below 0
+
+        if (Energy == 0)
+        {
+            Debug.Log("Player has no energy left");
+            // Handle zero energy state
+        }
+    }
+
+    // Public method to get energy percentage (0-100)
+    public float GetEnergyPercentage()
+    {
+        return Energy;
+    }
+
+    // Method to check if player has enough energy
+    public bool HasEnoughEnergy(float threshold)
+    {
+        return Energy >= threshold;
     }
 
 }

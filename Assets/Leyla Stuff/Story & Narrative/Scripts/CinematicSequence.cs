@@ -48,6 +48,7 @@ public class CinematicSequence : MonoBehaviour
 
     public event System.Action OnCinematicFinished;
     public event System.Action OnCinematicStarted;
+    public static bool IsCinematicActive { get; private set; } = false;
 
     public void StartCinematic()
     {
@@ -94,6 +95,7 @@ public class CinematicSequence : MonoBehaviour
                 }
             }
             // DisableAllCameras();
+            IsCinematicActive = true;
             StartCoroutine(PlayCinematic());
             // Instantiate the cinematic camera
             instantiatedCamera = Instantiate(cinematicCameraPrefab);
@@ -195,9 +197,8 @@ public class CinematicSequence : MonoBehaviour
                 Debug.LogWarning($"Random text for dialogue index {i} is null.");
             }
 
-            // Check if there is an FMOD event assigned before playing it
             FMOD.Studio.EventInstance audioEventInstance;
-            if (!string.IsNullOrEmpty(dialogueAudio.fmodAudioEvent.Path))
+            if (!dialogueAudio.fmodAudioEvent.IsNull)
             {
                 audioEventInstance = RuntimeManager.CreateInstance(dialogueAudio.fmodAudioEvent);
                 audioEventInstance.start();
@@ -541,7 +542,12 @@ public class CinematicSequence : MonoBehaviour
         {
             cameraController.SetLookState(true);
         }
+        if (dayNightCycle != null)
+        {
+            dayNightCycle.StartTime();
+        }
 
+        IsCinematicActive = false;
         OnCinematicFinished?.Invoke();
     }
 }
