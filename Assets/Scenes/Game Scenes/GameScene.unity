@@ -1555,7 +1555,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1130649171433050995, guid: fe3c1bf577aee423a8108a7bab2ba75d, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4272749764977733547, guid: fe3c1bf577aee423a8108a7bab2ba75d, type: 3}
       propertyPath: m_Pivot.x
@@ -2823,6 +2823,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   key: 112
   boolName: BaseCampTrainingCompleted
+  tipManager: {fileID: 0}
+  tipNumber: 0
 --- !u!4 &737598464
 Transform:
   m_ObjectHideFlags: 0
@@ -3721,25 +3723,37 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 2206885108856580092, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
+      propertyPath: field of view
+      value: 60.000004
+      objectReference: {fileID: 0}
     - target: {fileID: 4116197491859869406, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.0000013262033
+      value: 2.7736359
       objectReference: {fileID: 0}
     - target: {fileID: 4116197491859869406, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.6915503
+      value: 9.30001
       objectReference: {fileID: 0}
     - target: {fileID: 4116197491859869406, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.28769323
+      value: 66.701546
       objectReference: {fileID: 0}
     - target: {fileID: 4116197491859869406, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: -0.8169997
+      objectReference: {fileID: 0}
+    - target: {fileID: 4116197491859869406, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.18112466
       objectReference: {fileID: 0}
     - target: {fileID: 4116197491859869406, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: 0.53447676
+      objectReference: {fileID: 0}
+    - target: {fileID: 4116197491859869406, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.11849035
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -8540,6 +8554,69 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 22.638962, y: 5, z: 13.916084}
   m_Center: {x: 1.3194809, y: 0, z: 1.9580421}
+--- !u!1 &1862274660
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1862274662}
+  - component: {fileID: 1862274663}
+  m_Layer: 0
+  m_Name: SnowManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1862274662
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1862274660}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1862274663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1862274660}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5868ede5faa755a4bb057153d9bea823, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 1183533464}
+  snowParticlePrefab: {fileID: 4615988384918216616, guid: a92ed6761637e1248a6847dffecc57f9, type: 3}
+  gridSize: 20
+  activationDistance: 40
+  deactivationDistance: 25
+  heightAbovePlayer: 15
+  maxSnowHeight: 5000
+  minSnowHeight: -100
+  terrainLayer:
+    serializedVersion: 2
+    m_Bits: 131072
+  raycastDistance: 100
+  initialPoolSize: 30
+  maxPoolSize: 60
+  prewarmTime: 5
+  predictionMultiplier: 1.5
+  playerVelocityInfluence: 20
+  fadeInTime: 0.2
+  fadeOutTime: 0.5
 --- !u!1 &1870455184
 GameObject:
   m_ObjectHideFlags: 0
@@ -10029,6 +10106,7 @@ SceneRoots:
   - {fileID: 883206367}
   - {fileID: 2540187467636894881}
   - {fileID: 1098997992}
+  - {fileID: 1862274662}
   - {fileID: 751153423}
   - {fileID: 2016740074}
   - {fileID: 396994942}
