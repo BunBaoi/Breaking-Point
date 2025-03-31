@@ -832,6 +832,7 @@ public class DialogueManager : MonoBehaviour
 
         // Audio variables
         DialogueAudio audioSettings = node.dialogueAudio;
+        int validCharCount = 0;
 
         // Start the FMOD audio immediately
         if (audioSettings != null && node.useDialogueAudio)
@@ -853,43 +854,48 @@ public class DialogueManager : MonoBehaviour
         {
             dialogueTextUI.text = $"<color={npcNameColorHex}>{node.npcName}:</color> {node.dialogueText.Substring(0, i + 1)}";
 
-            // Play audio based on frequency
-            if (audioSettings != null && i % audioSettings.frequency == 0 && node.useDialogueAudio)
+            char currentChar = node.dialogueText[i];
+
+            // Check if the character is a letter (ignoring spaces and punctuation)
+            if (char.IsLetter(currentChar))
             {
-                // Stop previous sound if any
-                if (currentSound.isValid())
+                validCharCount++;
+
+                // Play audio based on the frequency of valid letters only
+                if (audioSettings != null && validCharCount % audioSettings.frequency == 0 && node.useDialogueAudio)
                 {
-                    currentSound.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
-                    currentSound.release();
+                    // Stop previous sound if any
+                    if (currentSound.isValid())
+                    {
+                        currentSound.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+                        currentSound.release();
+                    }
+
+                    int charHash = currentChar.GetHashCode();
+                    int soundIndex = Mathf.Abs(charHash) % audioSettings.fmodSoundEvents.Length;
+                    EventReference soundEventReference = audioSettings.fmodSoundEvents[soundIndex];
+
+                    // Create a new FMOD EventInstance using EventReference
+                    currentSound = FMODUnity.RuntimeManager.CreateInstance(soundEventReference);
+
+                    // Determine consistent pitch based on character hash
+                    float pitch = Mathf.Lerp(audioSettings.minPitch, audioSettings.maxPitch, Mathf.Abs(charHash % 100) / 100f);
+
+                    // Set the pitch and start the sound
+                    currentSound.setPitch(pitch);
+                    currentSound.start();
                 }
-
-                // Get the character to hash for new sound
-                char currentChar = node.dialogueText[i];
-                int charHash = currentChar.GetHashCode();
-
-                int soundIndex = Mathf.Abs(charHash) % audioSettings.fmodSoundEvents.Length;
-                EventReference soundEventReference = audioSettings.fmodSoundEvents[soundIndex];
-
-                // Create a new FMOD EventInstance using EventReference
-                currentSound = FMODUnity.RuntimeManager.CreateInstance(soundEventReference);
-
-                // Determine consistent pitch based on character hash
-                float pitch = Mathf.Lerp(audioSettings.minPitch, audioSettings.maxPitch, Mathf.Abs(charHash % 100) / 100f);
-
-                // Set the pitch and start the sound
-                currentSound.setPitch(pitch);
-                currentSound.start();
             }
 
             yield return new WaitForSeconds(scrollSpeed);
         }
 
         // Stop any remaining audio after text scrolling
-        if (currentSound.isValid())
+        /*if (currentSound.isValid())
         {
             currentSound.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
             currentSound.release();
-        }
+        }*/
 
         // Display the full formatted text
         dialogueTextUI.text = fullTextWithRichText;
@@ -899,6 +905,7 @@ public class DialogueManager : MonoBehaviour
 
         ShowOptions(node);
     }
+
 
     private IEnumerator FadeInAndOutIndicator()
     {
