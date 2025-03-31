@@ -6,7 +6,7 @@
 [LOG] OutputCoreAudio::init                    : Maximum hardware read size: 512 samples, Software buffer size: 512 samples, Number of software buffers: 4.
 [LOG] Thread::initThread                       : Init FMOD stream thread. Affinity: 0x4000000000000003, Priority: 0xFFFF7FFB, Stack Size: 98304, Semaphore: No, Sleep Time: 10, Looping: Yes.
 [LOG] Thread::initThread                       : Init FMOD mixer thread. Affinity: 0x4000000000000001, Priority: 0xFFFF7FFA, Stack Size: 81920, Semaphore: Yes, Sleep Time: 0, Looping: Yes.
-[LOG] AsyncManager::init                       : manager 0x125721208 isAsync 0 updatePeriod 0.02
+[LOG] AsyncManager::init                       : manager 0x3c8d72208 isAsync 0 updatePeriod 0.02
 [LOG] AsyncManager::init                       : done
 [LOG] PlaybackSystem::init                     : 
 [LOG] Thread::initThread                       : Init FMOD Studio sample load thread. Affinity: 0x4000000000000003, Priority: 0xFFFF7FFD, Stack Size: 98304, Semaphore: No, Sleep Time: 1, Looping: No.
@@ -16,6 +16,37 @@
 [LOG] Manager::readBank                        : fileversion = 142, compatVersion = 140 (oldest = 44, newest = 142)
 [LOG] Manager::readBank                        : fileversion = 142, compatVersion = 140 (oldest = 44, newest = 142)
 [LOG] Manager::readBank                        : fileversion = 142, compatVersion = 140 (oldest = 44, newest = 142)
-[LOG] Manager::readBank                        : fileversion = 142, compatVersion = 140 (oldest = 44, newest = 142)
 [LOG] PlaybackSystem::acquireMasterBus         : Setting master channel group format to 6
-[ERR] assert                                   : assertion: 'gSystemInitCount == 0' failed
+[LOG] SoundI::release                          :  (0x3d6d1b958)
+[LOG] SoundI::release                          :     LowPitch-09 (0x3e7e33c48)
+[LOG] SoundI::release                          :  (0x3ec381ba8)
+[LOG] SoundI::release                          :     LowPitch-03 (0x3ec313f18)
+[LOG] SoundI::release                          :  (0x3e7e08a18)
+[LOG] SoundI::release                          :     LowPitch-18 (0x3e7e38498)
+[LOG] SoundI::release                          :  (0x3623c8bc8)
+[LOG] SoundI::release                          :     LowPitch-25 (0x4012363f8)
+[LOG] SoundI::release                          :  (0x3d6d30f98)
+[LOG] SoundI::release                          :     LowPitch-14 (0x3e7e33918)
+[LOG] SoundI::release                          :  (0x3ebd75f58)
+[LOG] SoundI::release                          :     LowPitch-26 (0x3ebd72208)
+[LOG] SoundI::release                          :  (0x3a880e5a8)
+[LOG] SoundI::release                          :     LowPitch-17 (0x3a7d5d258)
+[LOG] SoundI::release                          :  (0x3cac86158)
+[LOG] SoundI::release                          :     LowPitch-07 (0x3cac25858)
+[LOG] Thread::callback                         : FMOD Studio update thread finished.
+[LOG] Thread::callback                         : FMOD Studio bank load thread finished.
+[LOG] Profile::disconnectAll                   : Profiler disconnecting all clients
+[LOG] Thread::callback                         : FMOD Studio sample load thread finished.
+[LOG] LiveUpdate::release                      : 
+[LOG] LiveUpdate::reset                        : Reset connection (reason Disconnected)
+[LOG] Thread::callback                         : FMOD stream thread finished.
+[LOG] Thread::callback                         : FMOD mixer thread finished.
+[LOG] Profile::disconnectAll                   : Profiler disconnecting all clients
+[LOG] SystemI::close                           : Closed.
+[LOG] Thread::callback                         : FMOD Studio bank load thread finished.
+[LOG] Thread::callback                         : FMOD Studio sample load thread finished.
+[LOG] LiveUpdate::release                      : 
+[LOG] LiveUpdate::reset                        : Reset connection (reason Disconnected)
+[LOG] Thread::callback                         : FMOD stream thread finished.
+[LOG] Thread::callback                         : FMOD mixer thread finished.
+[LOG] SystemI::close                           : Closed.

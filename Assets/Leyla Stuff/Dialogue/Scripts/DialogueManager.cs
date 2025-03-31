@@ -44,22 +44,6 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private string selectOptionName = "Select Option";
     [SerializeField] private string scrollName = "Interaction Scroll";
 
-    // OLD KEYBINDS
-    /* [SerializeField] private string scrollUpName = "Scroll Up";
-    // [SerializeField] private string scrollDownName = "Scroll Down";*/
-    /* public KeyCode advanceKey = KeyCode.Mouse0;
-    [SerializeField] private KeyCode selectOptionKey = KeyCode.F;*/
-
-    private InputAction advanceDialogue;
-    private InputAction selectOption;
-    private InputAction scroll;
-
-    private int selectedOptionIndex = 0;
-    [SerializeField] private GameObject scrollIndicatorPrefab;
-    [SerializeField] private GameObject selectOptionIndicatorPrefab;
-    private GameObject instantiatedScrollIndicator;
-    private GameObject instantiatedSelectOptionIndicator;
-
     [Header("Testing Purposes")]
     [SerializeField] private bool isTextScrolling = false;
     [SerializeField] private bool isFullTextShown = false;
@@ -71,22 +55,6 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private Canvas inventoryCanvas;
     [SerializeField] private GameObject[] playerHands;
 
-    private Coroutine currentLookAtNpcCoroutine;
-    private Coroutine scrollingCoroutine;
-    private Coroutine indicatorCoroutine;
-
-    private List<GameObject> instantiatedButtons = new List<GameObject>();
-
-    private FMOD.Studio.EventInstance currentDialogueEvent;
-
-    private DialogueTree originalDialogueTree;
-    private int originalIndex;
-    private bool returningToOriginal = false;
-    private DialogueTree currentDialogueTree;
-    private int currentIndex = 0;
-
-    private PlayerMovement playerMovement;
-
     [Header("Automatic Dialogue")]
     public bool isAutomaticDialogueActive = false;
     public bool IsAutomaticDialogueActive => isAutomaticDialogueActive;
@@ -96,11 +64,44 @@ public class DialogueManager : MonoBehaviour
     private float cooldownTimer = 0f;  // Timer to track the cooldown
     public bool canStartDialogue = true;  // Flag to check if dialogue can start
 
+    private InputAction advanceDialogue;
+    private InputAction selectOption;
+    private InputAction scroll;
+
+    private int selectedOptionIndex = 0;
+    [SerializeField] private GameObject scrollIndicatorPrefab;
+    [SerializeField] private GameObject selectOptionIndicatorPrefab;
+    private GameObject instantiatedScrollIndicator;
+    private GameObject instantiatedSelectOptionIndicator;
+
+    private Coroutine currentLookAtNpcCoroutine;
+    private Coroutine scrollingCoroutine;
+    private Coroutine indicatorCoroutine;
+
+    private List<GameObject> instantiatedButtons = new List<GameObject>();
+
+    private FMOD.Studio.EventInstance currentDialogueEvent;
+    private FMOD.Studio.EventInstance currentSound = default;
+
+    private DialogueTree originalDialogueTree;
+    private int originalIndex;
+    private bool returningToOriginal = false;
+    private DialogueTree currentDialogueTree;
+    private int currentIndex = 0;
+
+    private PlayerMovement playerMovement;
+
     // access the status variables
     public bool IsTextScrolling() => isTextScrolling;
     public bool IsFullTextShown() => isFullTextShown;
     public bool OptionsAreVisible() => optionsAreVisible;
     public bool IsDialogueActive() => isDialogueActive;
+
+    // OLD KEYBINDS
+    /* [SerializeField] private string scrollUpName = "Scroll Up";
+    // [SerializeField] private string scrollDownName = "Scroll Down";*/
+    /* public KeyCode advanceKey = KeyCode.Mouse0;
+    [SerializeField] private KeyCode selectOptionKey = KeyCode.F;*/
 
     private void Awake()
     {
@@ -111,7 +112,7 @@ public class DialogueManager : MonoBehaviour
 
         if (advanceDialogue != null)
         {
-            advanceDialogue.Enable(); // Enable the action
+            advanceDialogue.Enable();
         }
         else
         {
@@ -119,7 +120,7 @@ public class DialogueManager : MonoBehaviour
         }
         if (selectOption != null)
         {
-            selectOption.Enable(); // Enable the action
+            selectOption.Enable();
         }
         else
         {
@@ -127,7 +128,7 @@ public class DialogueManager : MonoBehaviour
         }
         if (scroll != null)
         {
-            scroll.Enable(); // Enable the action
+            scroll.Enable();
         }
         else
         {
@@ -191,17 +192,17 @@ public class DialogueManager : MonoBehaviour
         // Activate or deactivate the InventoryManager script itself
         if (inventoryManager != null)
         {
-            inventoryManager.enabled = isActive;  // Enable/disable the script based on isActive
+            inventoryManager.enabled = isActive;
         }
 
         // Also manage the other objects
         if (inventoryCanvas != null)
-            inventoryCanvas.gameObject.SetActive(isActive);   // Set to true or false based on isActive
+            inventoryCanvas.gameObject.SetActive(isActive); 
 
         foreach (var hand in playerHands)
         {
             if (hand != null)
-                hand.SetActive(isActive);  // Set to true or false based on isActive
+                hand.SetActive(isActive);
         }
     }
 
@@ -254,6 +255,13 @@ public class DialogueManager : MonoBehaviour
                     dialogueTextUI.text = $"<color={npcNameColorHex}>{currentDialogueTree.dialogueNodes[currentIndex - 1].npcName}:</color> <color={dialogueTextColorHex}>{currentDialogueTree.dialogueNodes[currentIndex - 1].dialogueText}</color>";
                     isTextScrolling = false;
                     isFullTextShown = true;
+
+                    if (currentSound.isValid())
+                    {
+                        currentSound.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+                        currentSound.release();
+                    }
+
                     ShowOptions(currentDialogueTree.dialogueNodes[currentIndex - 1]);
                 }
                 else if (isFullTextShown)
@@ -277,7 +285,7 @@ public class DialogueManager : MonoBehaviour
         InputAction action = inputActions.FindAction(actionName);
         if (action == null) return;
 
-        // Get the first binding (keyboard) or second binding 
+        // Get the first binding (keyboard) or second binding (controller)
         int bindingIndex = KeyBindingManager.Instance.IsUsingController() ? 1 : 0;
         if (action.bindings.Count <= bindingIndex) return;
 
@@ -291,24 +299,21 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
-        // Get the keybinding from KeyBindingManager
         KeyBinding keyBinding = KeyBindingManager.Instance.GetKeybinding(actionName);
         if (keyBinding == null) return;
 
-        // Set the sprite for the indicator
         Image indicatorImage = indicatorObject.GetComponent<Image>();
         if (indicatorImage == null) return;
 
         indicatorImage.sprite = KeyBindingManager.Instance.IsUsingController() ? keyBinding.controllerSprite : keyBinding.keySprite;
 
-        // Set up the Animator
         Animator animator = indicatorObject.GetComponent<Animator>();
         if (animator == null)
         {
             animator = indicatorObject.AddComponent<Animator>();
         }
 
-        animator.enabled = true; // Ensure animator is enabled
+        animator.enabled = true;
 
         // Load the correct animator based on the key/button
         string folderPath = KeyBindingManager.Instance.IsUsingController() ? "UI/Controller/" : "UI/Keyboard/";
@@ -352,7 +357,7 @@ public class DialogueManager : MonoBehaviour
 
         if (Mathf.Abs(scrollValue) > 0.1f) // Deadzone threshold
         {
-            if (scrollValue > 0) // Scroll Up
+            if (scrollValue > 0)
             {
                 if (selectedOptionIndex > 0)
                 {
@@ -361,7 +366,7 @@ public class DialogueManager : MonoBehaviour
                     UpdateHighlightedOption();
                 }
             }
-            else if (scrollValue < 0) // Scroll Down
+            else if (scrollValue < 0)
             {
                 if (selectedOptionIndex < instantiatedButtons.Count - 1)
                 {
@@ -459,10 +464,8 @@ public class DialogueManager : MonoBehaviour
             buttonRectTransform.localPosition.z
         );
 
-        // Instantiate the indicator prefab
         instantiatedSelectOptionIndicator = Instantiate(selectOptionIndicatorPrefab, indicatorPosition, Quaternion.identity);
 
-        // Set its parent
         instantiatedSelectOptionIndicator.transform.SetParent(optionIndicatorParent, true);
 
         // Set the correct sprite based on input device
@@ -471,14 +474,14 @@ public class DialogueManager : MonoBehaviour
 
     private void UpdateSelectOptionIndicatorPosition()
     {
-        // Check if the selectedOptionIndex is within the valid range
+        // Is it within valid range?
         if (selectedOptionIndex < 0 || selectedOptionIndex >= instantiatedButtons.Count)
         {
             // Debug.LogError($"Selected option index {selectedOptionIndex} is out of range. Valid range is 0 to {instantiatedButtons.Count - 1}.");
-            return; // Exit the method if the index is invalid
+            return;
         }
 
-        // Get the position of the currently highlighted button
+        // Get the position
         RectTransform buttonRectTransform = instantiatedButtons[selectedOptionIndex].GetComponent<RectTransform>();
 
         // Calculate the new position
@@ -523,7 +526,6 @@ public class DialogueManager : MonoBehaviour
             return; // Prevent dialogue from advancing while the settings menu is open
         }
 
-        // Disable the InventoryManager when dialogue starts
         if (inventoryManager != null)
         {
             inventoryManager.enabled = false;
@@ -532,19 +534,17 @@ public class DialogueManager : MonoBehaviour
 
         if (playerHands != null)
         {
-            // Disable all GameObjects in the playerHands array
             foreach (GameObject hand in playerHands)
             {
                 hand.SetActive(false);
             }
         }
-        // Find the Player object by tag
+
         GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
         if (playerObject != null)
         {
             playerMovement = playerObject.GetComponent<PlayerMovement>();
 
-            // Disable player movement when dialogue starts
             if (playerMovement != null)
             {
                 Debug.Log("Disabling movement");
@@ -626,7 +626,6 @@ public class DialogueManager : MonoBehaviour
             {
                 playerMovement.SetMovementState(true);
             }
-            // Enable the InventoryManager when dialogue ends
             if (inventoryManager != null)
             {
                 inventoryManager.enabled = true;
@@ -634,7 +633,6 @@ public class DialogueManager : MonoBehaviour
             }
             if (playerHands != null)
             {
-                // Enable all game objects in the playerHands array
                 foreach (GameObject hand in playerHands)
                 {
                     hand.SetActive(true);
@@ -646,7 +644,7 @@ public class DialogueManager : MonoBehaviour
     private void StartCooldown()
     {
         cooldownTimer = cooldownTime;
-        canStartDialogue = false;  // Disable starting new dialogue
+        canStartDialogue = false;
     }
 
     private void DisplayDialogue(DialogueNode node)
@@ -677,17 +675,27 @@ public class DialogueManager : MonoBehaviour
             npcNameUI.text = node.npcName;
         }*/
 
+        // Stop fmod event and if useDialogueAudio is false for the current node, play the fmodSoundEvent variable instead
         if (currentDialogueEvent.isValid())
         {
             currentDialogueEvent.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
             currentDialogueEvent.release();
         }
 
-        if (!node.fmodAudioEvent.IsNull)
+        if (!node.useDialogueAudio)
+        {
+            if (!node.fmodSoundEvent.IsNull)
+            {
+                currentDialogueEvent = FMODUnity.RuntimeManager.CreateInstance(node.fmodSoundEvent);
+                currentDialogueEvent.start();
+            }
+        }
+
+        /*if (!node.fmodAudioEvent.IsNull)
         {
             currentDialogueEvent = RuntimeManager.CreateInstance(node.fmodAudioEvent);
             currentDialogueEvent.start();
-        }
+        }*/
 
         // Trigger the camera look at the NPC if npcTag is provided
         TriggerCameraLookAtNpc(node);
@@ -733,7 +741,6 @@ public class DialogueManager : MonoBehaviour
                 // If closest NPC found, start the look at NPC process
                 if (closestNpc != null)
                 {
-                    // Stop the previous coroutine if it's running
                     if (currentLookAtNpcCoroutine != null)
                     {
                         StopCoroutine(currentLookAtNpcCoroutine);
@@ -804,47 +811,101 @@ public class DialogueManager : MonoBehaviour
         dialogueTextUI.text = fullTextWithRichText;
         dialogueTextUI.ForceMeshUpdate();
 
-        if (dialogueTextUI.textInfo.lineCount == 1) // Only center single-line text
+        // Center single-line text if applicable
+        if (dialogueTextUI.textInfo.lineCount == 1)
         {
             TMP_TextInfo textInfo = dialogueTextUI.textInfo;
-            int totalChars = rawFullText.Length + 2; // Add 2 extra characters
-
+            int totalChars = rawFullText.Length + 2;
             if (totalChars > 0)
             {
-                int middleIndex = totalChars / 2; // Get middle character index
-
-                // Ensure middle index is valid within TMP's character count
-                middleIndex = Mathf.Clamp(middleIndex, 0, textInfo.characterCount - 1);
-
-                // Get the x-position of the middle character
+                int middleIndex = Mathf.Clamp(totalChars / 2, 0, textInfo.characterCount - 1);
                 float middleCharX = textInfo.characterInfo[middleIndex].origin;
-
-                // Apply position adjustment to center the middle character at x = 0
                 RectTransform rt = dialogueTextUI.GetComponent<RectTransform>();
                 rt.localPosition = new Vector3(-middleCharX, rt.localPosition.y, rt.localPosition.z);
             }
         }
         else
         {
-            // Reset position for multi-line text
             RectTransform rt = dialogueTextUI.GetComponent<RectTransform>();
             rt.localPosition = new Vector3(0, rt.localPosition.y, rt.localPosition.z);
         }
 
-        // Scroll the dialogue text
+        // Audio variables
+        DialogueAudio audioSettings = node.dialogueAudio;
+        int validCharCount = 0;
+
+        // Start the FMOD audio immediately
+        if (audioSettings != null && node.useDialogueAudio)
+        {
+            int charHash = node.dialogueText[0].GetHashCode();
+            int soundIndex = Mathf.Abs(charHash) % audioSettings.fmodSoundEvents.Length;
+            EventReference soundEventReference = audioSettings.fmodSoundEvents[soundIndex];
+
+            currentSound = FMODUnity.RuntimeManager.CreateInstance(soundEventReference);
+
+            // Set the pitch based on character hash
+            float pitch = Mathf.Lerp(audioSettings.minPitch, audioSettings.maxPitch, Mathf.Abs(charHash % 100) / 100f);
+
+            currentSound.setPitch(pitch);
+            currentSound.start();
+        }
+
         for (int i = 0; i < node.dialogueText.Length; i++)
         {
             dialogueTextUI.text = $"<color={npcNameColorHex}>{node.npcName}:</color> {node.dialogueText.Substring(0, i + 1)}";
+
+            char currentChar = node.dialogueText[i];
+
+            // Check if the character is a letter (ignoring spaces and punctuation)
+            if (char.IsLetter(currentChar))
+            {
+                validCharCount++;
+
+                // Play audio based on the frequency of valid letters only
+                if (audioSettings != null && validCharCount % audioSettings.frequency == 0 && node.useDialogueAudio)
+                {
+                    // Stop previous sound if any
+                    if (currentSound.isValid())
+                    {
+                        currentSound.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+                        currentSound.release();
+                    }
+
+                    int charHash = currentChar.GetHashCode();
+                    int soundIndex = Mathf.Abs(charHash) % audioSettings.fmodSoundEvents.Length;
+                    EventReference soundEventReference = audioSettings.fmodSoundEvents[soundIndex];
+
+                    // Create a new FMOD EventInstance using EventReference
+                    currentSound = FMODUnity.RuntimeManager.CreateInstance(soundEventReference);
+
+                    // Determine consistent pitch based on character hash
+                    float pitch = Mathf.Lerp(audioSettings.minPitch, audioSettings.maxPitch, Mathf.Abs(charHash % 100) / 100f);
+
+                    // Set the pitch and start the sound
+                    currentSound.setPitch(pitch);
+                    currentSound.start();
+                }
+            }
+
             yield return new WaitForSeconds(scrollSpeed);
         }
 
-        // After scrolling, display the full formatted text
+        // Stop any remaining audio after text scrolling
+        /*if (currentSound.isValid())
+        {
+            currentSound.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+            currentSound.release();
+        }*/
+
+        // Display the full formatted text
         dialogueTextUI.text = fullTextWithRichText;
 
         isTextScrolling = false;
         isFullTextShown = true;
-        ShowOptions(currentDialogueTree.dialogueNodes[currentIndex - 1]);
+
+        ShowOptions(node);
     }
+
 
     private IEnumerator FadeInAndOutIndicator()
     {
