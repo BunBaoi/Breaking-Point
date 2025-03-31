@@ -6,19 +6,23 @@ using System.Collections;
 [System.Serializable]
 public class DialogueOption
 {
-    public string optionText; // Text to display on the button
-    public DialogueTree nextDialogueTree; // New dialogue tree to start (if the option leads to a new tree)
+    public string optionText;
+    public DialogueTree nextDialogueTree;
 }
 
 [System.Serializable]
 public class DialogueNode
 {
     [TextArea] public string dialogueText;
-    public EventReference fmodAudioEvent; // FMOD event for audio
+    public DialogueAudio dialogueAudio;
 
-    public List<string> eventIds = new List<string>(); // List to store multiple eventIDs
+    public List<string> eventIds = new List<string>();
     public List<DialogueOption> options;
 
-    public string npcName; // Name of the NPC in the dialogue
-    public string npcTag; // Optional tag to search for the NPC in the scene
+    public string npcName;
+    public string npcTag;
+
+    public bool useDialogueAudio = true;
+
+    [HideInInspector] public EventReference fmodSoundEvent;
 }
