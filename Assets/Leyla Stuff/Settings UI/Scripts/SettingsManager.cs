@@ -29,6 +29,7 @@ public class SettingsManager : MonoBehaviour
     [SerializeField] private string toggleMenuAction = "Pause";
 
     [Header("Scroll Text Speed")]
+    [SerializeField] private Slider scrollSpeedSlider;
     [SerializeField] private TMP_InputField scrollSpeedInput;
     [SerializeField] private float scrollSpeed = 0.05f;
 
@@ -155,11 +156,24 @@ public class SettingsManager : MonoBehaviour
         }
 
         // Scroll speed settings
+        if (scrollSpeedSlider != null)
+        {
+            scrollSpeed = PlayerPrefs.GetFloat("ScrollSpeed", 0.05f);  // Load from PlayerPrefs
+            scrollSpeedSlider.minValue = 0.01f;
+            scrollSpeedSlider.maxValue = 5f;
+            scrollSpeedSlider.value = scrollSpeed;
+
+            // Update the input field text to match the slider value
+            UpdateScrollSpeedText(scrollSpeed);
+
+            // Add listener for the slider to update the scroll speed
+            scrollSpeedSlider.onValueChanged.AddListener(UpdateScrollSpeed);
+        }
+
+        // If the input field is assigned, add a listener to update scroll speed when the text changes
         if (scrollSpeedInput != null)
         {
-            scrollSpeed = PlayerPrefs.GetFloat("ScrollSpeed", 0.05f);  // Load scroll speed from PlayerPrefs
-            scrollSpeedInput.text = scrollSpeed.ToString("0.00");
-            scrollSpeedInput.onEndEdit.AddListener(UpdateScrollSpeed);
+            scrollSpeedInput.onEndEdit.AddListener(UpdateScrollSpeedFromInput);
         }
 
         // Brightness settings
@@ -317,20 +331,50 @@ public class SettingsManager : MonoBehaviour
         }
     }
 
-    public void UpdateScrollSpeed(string input)
+    private void UpdateScrollSpeed(float newSpeed)
     {
+        // Clamp the new speed between 0.01f and 5f
+        scrollSpeed = Mathf.Clamp(newSpeed, 0.01f, 5f);
+
+        // Update the Input Field Text
+        UpdateScrollSpeedText(scrollSpeed);
+
+        // Save the updated scroll speed in PlayerPrefs
+        PlayerPrefs.SetFloat("ScrollSpeed", scrollSpeed);
+        Debug.Log($"Scroll Speed Updated: {scrollSpeed}");
+    }
+
+    private void UpdateScrollSpeedText(float speed)
+    {
+        // Update the TextMeshPro input field with the new scroll speed
+        if (scrollSpeedInput != null)
+        {
+            scrollSpeedInput.text = $"{speed:0.00}";
+        }
+    }
+
+    private void UpdateScrollSpeedFromInput(string input)
+    {
+        // Try to parse the input and update the scroll speed
         if (float.TryParse(input, out float newSpeed))
         {
+            // Clamp the value and update
             newSpeed = Mathf.Clamp(newSpeed, 0.01f, 5f);
             scrollSpeed = newSpeed;
-            scrollSpeedInput.text = newSpeed.ToString("0.00");
-            PlayerPrefs.SetFloat("ScrollSpeed", scrollSpeed);  // Save scroll speed to PlayerPrefs
-            Debug.Log($"Scroll Speed Updated: {scrollSpeed}");
+
+            // Update the slider with the new value
+            if (scrollSpeedSlider != null)
+            {
+                scrollSpeedSlider.value = scrollSpeed;
+            }
+
+            // Save to PlayerPrefs
+            PlayerPrefs.SetFloat("ScrollSpeed", scrollSpeed);
+            Debug.Log($"Scroll Speed Updated from Input: {scrollSpeed}");
         }
         else
         {
             Debug.LogError("Invalid input for scroll speed.");
-            scrollSpeedInput.text = scrollSpeed.ToString("0.00");
         }
     }
 
@@ -373,9 +417,23 @@ public class SettingsManager : MonoBehaviour
     public void ResetToDefaultSettings()
     {
         // Reset Scroll Speed
+        // Reset Scroll Speed
         scrollSpeed = 0.05f;
-        scrollSpeedInput.text = scrollSpeed.ToString("0.00");
-        PlayerPrefs.SetFloat("ScrollSpeed", scrollSpeed);  // Reset Scroll Speed in PlayerPrefs
+
+        // Reset Slider Value
+        if (scrollSpeedSlider != null)
+        {
+            scrollSpeedSlider.value = scrollSpeed;  // Reset Slider Value
+        }
+
+        // Reset Input Field Text
+        if (scrollSpeedInput != null)
+        {
+            scrollSpeedInput.text = $"{scrollSpeed:0.00}";  // Reset Text Display
+        }
+
+        // Save the default scroll speed in PlayerPrefs
+        PlayerPrefs.SetFloat("ScrollSpeed", scrollSpeed);
 
         // Reset Brightness
         brightnessSlider.value = 0.5f;
