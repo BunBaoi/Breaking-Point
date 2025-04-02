@@ -352,7 +352,7 @@ public class BedManager : MonoBehaviour
         if (Physics.Raycast(ray, out hit, 3f))
         {
             // Check for the Bed Mesh and inTrigger condition
-            if (hit.collider.gameObject.name == "Bed Mesh" && inTrigger)
+            if (hit.collider.CompareTag(bedTag) && inTrigger)
             {
                 ShowInteractText();
             }
