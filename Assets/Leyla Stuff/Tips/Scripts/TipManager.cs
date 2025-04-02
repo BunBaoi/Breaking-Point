@@ -106,7 +106,11 @@ public class TipManager : MonoBehaviour
                     if (processedTipText.Contains(actionNameTag))
                     {
                         string keybind = previousKeybinds[i];
-                        processedTipText = processedTipText.Replace(actionNameTag, keybind);
+                        Color actionColor = currentTip.actionColors[i]; // Get the color for the action
+
+                        // Convert the color to a hex string and apply to the keybind
+                        string colorCode = ColorUtility.ToHtmlStringRGB(actionColor);
+                        processedTipText = processedTipText.Replace(actionNameTag, $"<color=#{colorCode}>{keybind}</color>");
                     }
                 }
 
@@ -157,7 +161,6 @@ public class TipManager : MonoBehaviour
 
                 if (processedTipText.Contains(actionTag))
                 {
-                    // Replace <action{i}> with a space (or placeholder)
                     processedTipText = processedTipText.Replace(actionTag, " ");
 
                     // Create the icon for this action
@@ -165,15 +168,17 @@ public class TipManager : MonoBehaviour
                     iconObj.transform.SetParent(iconParent.transform, false);
                     iconObjects.Add(iconObj);
 
-                    // Update the icon with the appropriate sprite for the action
                     currentTip.UpdateSprite(iconObj, currentTip.selectedActions[i]);
                 }
 
                 if (processedTipText.Contains(actionNameTag))
                 {
                     string keybind = GetKeyBindForAction(currentTip.selectedActions[i]);
+                    Color actionColor = currentTip.actionColors[i]; // Get the colour for this action
 
-                    processedTipText = processedTipText.Replace(actionNameTag, keybind);
+                    string colorCode = ColorUtility.ToHtmlStringRGB(actionColor);
+
+                    processedTipText = processedTipText.Replace(actionNameTag, $"<color=#{colorCode}>{keybind}</color>");
                 }
             }
 

@@ -16,6 +16,9 @@ public class Tip : ScriptableObject
     [Tooltip("Array of actions for which the sprites will be displayed.")]
     public string[] selectedActions;
 
+    [Tooltip("Array of colours for the keybinds.")]
+    public Color[] actionColors;
+
     public void UpdateSprite(GameObject iconObject, string actionName)
     {
         if (KeyBindingManager.Instance == null || iconObject == null || inputActions == null) return;
