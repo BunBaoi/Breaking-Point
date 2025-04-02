@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 using static PlayerStats;
 //using static QTEMechanic;
 
@@ -10,6 +11,7 @@ public class PlayerMovement : MonoBehaviour
     public QTEMechanicScript qTEMechanicScript;
     public CharacterController controller;
     private PlayerStats playerStats;
+    public Camera playerCamera;
 
     public GameObject targetPos;
     public GameObject playerPos;
@@ -21,6 +23,8 @@ public class PlayerMovement : MonoBehaviour
     public float gravity = -9.81f;
     public bool IsSprint = false;
     public float playerHeight;
+    public float zoomFOV, normalFOV;
+    public RawImage binocularsUI;
 
     [Header("Testing Purposes")]
     public bool canMove = true;
@@ -90,6 +94,7 @@ public class PlayerMovement : MonoBehaviour
         ApplyGravity();
         // OxyOutputRate();
         QTEControl();
+        binocularZoom();
     }
 
     void HandleGroundMovement()
@@ -165,5 +170,20 @@ public class PlayerMovement : MonoBehaviour
     public void SetMovementState(bool state)
     {
         canMove = state;
+    }
+
+    public void binocularZoom()
+    {
+        if (Input.GetKey(KeyCode.Z))
+        {
+            Debug.Log("Z button pressed");
+            playerCamera.fieldOfView = zoomFOV;
+            binocularsUI.enabled = true;
+        }
+        else
+        {
+            playerCamera.fieldOfView = normalFOV;
+            binocularsUI.enabled = false;
+        }
     }
 }
