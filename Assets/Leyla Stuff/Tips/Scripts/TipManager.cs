@@ -213,7 +213,6 @@ public class TipManager : MonoBehaviour
         {
             // Determine if the player is using a controller or keyboard
             bool isUsingController = KeyBindingManager.Instance.IsUsingController();
-
             int bindingIndex = isUsingController ? 1 : 0;
 
             // Ensure that the action has enough bindings
@@ -221,14 +220,32 @@ public class TipManager : MonoBehaviour
             {
                 string keybind = action.bindings[bindingIndex].ToDisplayString();
 
-                // Optionally trim any "Press" or "Hold" labels or other extra info
-                keybind = keybind.Replace("Press", "").Replace("Hold", "").Trim();
+                // Define replacements in a dictionary for convenience
+                Dictionary<string, string> replacements = new Dictionary<string, string>
+            {
+                { "Press", "" },
+                { "Hold", "" },
+                { "LMB", "LMB" },
+                { "RMB", "RMB" },
+                { "Scroll/Y", "Mouse Scroll" },
+                { "Scroll/X", "Mouse Horizontal Scroll" },
+                { "Forward", "MB5" },
+                { "Back", "MB4" },
+                { "dpad/y", "D-Pad Vertical" },
+                { "dpad/x", "D-Pad Horizontal" }
+            };
+
+                // Apply all replacements
+                foreach (var replacement in replacements)
+                {
+                    keybind = keybind.Replace(replacement.Key, replacement.Value).Trim();
+                }
 
                 return keybind;
             }
         }
 
-        return "Unknown";  // If the action isn't found or doesn't have the expected binding, return "Unknown"
+        return "Unknown";
     }
 
     private IEnumerator HideTip(List<GameObject> iconObjects)
