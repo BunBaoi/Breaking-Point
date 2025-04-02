@@ -696,6 +696,10 @@ public class KeybindSettings: MonoBehaviour
                 {
                     keybindText.text = "RMB";
                 }
+                if (newKey == "Middle Button")
+                {
+                    keybindText.text = "MMB";
+                }
                 if (newKey == "Scroll/Y")
                 {
                     keybindText.text = "Mouse Scroll";
