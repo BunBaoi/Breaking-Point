@@ -22,16 +22,16 @@ public class BedManager : MonoBehaviour
     [SerializeField] private PlayerStats playerStats;
 
     [Header("Keybinds")]
-    [SerializeField] private InputActionAsset inputActions; // Reference to the Input Action Asset
+    [SerializeField] private InputActionAsset inputActions;
     [SerializeField] private string interactActionName = "Interact";
-    [SerializeField] private GameObject interactTextPrefab; // Prefab for interaction text
+    [SerializeField] private GameObject interactTextPrefab;
     private GameObject interactTextInstance;
     private GameObject iconObject;
     private InputAction interactAction;
 
     [Header("Bool Conditions")]
-    [SerializeField] private List<string> requiredBoolKeysTrue = new List<string>(); // List of bool keys that should be true
-    [SerializeField] private List<string> requiredBoolKeysFalse = new List<string>(); // List of bool keys that should be false
+    [SerializeField] private List<string> requiredBoolKeysTrue = new List<string>();
+    [SerializeField] private List<string> requiredBoolKeysFalse = new List<string>();
     [SerializeField] private bool hasSetTime = false;
     [SerializeField] private bool isInteracting = false;
     [SerializeField] private bool inTrigger = false;
@@ -91,87 +91,128 @@ public class BedManager : MonoBehaviour
             inTrigger = true;
             player = GameObject.FindGameObjectWithTag(playerTag)?.transform;
 
-            if (interactTextPrefab != null && interactTextInstance == null)
+        }
+    }
+
+    void ShowInteractText()
+    {
+        if (interactTextInstance == null && interactTextPrefab != null)
+        {
+            interactTextInstance = Instantiate(interactTextPrefab);
+
+            interactTextInstance.transform.SetParent(transform, false);
+
+            Transform objectColliderTransform = transform.Find("Bed Mesh");
+
+            if (objectColliderTransform != null)
             {
-                interactTextInstance = Instantiate(interactTextPrefab);
-                interactTextInstance.transform.SetParent(transform, false);
-                interactTextInstance.transform.localPosition = new Vector3(0, 0.5f, 0);
+                Collider objectCollider = objectColliderTransform.GetComponent<Collider>();
 
-                // Declare the interactText variable
-                string interactText = "to Sleep"; // Default text
-
-                // Get the keybinding data for "Interact"
-                KeyBinding keyBinding = KeyBindingManager.Instance.GetKeybinding(interactActionName);
-
-                // Update text dynamically to match the correct keybinding based on input device
-                TextMeshPro textMesh = interactTextInstance.GetComponent<TextMeshPro>();
-                if (textMesh != null)
+                if (objectCollider != null)
                 {
-                    textMesh.text = "to Sleep";
+                    Vector3 objectTopWorldPos = objectCollider.bounds.max;
 
-                    // Now check if we have a keybinding sprite
-                    if (keyBinding != null)
+                    // Convert the world position to local position relative to the parent
+                    Vector3 pickUpTopLocalPos = interactTextInstance.transform.InverseTransformPoint(objectTopWorldPos);
+
+                    // Position the interact text just above the top of the "Pick Up Collider"
+                    interactTextInstance.transform.localPosition = new Vector3(0, pickUpTopLocalPos.y + 0.2f, 0); // Adjust the Y offset as needed
+                }
+                else
+                {
+                    // If no collider is attached to "Pick Up Collider", fallback position
+                    interactTextInstance.transform.localPosition = new Vector3(0, 0.2f, 0);
+                }
+            }
+            else
+            {
+                // If no "Pick Up Collider" child is found, fallback position
+                interactTextInstance.transform.localPosition = new Vector3(0, 0.2f, 0);
+            }
+
+            // Declare the interactText variable
+            string interactText = "Sleep"; // Default text
+
+            // Get the keybinding data for "Interact"
+            KeyBinding keyBinding = KeyBindingManager.Instance.GetKeybinding(interactActionName);
+
+            // Update text dynamically to match the correct keybinding based on input device
+            TextMeshPro textMesh = interactTextInstance.GetComponent<TextMeshPro>();
+            if (textMesh != null)
+            {
+                textMesh.text = "Sleep";
+
+                // Now check if we have a keybinding sprite
+                if (keyBinding != null)
+                {
+                    Sprite icon = KeyBindingManager.Instance.IsUsingController() ? keyBinding.controllerSprite : keyBinding.keySprite;
+
+                    // If the sprite exists, display it next to the text
+                    if (icon != null)
                     {
-                        Sprite icon = KeyBindingManager.Instance.IsUsingController() ? keyBinding.controllerSprite : keyBinding.keySprite;
+                        // Create a object for the sprite and set it next to the text
+                        iconObject = new GameObject("KeybindIcon");
+                        iconObject.transform.SetParent(interactTextInstance.transform); // Make it a child of the text
 
-                        // If the sprite exists, display it next to the text
-                        if (icon != null)
+                        // Position sprite to left of text
+                        // Increase the horizontal space by adjusting the x-position further
+                        float horizontalOffset = -textMesh.preferredWidth / 2 - 0.04f; // Increased offset to add more space
+                        iconObject.transform.localPosition = new Vector3(horizontalOffset, 0f, 0);
+
+                        // Add a SpriteRenderer to display the icon
+                        SpriteRenderer spriteRenderer = iconObject.AddComponent<SpriteRenderer>();
+                        spriteRenderer.sprite = icon;
+                        spriteRenderer.sortingOrder = 1; // Ensure the sprite is above the text
+
+                        spriteRenderer.transform.localScale = new Vector3(0.08f, 0.08f, 0.08f);
+
+                        UpdateSprite(iconObject.gameObject, interactActionName);
+                    }
+                    else
+                    {
+                        // Get the first binding for keyboard and second for controller directly from the InputActionAsset
+                        string keyText = "";
+
+                        // Get the "Interact" action
+                        var interactAction = inputActions.FindAction(interactActionName);
+
+                        if (interactAction != null)
                         {
-                            // Create a object for the sprite and set it next to the text
-                            iconObject = new GameObject("KeybindIcon");
-                            iconObject.transform.SetParent(interactTextInstance.transform); // Make it a child of the text
-
-                            // Position sprite to left of text
-                            // Increase the horizontal space by adjusting the x-position further
-                            float horizontalOffset = -textMesh.preferredWidth / 2 - 0.5f; // Increased offset to add more space
-                            iconObject.transform.localPosition = new Vector3(horizontalOffset, 0.7f, 0);
-
-                            // Add a SpriteRenderer to display the icon
-                            SpriteRenderer spriteRenderer = iconObject.AddComponent<SpriteRenderer>();
-                            spriteRenderer.sprite = icon;
-                            spriteRenderer.sortingOrder = 1; // Ensure the sprite is above the text
-
-                            spriteRenderer.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-
-                            UpdateSprite(iconObject.gameObject, interactActionName);
-                        }
-                        else
-                        {
-                            // Get the first binding for keyboard and second for controller directly from the InputActionAsset
-                            string keyText = "";
-
-                            // Get the "Interact" action
-                            var interactAction = inputActions.FindAction(interactActionName);
-
-                            if (interactAction != null)
+                            // If using a controller, get the second binding (controller binding)
+                            if (KeyBindingManager.Instance.IsUsingController())
                             {
-                                // If using a controller, get the second binding (controller binding)
-                                if (KeyBindingManager.Instance.IsUsingController())
-                                {
-                                    keyText = interactAction.bindings[1].ToDisplayString();  // Second binding (controller)
-                                }
-                                else
-                                {
-                                    keyText = interactAction.bindings[0].ToDisplayString();  // First binding (keyboard)
-                                }
-
-                                // Remove the word "Press" from the keyText if it exists
-                                keyText = keyText.Replace("Press ", "").Trim(); // Removes "Press" and any extra spaces
-
-                                // Set the fallback text to show the keybinding for "Interact"
-                                interactText = $"[{keyText}] to Sleep";
+                                keyText = interactAction.bindings[1].ToDisplayString();  // Second binding (controller)
                             }
                             else
                             {
-                                Debug.LogError("Interact action not found in InputActionAsset");
+                                keyText = interactAction.bindings[0].ToDisplayString();  // First binding (keyboard)
                             }
-                        }
 
-                        // Set the updated text (with sprite or keybinding fallback)
-                        textMesh.text = interactText;
+                            // Remove the word "Press" from the keyText if it exists
+                            keyText = keyText.Replace("Press ", "").Trim(); // Removes "Press" and any extra spaces
+
+                            // Set the fallback text to show the keybinding for "Interact"
+                            interactText = $"[{keyText}] Sleep";
+                        }
+                        else
+                        {
+                            Debug.LogError("Interact action not found in InputActionAsset");
+                        }
                     }
+
+                    // Set the updated text (with sprite or keybinding fallback)
+                    textMesh.text = interactText;
                 }
             }
+        }
+    }
+
+    void HideInteractText()
+    {
+        if (interactTextInstance != null)
+        {
+            Destroy(interactTextInstance);
+            interactTextInstance = null;
         }
     }
 
@@ -230,7 +271,10 @@ public class BedManager : MonoBehaviour
     {
         if (other.CompareTag("Player") && inTrigger)
         {
-            UpdateSprite(iconObject.gameObject, interactActionName);
+            if (interactTextInstance != null)
+            {
+                UpdateSprite(iconObject.gameObject, interactActionName);
+            }
         }
     }
 
@@ -243,8 +287,7 @@ public class BedManager : MonoBehaviour
 
             if (interactTextInstance != null)
             {
-                Destroy(interactTextInstance);
-                interactTextInstance = null;
+                HideInteractText();
             }
         }
     }
@@ -253,10 +296,42 @@ public class BedManager : MonoBehaviour
     {
         if (inTrigger && interactTextInstance != null && player != null)
         {
-            // Make the text only rotate left and right (Y-axis only)
-            Vector3 lookDirection = player.position - interactTextInstance.transform.position;
-            lookDirection.y = 0; // Ignore vertical rotation
-            interactTextInstance.transform.forward = -lookDirection.normalized; // Fix backwards issue
+            GameObject playerCamera = GameObject.FindGameObjectWithTag("PlayerCamera");
+
+            if (playerCamera != null)
+            {
+                Vector3 lookDirection = player.position - interactTextInstance.transform.position;
+                lookDirection.y = 0; // Keep the text rotation horizontal (no vertical tilt)
+
+                interactTextInstance.transform.forward = -lookDirection.normalized;
+
+                Vector3 currentEulerAngles = interactTextInstance.transform.eulerAngles;
+
+                // Set the Y rotation of the interaction text based on the camera's X rotation
+                currentEulerAngles.x = playerCamera.transform.eulerAngles.x;
+                interactTextInstance.transform.eulerAngles = currentEulerAngles;
+            }
+        }
+
+        RaycastHit hit;
+        Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
+
+        Debug.DrawRay(ray.origin, ray.direction * 3f, Color.red, 1f); // Visualize the ray
+
+        if (Physics.Raycast(ray, out hit, 3f))
+        {
+            if (hit.collider.CompareTag(bedTag))
+            {
+                ShowInteractText();
+            }
+            else
+            {
+                HideInteractText();
+            }
+        }
+        else
+        {
+            HideInteractText();
         }
 
         if (interactAction.triggered && inTrigger)
@@ -266,9 +341,6 @@ public class BedManager : MonoBehaviour
                 Debug.LogError("PlayerCamera is null! Raycast cannot proceed.");
                 return;
             }
-
-            RaycastHit hit;
-            Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
 
             Debug.DrawRay(ray.origin, ray.direction * 3f, Color.red, 1f); // Visualise the ray
 
@@ -280,13 +352,7 @@ public class BedManager : MonoBehaviour
                 {
                     Debug.Log("Bed detected! Starting interaction.");
                     bed = hit.collider.transform;
-                    // Remove interact text when dialogue starts
-                    if (interactTextInstance != null)
-                    {
-                        Debug.Log("destroy text");
-                        Destroy(interactTextInstance);
-                        interactTextInstance = null;
-                    }
+                    HideInteractText();
                     StartCoroutine(HandleBedInteraction());
                 }
                 else

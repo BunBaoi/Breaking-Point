@@ -41,7 +41,7 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] private string scrollActionName = "Inventory Scroll";
     [SerializeField] private string dropActionName = "Drop";
     [SerializeField] private string slotActionsName = "Slot";
-    [SerializeField] private float scrollCooldown = 0.1f; // Cooldown time (in seconds)
+    [SerializeField] private float scrollCooldown = 0f; // Cooldown time (in seconds)
     private float lastScrollTime = 0f; // Time when the last scroll occurred
     private InputAction scrollAction;
     private InputAction dropAction;
@@ -154,7 +154,10 @@ public class InventoryManager : MonoBehaviour
         {
             if (slotActions[i].triggered)
             {
-                SelectSlot(i);
+                int previousSlotIndex = selectedSlotIndex;  // Store the current selected slot as previous
+
+                // Call the updated SelectSlot method with both current and previous indices
+                SelectSlot(i, previousSlotIndex);
 
                 UpdateSlotImageForAllSlots(i);
 
@@ -163,7 +166,7 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
-    private void UpdateSlotImageForAllSlots(int selectedSlotIndex)
+        private void UpdateSlotImageForAllSlots(int selectedSlotIndex)
     {
         // Loop through all the slots and update their images based on whether they are selected or not
         for (int i = 0; i < slots.Count; i++)
@@ -183,7 +186,7 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
-    private void SelectSlot(int index)
+    private void SelectSlot(int index, int previousIndex)
     {
         if (index >= 0 && index < slots.Count)
         {
@@ -194,16 +197,16 @@ public class InventoryManager : MonoBehaviour
             }
 
             // Update the previous slot to show as unequipped and return to original scale
-            if (selectedSlotIndex >= 0 && selectedSlotIndex < slots.Count)
+            if (previousIndex >= 0 && previousIndex < slots.Count)
             {
-                slots[selectedSlotIndex].UpdateSlotImage(false);
-                slots[selectedSlotIndex].UpdateSelection(false);
+                slots[previousIndex].UpdateSlotImage(false);
+                slots[previousIndex].UpdateSelection(false);
 
                 // Gradually reset the previous slot scale back to normal (1x)
-                RectTransform prevRect = slots[selectedSlotIndex].GetComponent<RectTransform>();
+                RectTransform prevRect = slots[previousIndex].GetComponent<RectTransform>();
                 if (prevRect != null)
                 {
-                    StartCoroutine(ScaleSlotOverTime(prevRect, prevRect.localScale, Vector3.one, 0.3f)); // Smoothly scale back to normal size
+                    StartCoroutine(ScaleSlotOverTime(prevRect, prevRect.localScale, Vector3.one, 0.3f));
                 }
             }
 
@@ -217,7 +220,7 @@ public class InventoryManager : MonoBehaviour
             RectTransform selectedRect = slots[selectedSlotIndex].GetComponent<RectTransform>();
             if (selectedRect != null)
             {
-                StartCoroutine(ScaleSlotOverTime(selectedRect, selectedRect.localScale, new Vector3(1.5f, 1.5f, 1f), 0.3f)); // Smoothly scale up
+                StartCoroutine(ScaleSlotOverTime(selectedRect, selectedRect.localScale, new Vector3(1.5f, 1.5f, 1f), 0.3f));
             }
 
             UpdateEquippedItem();
@@ -543,10 +546,14 @@ public class InventoryManager : MonoBehaviour
             return;
         }
 
+        int previousSlotIndex = selectedSlotIndex;  // Store the previous slot index
+
         selectedSlotIndex += direction;
         if (selectedSlotIndex >= slots.Count) selectedSlotIndex = 0;
         if (selectedSlotIndex < 0) selectedSlotIndex = slots.Count - 1;
 
+        // Pass the previous slot index to properly reset its scale
+        SelectSlot(selectedSlotIndex, previousSlotIndex);
         UpdateEquippedItem();
     }
 

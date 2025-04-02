@@ -7,7 +7,7 @@ using System.Collections.Generic;
 public class NPCDialogue : MonoBehaviour
 {
     [Header("Dialogue Settings")]
-    [SerializeField] private DialogueTree npcDialogueTree; // NPC's dialogue tree reference
+    [SerializeField] private DialogueTree npcDialogueTree;
     [SerializeField] private CompanionScript companionScript;
     [SerializeField] private string dialogueKey = "DialogueTriggered";
 
@@ -16,18 +16,18 @@ public class NPCDialogue : MonoBehaviour
     [SerializeField] private bool isDialoguePressed;
 
     [Header("Keybinds")]
-    [SerializeField] private InputActionAsset inputActions; // Reference to the Input Action Asset
-    [SerializeField] private string interactActionName = "Interact"; // Action name as a string that can be edited in the inspector
+    [SerializeField] private InputActionAsset inputActions;
+    [SerializeField] private string interactActionName = "Interact";
     [SerializeField] private KeyCode clearPlayerPrefs = KeyCode.C;
-    [SerializeField] private GameObject interactTextPrefab; // Prefab for interaction text
+    [SerializeField] private GameObject interactTextPrefab;
 
-    private GameObject interactTextInstance; // Reference to instantiated text
-    private Transform player; // Reference to the player's transform
-    private GameObject iconObject; // Declare it at the class level
+    private GameObject interactTextInstance;
+    private Transform player;
+    private GameObject iconObject;
 
     [Header("Bool Conditions")]
-    [SerializeField] private List<string> requiredBoolKeysTrue = new List<string>(); // List of bool keys that should be true
-    [SerializeField] private List<string> requiredBoolKeysFalse = new List<string>(); // List of bool keys that should be false
+    [SerializeField] private List<string> requiredBoolKeysTrue = new List<string>(); 
+    [SerializeField] private List<string> requiredBoolKeysFalse = new List<string>();
 
     private InputAction interactAction; // Reference to the "Interact" InputAction
 
@@ -63,97 +63,122 @@ public class NPCDialogue : MonoBehaviour
         }
     }
 
+    void ShowInteractText()
+    {
+        if (!isDialoguePressed && interactTextPrefab != null && interactTextInstance == null && CanStartDialogue())
+        {
+            interactTextInstance = Instantiate(interactTextPrefab);
+
+            interactTextInstance.transform.SetParent(transform, false);
+
+            Transform objectColliderTransform = transform.Find("NPC Mesh");
+
+            if (objectColliderTransform != null)
+            {
+                Collider objectCollider = objectColliderTransform.GetComponent<Collider>();
+
+                if (objectCollider != null)
+                {
+                    Vector3 objectTopWorldPos = objectCollider.bounds.max;
+
+                    // Convert the world position to local position relative to the parent
+                    Vector3 pickUpTopLocalPos = interactTextInstance.transform.InverseTransformPoint(objectTopWorldPos);
+
+                    interactTextInstance.transform.localPosition = new Vector3(0, pickUpTopLocalPos.y + 0.2f, 0); // Adjust the Y offset as needed
+                }
+                else
+                {
+                    // If no collider is attached to "Pick Up Collider", fallback position
+                    interactTextInstance.transform.localPosition = new Vector3(0, 0.2f, 0);
+                }
+            }
+            else
+            {
+                interactTextInstance.transform.localPosition = new Vector3(0, 0.2f, 0);
+            }
+
+            string interactText = "Talk"; // Default text
+
+            KeyBinding keyBinding = KeyBindingManager.Instance.GetKeybinding(interactActionName);
+
+            // Update text dynamically to match the correct keybinding based on input device
+            TextMeshPro textMesh = interactTextInstance.GetComponent<TextMeshPro>();
+            if (textMesh != null)
+            {
+                textMesh.text = "Talk";
+
+                // Now check if we have a keybinding sprite
+                if (keyBinding != null)
+                {
+                    Sprite icon = KeyBindingManager.Instance.IsUsingController() ? keyBinding.controllerSprite : keyBinding.keySprite;
+
+                    // If the sprite exists, display it next to the text
+                    if (icon != null)
+                    {
+                        iconObject = new GameObject("KeybindIcon");
+                        iconObject.transform.SetParent(interactTextInstance.transform);
+
+                        float horizontalOffset = -textMesh.preferredWidth / 2 - 0.04f;
+                        iconObject.transform.localPosition = new Vector3(horizontalOffset, 0f, 0);
+
+                        // Add a SpriteRenderer to display the icon
+                        SpriteRenderer spriteRenderer = iconObject.AddComponent<SpriteRenderer>();
+                        spriteRenderer.sprite = icon;
+                        spriteRenderer.sortingOrder = 1;
+
+                        spriteRenderer.transform.localScale = new Vector3(0.08f, 0.08f, 0.08f);
+
+                        UpdateSprite(iconObject.gameObject, interactActionName);
+                    }
+                    else
+                    {
+                        string keyText = "";
+
+                        var interactAction = inputActions.FindAction(interactActionName);
+
+                        if (interactAction != null)
+                        {
+                            // If using a controller, get the second binding (controller binding)
+                            if (KeyBindingManager.Instance.IsUsingController())
+                            {
+                                keyText = interactAction.bindings[1].ToDisplayString(); 
+                            }
+                            else
+                            {
+                                keyText = interactAction.bindings[0].ToDisplayString();
+                            }
+
+                            keyText = keyText.Replace("Press ", "").Trim(); // Removes "Press" and any extra spaces
+
+                            interactText = $"[{keyText}] Talk";
+                        }
+                        else
+                        {
+                            Debug.LogError("Interact action not found in InputActionAsset");
+                        }
+                    }
+
+                    textMesh.text = interactText;
+                }
+            }
+        }
+    }
+
+    void HideInteractText()
+    {
+        if (interactTextInstance != null)
+        {
+            Destroy(interactTextInstance);
+            interactTextInstance = null;
+        }
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
             playerInRange = true;
-            player = other.transform; // Store player reference
-            Debug.Log("Player entered NPC trigger zone.");
-
-            // Prevent text from appearing if dialogue is already triggered
-            if (!isDialoguePressed && interactTextPrefab != null && interactTextInstance == null && CanStartDialogue())
-            {
-                interactTextInstance = Instantiate(interactTextPrefab);
-                interactTextInstance.transform.SetParent(transform, false); // Keep local position
-                interactTextInstance.transform.localPosition = new Vector3(0, 0.5f, 0); // Position 0.5 above NPC
-
-                // Declare the interactText variable
-                string interactText = "to Interact"; // Default text
-
-                // Get the keybinding data for "Interact"
-                KeyBinding keyBinding = KeyBindingManager.Instance.GetKeybinding(interactActionName);
-
-                // Update text dynamically to match the correct keybinding based on input device
-                TextMeshPro textMesh = interactTextInstance.GetComponent<TextMeshPro>();
-                if (textMesh != null)
-                {
-                    // We start by setting the "to Interact" text
-                    textMesh.text = "to Interact";
-
-                    // Now check if we have a keybinding sprite
-                    if (keyBinding != null)
-                    {
-                        Sprite icon = KeyBindingManager.Instance.IsUsingController() ? keyBinding.controllerSprite : keyBinding.keySprite;
-
-                        // If the sprite exists, display it next to the text
-                        if (icon != null)
-                        {
-                            // Create a object for the sprite and set it next to the text
-                            iconObject = new GameObject("KeybindIcon");
-                            iconObject.transform.SetParent(interactTextInstance.transform); // Make it a child of the text
-
-                            // Position sprite to left of text
-                            // Increase the horizontal space by adjusting the x-position further
-                            float horizontalOffset = -textMesh.preferredWidth / 2 - 0.5f; // Increased offset to add more space
-                            iconObject.transform.localPosition = new Vector3(horizontalOffset, 0.7f, 0);
-
-                            // Add a SpriteRenderer to display the icon
-                            SpriteRenderer spriteRenderer = iconObject.AddComponent<SpriteRenderer>();
-                            spriteRenderer.sprite = icon;
-                            spriteRenderer.sortingOrder = 1; // Ensure the sprite is above the text
-
-                            spriteRenderer.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-
-                            UpdateSprite(iconObject.gameObject, interactActionName);
-                        }
-                        else
-                        {
-                            // Get the first binding for keyboard and second for controller directly from the InputActionAsset
-                            string keyText = "";
-
-                            // Get the "Interact" action
-                            var interactAction = inputActions.FindAction(interactActionName);
-
-                            if (interactAction != null)
-                            {
-                                // If using a controller, get the second binding (controller binding)
-                                if (KeyBindingManager.Instance.IsUsingController())
-                                {
-                                    keyText = interactAction.bindings[1].ToDisplayString();  // Second binding (controller)
-                                }
-                                else
-                                {
-                                    keyText = interactAction.bindings[0].ToDisplayString();  // First binding (keyboard)
-                                }
-
-                                // Remove the word "Press" from the keyText if it exists
-                                keyText = keyText.Replace("Press ", "").Trim(); // Removes "Press" and any extra spaces
-
-                                // Set the fallback text to show the keybinding for "Interact"
-                                interactText = $"[{keyText}] to Interact";
-                            }
-                            else
-                            {
-                                Debug.LogError("Interact action not found in InputActionAsset");
-                            }
-                        }
-
-                        // Set the updated text (with sprite or keybinding fallback)
-                        textMesh.text = interactText;
-                    }
-                }
-            }
+            player = other.transform;
         }
     }
 
@@ -212,7 +237,10 @@ public class NPCDialogue : MonoBehaviour
     {
         if (other.CompareTag("Player") && playerInRange)
         {
-            UpdateSprite(iconObject.gameObject, interactActionName);
+            if (interactTextInstance != null)
+            {
+                UpdateSprite(iconObject.gameObject, interactActionName);
+            }
         }
     }
 
@@ -224,38 +252,59 @@ public class NPCDialogue : MonoBehaviour
             player = null;
             Debug.Log("Player exited NPC trigger zone.");
 
-            if (interactTextInstance != null)
-            {
-                Destroy(interactTextInstance);
-                interactTextInstance = null;
-            }
+            HideInteractText();
         }
     }
 
     private void Update()
     {
+        GameObject playerCamera = GameObject.FindGameObjectWithTag("PlayerCamera");
         if (playerInRange && interactTextInstance != null && player != null)
         {
-            // Make the text only rotate left and right (Y-axis only)
-            Vector3 lookDirection = player.position - interactTextInstance.transform.position;
-            lookDirection.y = 0; // Ignore vertical rotation
-            interactTextInstance.transform.forward = -lookDirection.normalized; // Fix backwards issue
+            if (playerCamera != null)
+            {
+                Vector3 lookDirection = player.position - interactTextInstance.transform.position;
+                lookDirection.y = 0; // Keep the text rotation horizontal (no vertical tilt)
+
+                interactTextInstance.transform.forward = -lookDirection.normalized;
+
+                Vector3 currentEulerAngles = interactTextInstance.transform.eulerAngles;
+
+                // Set the Y rotation of the interaction text based on the camera's X rotation
+                currentEulerAngles.x = playerCamera.transform.eulerAngles.x;
+                interactTextInstance.transform.eulerAngles = currentEulerAngles;
+            }
         }
 
-        // Check if the interact key is pressed
-        if (playerInRange && interactAction.triggered && !isDialoguePressed && CanStartDialogue())
+        RaycastHit hit;
+        Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
+
+        if (Physics.Raycast(ray, out hit, 3f))
+        {
+            Debug.Log("Raycast hit: " + hit.collider.name);
+            if (hit.collider != null && hit.collider.gameObject.name == "NPC Mesh" && hit.collider.transform.IsChildOf(transform))
+            {
+                ShowInteractText();
+            }
+            else
+            {
+                HideInteractText();
+            }
+        }
+        else
+        {
+            HideInteractText();
+        }
+
+// Check if the interact key is pressed
+if (playerInRange && interactAction.triggered && !isDialoguePressed && CanStartDialogue())
         {
             isDialoguePressed = true;
             PlayerPrefs.SetInt(dialogueKey, 1);
             PlayerPrefs.Save();
             StartDialogue();
 
-            // Remove interact text when dialogue starts
-            if (interactTextInstance != null)
-            {
-                Destroy(interactTextInstance);
-                interactTextInstance = null;
-            }
+            HideInteractText();
         }
 
         if (Input.GetKeyDown(clearPlayerPrefs))

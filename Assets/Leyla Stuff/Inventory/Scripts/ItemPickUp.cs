@@ -5,29 +5,29 @@ using TMPro;
 public class ItemPickUp : MonoBehaviour
 {
     [Header("Pickup Settings")]
-    public Item item; // Reference to the item that can be picked up
+    public Item item;
     [SerializeField] private float raycastDistance = 5f; // Distance to check for raycast
     [SerializeField] private float pickupRadius = 1f; // Radius around the centre of the screen for pickup detection
-    [SerializeField] private string playerCameraTag = "PlayerCamera"; // Tag for the player's camera
-    [SerializeField] private string playerTag = "Player"; // Tag for the player object
-    [SerializeField] private LayerMask itemLayer; // Layer mask to specify which layers are considered as items
-    [SerializeField] private LayerMask pickUpColliderLayer; // Layer mask to specify which layers are considered as pick-up colliders
+    [SerializeField] private string playerCameraTag = "PlayerCamera";
+    [SerializeField] private string playerTag = "Player";
+    [SerializeField] private LayerMask itemLayer; // Inventory item layer
+    [SerializeField] private LayerMask pickUpColliderLayer;
 
-    [SerializeField] private bool canPickUp = false; // Flag to check if the player is in range
-    [SerializeField] private bool isPickingUp = false; // Flag to prevent picking up multiple items at once
+    [SerializeField] private bool canPickUp = false;
+    [SerializeField] private bool isPickingUp = false;
 
     [Header("Interact Text")]
-    [SerializeField] private GameObject interactTextPrefab; // Prefab for interaction text
+    [SerializeField] private GameObject interactTextPrefab;
 
-    private GameObject interactTextInstance; // Reference to instantiated text
-    private Transform player; // Reference to the player's transform
-    private GameObject iconObject; // Declare it at the class level
+    private GameObject interactTextInstance;
+    private Transform player;
+    private GameObject iconObject;
 
     [Header("Input Settings")]
     [SerializeField] private InputActionAsset inputActions;
-    [SerializeField] private string pickupActionName = "PickUp"; // Action name for item pickup
+    [SerializeField] private string pickupActionName = "PickUp"; 
 
-    private InputAction pickupAction; // Reference to the input action for pickup
+    private InputAction pickupAction;
 
     void Awake()
     {
@@ -64,91 +64,8 @@ public class ItemPickUp : MonoBehaviour
         {
             canPickUp = true; // Player is in range to pick up the item
             player = other.transform;
-            if (interactTextPrefab != null && interactTextInstance == null)
-            {
-                interactTextInstance = Instantiate(interactTextPrefab);
-                interactTextInstance.transform.SetParent(transform, false); // Keep local position
-                interactTextInstance.transform.localPosition = new Vector3(0, 0.5f, 0); // Position 0.5 above
-
-                // Declare the interactText variable
-                string interactText = "to Pick Up"; // Default text
-
-                // Get the keybinding data for "Interact"
-                KeyBinding keyBinding = KeyBindingManager.Instance.GetKeybinding(pickupActionName);
-
-                // Update text dynamically to match the correct keybinding based on input device
-                TextMeshPro textMesh = interactTextInstance.GetComponent<TextMeshPro>();
-                if (textMesh != null)
-                {
-                    // We start by setting the "to Interact" text
-                    textMesh.text = "to Pick Up";
-
-                    // Now check if we have a keybinding sprite
-                    if (keyBinding != null)
-                    {
-                        Sprite icon = KeyBindingManager.Instance.IsUsingController() ? keyBinding.controllerSprite : keyBinding.keySprite;
-
-                        // If the sprite exists, display it next to the text
-                        if (icon != null)
-                        {
-                            // Create a object for the sprite and set it next to the text
-                            iconObject = new GameObject("KeybindIcon");
-                            iconObject.transform.SetParent(interactTextInstance.transform); // Make it a child of the text
-
-                            // Position sprite to left of text
-                            // Increase the horizontal space by adjusting the x-position further
-                            float horizontalOffset = -textMesh.preferredWidth / 2 - 0.5f; // Increased offset to add more space
-                            iconObject.transform.localPosition = new Vector3(horizontalOffset, 0.7f, 0);
-
-                            // Add a SpriteRenderer to display the icon
-                            SpriteRenderer spriteRenderer = iconObject.AddComponent<SpriteRenderer>();
-                            spriteRenderer.sprite = icon;
-                            spriteRenderer.sortingOrder = 1; // Ensure the sprite is above the text
-
-                            spriteRenderer.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-
-                            UpdateSprite(iconObject.gameObject, pickupActionName);
-                        }
-                        else
-                        {
-                            // Get the first binding for keyboard and second for controller directly from the InputActionAsset
-                            string keyText = "";
-
-                            // Get the "Interact" action
-                            var interactAction = inputActions.FindAction(pickupActionName);
-
-                            if (interactAction != null)
-                            {
-                                // If using a controller, get the second binding (controller binding)
-                                if (KeyBindingManager.Instance.IsUsingController())
-                                {
-                                    keyText = interactAction.bindings[1].ToDisplayString();  // Second binding (controller)
-                                }
-                                else
-                                {
-                                    keyText = interactAction.bindings[0].ToDisplayString();  // First binding (keyboard)
-                                }
-
-                                // Remove the word "Press" from the keyText if it exists
-                                keyText = keyText.Replace("Press ", "").Trim(); // Removes "Press" and any extra spaces
-
-                                // Set the fallback text to show the keybinding for "Interact"
-                                interactText = $"[{keyText}] to Pick Up";
-                            }
-                            else
-                            {
-                                Debug.LogError("Pick Up action not found in InputActionAsset");
-                            }
-                        }
-
-                        // Set the updated text (with sprite or keybinding fallback)
-                        textMesh.text = interactText;
-                    }
-                }
-            }
         }
-            Debug.Log("Player is in range to pick up the item.");
-        }
+    }
 
     private void UpdateSprite(GameObject iconObject, string actionName)
     {
@@ -184,7 +101,7 @@ public class ItemPickUp : MonoBehaviour
             animator = iconObject.AddComponent<Animator>();
         }
 
-        animator.enabled = true; // Ensure animator is enabled
+        animator.enabled = true;
 
         string folderPath = isUsingController ? "UI/Controller/" : "UI/Keyboard/";
         string animatorName = KeyBindingManager.Instance.GetSanitisedKeyName(boundKeyOrButton) + ".sprite";
@@ -205,8 +122,11 @@ public class ItemPickUp : MonoBehaviour
     {
         if (other.CompareTag(playerTag))
         {
-            canPickUp = true; // Player is in range to pick up the item
-            UpdateSprite(iconObject.gameObject, pickupActionName);
+            canPickUp = true;
+            if (interactTextInstance != null)
+            {
+                UpdateSprite(iconObject.gameObject, pickupActionName);
+            }
         }
     }
 
@@ -214,28 +134,191 @@ public class ItemPickUp : MonoBehaviour
     {
         if (other.CompareTag(playerTag))
         {
-            canPickUp = false; // Player is out of range
+            canPickUp = false;
             player = null;
-            Debug.Log("Player is out of range to pick up the item.");
             if (interactTextInstance != null)
             {
-                Destroy(interactTextInstance);
-                interactTextInstance = null;
+                HideInteractText();
             }
+        }
+    }
+
+    void ShowInteractText()
+    {
+        if (interactTextInstance == null && interactTextPrefab != null)
+        {
+            interactTextInstance = Instantiate(interactTextPrefab);
+
+            // Set the parent of the interact text instance
+            interactTextInstance.transform.SetParent(transform, false);
+
+            // Find the "Pick Up Collider" child
+            Transform pickUpColliderTransform = transform.Find("Pick Up Collider");
+
+            if (pickUpColliderTransform != null)
+            {
+                // Get the collider of the "Pick Up Collider"
+                Collider pickUpCollider = pickUpColliderTransform.GetComponent<Collider>();
+
+                if (pickUpCollider != null)
+                {
+                    // Get the top position of the "Pick Up Collider" in world space
+                    Vector3 pickUpTopWorldPos = pickUpCollider.bounds.max;
+
+                    // Convert the world position to local position relative to the parent
+                    Vector3 pickUpTopLocalPos = interactTextInstance.transform.InverseTransformPoint(pickUpTopWorldPos);
+
+                    // Position the interact text just above the top of the "Pick Up Collider"
+                    interactTextInstance.transform.localPosition = new Vector3(0, pickUpTopLocalPos.y + 0.2f, 0); // Adjust the Y offset as needed
+                }
+                else
+                {
+                    // If no collider is attached to "Pick Up Collider", fallback position
+                    interactTextInstance.transform.localPosition = new Vector3(0, 0.2f, 0);
+                }
+            }
+            else
+            {
+                // If no "Pick Up Collider" child is found, fallback position
+                interactTextInstance.transform.localPosition = new Vector3(0, 0.2f, 0);
+            }
+
+        string interactText = "Pick Up"; // Default text
+
+            KeyBinding keyBinding = KeyBindingManager.Instance.GetKeybinding(pickupActionName);
+
+            // Update text dynamically to match the correct keybinding based on input device
+            TextMeshPro textMesh = interactTextInstance.GetComponent<TextMeshPro>();
+            if (textMesh != null)
+            {
+                textMesh.text = "Pick Up";
+
+                if (keyBinding != null)
+                {
+                    Sprite icon = KeyBindingManager.Instance.IsUsingController() ? keyBinding.controllerSprite : keyBinding.keySprite;
+
+                    if (icon != null)
+                    {
+                        // Create a object for the sprite and set it next to the text
+                        iconObject = new GameObject("KeybindIcon");
+                        iconObject.transform.SetParent(interactTextInstance.transform); // Make it a child of the text
+
+                        // Position sprite to left of text
+                        float horizontalOffset = -textMesh.preferredWidth / 2 - 0.04f; // Increased offset to add more space
+                        iconObject.transform.localPosition = new Vector3(horizontalOffset, 0f, 0);
+
+                        SpriteRenderer spriteRenderer = iconObject.AddComponent<SpriteRenderer>();
+                        spriteRenderer.sprite = icon;
+                        spriteRenderer.sortingOrder = 1;
+
+                        spriteRenderer.transform.localScale = new Vector3(0.08f, 0.08f, 0.08f);
+
+                        UpdateSprite(iconObject.gameObject, pickupActionName);
+                    }
+                    else
+                    {
+                        string keyText = "";
+
+                        // Get the "Interact" action
+                        var interactAction = inputActions.FindAction(pickupActionName);
+
+                        if (interactAction != null)
+                        {
+                            // If using a controller, get the second binding (controller binding)
+                            if (KeyBindingManager.Instance.IsUsingController())
+                            {
+                                keyText = interactAction.bindings[1].ToDisplayString();  // Second binding (controller)
+                            }
+                            else
+                            {
+                                keyText = interactAction.bindings[0].ToDisplayString();  // First binding (keyboard)
+                            }
+
+                            // Remove the word "Press" from the keyText if it exists
+                            keyText = keyText.Replace("Press ", "").Trim();
+
+                            // Set the fallback text to show the keybinding for "Interact"
+                            interactText = $"[{keyText}] Pick Up";
+                        }
+                        else
+                        {
+                            Debug.LogError("Pick Up action not found in InputActionAsset");
+                        }
+                    }
+
+                    textMesh.text = interactText;
+                }
+            }
+        }
+    }
+
+    void HideInteractText()
+    {
+        if (interactTextInstance != null)
+        {
+            Destroy(interactTextInstance);
+            interactTextInstance = null;
         }
     }
 
     void Update()
     {
+        // --- Rotate pick up text based on player and camera ---
         if (canPickUp && interactTextInstance != null && player != null)
         {
-            // Make the text only rotate left and right (Y-axis only)
-            Vector3 lookDirection = player.position - interactTextInstance.transform.position;
-            lookDirection.y = 0; // Ignore vertical rotation
-            interactTextInstance.transform.forward = -lookDirection.normalized; // Fix backwards issue
+            GameObject playerCamera = GameObject.FindGameObjectWithTag(playerCameraTag);
+
+            if (playerCamera != null)
+            {
+                Vector3 lookDirection = player.position - interactTextInstance.transform.position;
+                lookDirection.y = 0; // Keep the text rotation horizontal (no vertical tilt)
+
+                interactTextInstance.transform.forward = -lookDirection.normalized;
+
+                Vector3 currentEulerAngles = interactTextInstance.transform.eulerAngles;
+
+                // Set the Y rotation of the interaction text based on the camera's X rotation
+                currentEulerAngles.x = playerCamera.transform.eulerAngles.x;
+                interactTextInstance.transform.eulerAngles = currentEulerAngles;
+            }
         }
 
-        if (canPickUp && pickupAction.triggered) // Check if pickup action is triggered
+        // --- Show pick up text ---
+        if (canPickUp && interactTextPrefab != null && player != null)
+        {
+            Camera playerCamera = FindCameraWithTag(playerCameraTag);
+
+            RaycastHit hit;
+            Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
+
+            // Create a layer mask that includes pickUpColliderLayer but excludes itemLayer
+            LayerMask combinedMask = pickUpColliderLayer & ~itemLayer;
+
+            // Perform a raycast to find the item in the center of the view
+            if (Physics.Raycast(ray, out hit, raycastDistance, combinedMask))
+            {
+                // Check if the hit collider matches the 'Pick Up Collider' child
+                if (IsHitOnPickUpCollider(hit.collider))
+                {
+                    // Check if the item is within the camera's view frustum
+                    if (IsWithinCameraView(playerCamera, hit.point))
+                    {
+                        ShowInteractText();
+                        if (isPickingUp)
+                        {
+                            HideInteractText();
+                        }
+                    }
+                }
+            }
+            else
+            {
+                HideInteractText();
+            }
+        }                        
+
+        // --- When triggering pick up action ---
+        if (canPickUp && pickupAction.triggered)
         {
             Camera playerCamera = FindCameraWithTag(playerCameraTag);
 
@@ -258,11 +341,7 @@ public class ItemPickUp : MonoBehaviour
                         {
                             if (isPickingUp)
                             {
-                                if (interactTextInstance != null)
-                                {
-                                    Destroy(interactTextInstance);
-                                    interactTextInstance = null;
-                                }
+                                HideInteractText();
                                 Debug.Log("Already picking up an item.");
                                 return;
                             }
@@ -284,13 +363,9 @@ public class ItemPickUp : MonoBehaviour
 
                                 if (added)
                                 {
-                                    if (interactTextInstance != null)
-                                    {
-                                        Destroy(interactTextInstance);
-                                        interactTextInstance = null;
-                                    }
+                                    HideInteractText();
                                     inventory.DisableItemPickup(item);
-                                    Destroy(gameObject); // Destroy the item in the world after picking it up
+                                    Destroy(gameObject);
                                 }
                             }
                             else
@@ -298,7 +373,7 @@ public class ItemPickUp : MonoBehaviour
                                 Debug.LogWarning("InventoryManager component not found on player.");
                             }
 
-                            Invoke("ResetPickingUpFlag", 0.5f); // Adjust the delay as needed
+                            Invoke("ResetPickingUpFlag", 0.5f);
                         }
                         else
                         {
