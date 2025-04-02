@@ -5,9 +5,9 @@ using UnityEngine.InputSystem;
 
 public class KeyBindingDisplay : MonoBehaviour
 {
-    [SerializeField] private string actionName; // Example: "Interact", "Jump"
-    [SerializeField] private Image keyImage; // UI Image for the key
-    [SerializeField] private TMP_Text actionText; // Text for "Press [E] to Interact"
+    [SerializeField] private string actionName;
+    [SerializeField] private Image keyImage;
+    [SerializeField] private TMP_Text actionText;
 
     private InputAction action;
 
@@ -34,7 +34,7 @@ public class KeyBindingDisplay : MonoBehaviour
 
     private void OnActionPerformed(InputAction.CallbackContext context)
     {
-        UpdateKeybindingUI(); // Update the UI when the action is performed
+        UpdateKeybindingUI();
     }
 
     private void UpdateKeybindingUI()

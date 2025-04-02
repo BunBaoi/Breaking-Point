@@ -320,17 +320,21 @@ public class BedManager : MonoBehaviour
 
         if (Physics.Raycast(ray, out hit, 3f))
         {
-            if (hit.collider.CompareTag(bedTag))
+            Debug.Log("Raycast hit: " + hit.collider.name);
+            if (hit.collider != null && hit.collider.gameObject.name == "Bed Mesh" && hit.collider.transform.IsChildOf(transform) && inTrigger)
             {
+                Debug.Log("Bed Mesh hit, showing text");
                 ShowInteractText();
             }
             else
             {
-                HideInteractText();
+                Debug.Log("Not Bed Mesh or not in trigger, hiding text");
+                // HideInteractText();
             }
         }
         else
         {
+            Debug.Log("Raycast hit nothing, hiding text");
             HideInteractText();
         }
 

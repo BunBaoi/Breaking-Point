@@ -24,6 +24,7 @@ public class NPCDialogue : MonoBehaviour
     private GameObject interactTextInstance;
     private Transform player;
     private GameObject iconObject;
+    private SpriteRenderer spriteRenderer;
 
     [Header("Bool Conditions")]
     [SerializeField] private List<string> requiredBoolKeysTrue = new List<string>(); 
@@ -122,11 +123,11 @@ public class NPCDialogue : MonoBehaviour
                         iconObject.transform.localPosition = new Vector3(horizontalOffset, 0f, 0);
 
                         // Add a SpriteRenderer to display the icon
-                        SpriteRenderer spriteRenderer = iconObject.AddComponent<SpriteRenderer>();
+                        spriteRenderer = iconObject.AddComponent<SpriteRenderer>();
                         spriteRenderer.sprite = icon;
                         spriteRenderer.sortingOrder = 1;
 
-                        spriteRenderer.transform.localScale = new Vector3(0.08f, 0.08f, 0.08f);
+                        UpdateSpriteScale();
 
                         UpdateSprite(iconObject.gameObject, interactActionName);
                     }
@@ -171,6 +172,35 @@ public class NPCDialogue : MonoBehaviour
             Destroy(interactTextInstance);
             interactTextInstance = null;
         }
+    }
+
+    void UpdateSpriteScale()
+    {
+        if (spriteRenderer == null) return;
+
+        // Get the keybinding and check the device being used (controller or keyboard/mouse)
+        InputAction action = inputActions.FindAction(interactActionName);
+        if (action == null) return;
+
+        int bindingIndex = KeyBindingManager.Instance.IsUsingController() ? 1 : 0;
+        if (action.bindings.Count <= bindingIndex) return;
+
+        InputBinding binding = action.bindings[bindingIndex];
+        string boundKeyOrButton = KeyBindingManager.Instance.GetSanitisedKeyName(binding.effectivePath);
+        if (string.IsNullOrEmpty(boundKeyOrButton))
+        {
+            Debug.LogWarning($"No key binding found for action: {interactActionName}");
+            return;
+        }
+
+        Debug.Log($"Bound Key or Button for action '{interactActionName}': {boundKeyOrButton}");
+
+        // Check if it's a mouse button
+        bool isMouseButton = boundKeyOrButton.Contains("Mouse") || boundKeyOrButton.Contains("Click") || boundKeyOrButton.Contains("Scroll");
+
+        // Set the scale based on whether it's a mouse button or not
+        float scale = isMouseButton ? 0.2f : 0.08f;
+        spriteRenderer.transform.localScale = new Vector3(scale, scale, scale);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -305,6 +335,12 @@ if (playerInRange && interactAction.triggered && !isDialoguePressed && CanStartD
             StartDialogue();
 
             HideInteractText();
+        }
+
+        if (spriteRenderer != null)
+        {
+            // Dynamically update sprite scale if keybinding changes during the game
+            UpdateSpriteScale();
         }
 
         if (Input.GetKeyDown(clearPlayerPrefs))

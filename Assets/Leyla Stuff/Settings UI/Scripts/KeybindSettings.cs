@@ -70,7 +70,8 @@ public class KeybindSettings: MonoBehaviour
     void Start()
     {
         PopulateKeybindList();
-        InitialiseDefaultBindings();
+        // InitialiseDefaultBindings();
+
     }
 
     private void Update()
@@ -90,6 +91,7 @@ public class KeybindSettings: MonoBehaviour
 
     private void InitialiseDefaultBindings()
     {
+        Debug.LogError("default bindings");
         bindingHistory.Clear();
         foreach (var entry in actionDictionary)
         {
@@ -183,11 +185,12 @@ public class KeybindSettings: MonoBehaviour
                     compositeKeybindTextKeyboard.text = action.bindings[keyboardIndex].ToDisplayString()
                         .Replace("Hold", "")
                         .Replace("Press", "")
-                    .Replace("LMB", "Left Button")
-                    .Replace("RMB", "Right Button")
-                    .Replace("Forward", "Forward Button")
-                    .Replace("Back", "Back Button")
-                    .Replace("MMB", "Middle Button")
+                    .Replace("LMB", "LMB")
+                    .Replace("RMB", "RMB")
+                    .Replace("Forward", "MB5")
+                    .Replace("Back", "MB4")
+                    .Replace("MMB", "MMB")
+                    .Replace("Scroll/Y", "Mouse Scroll")
                     .Replace("LB", "Left Bumper")
                     .Replace("RB", "Right Bumper")
                     .Replace("LT", "Left Trigger")
@@ -218,11 +221,12 @@ public class KeybindSettings: MonoBehaviour
                 {
                     compositeKeybindTextController.text = action.bindings[controllerIndex].ToDisplayString()
                         .Replace("Hold", "")
-                    .Replace("LMB", "Left Button")
-                    .Replace("RMB", "Right Button")
-                    .Replace("Forward", "Forward Button")
-                    .Replace("Back", "Back Button")
-                    .Replace("MMB", "Middle Button")
+                    .Replace("LMB", "LMB")
+                    .Replace("RMB", "RMB")
+                    .Replace("Forward", "MB5")
+                    .Replace("Back", "MB4")
+                    .Replace("MMB", "MMB")
+                    .Replace("Scroll/Y", "Mouse Scroll")
                     .Replace("LB", "Left Bumper")
                     .Replace("RB", "Right Bumper")
                     .Replace("LT", "Left Trigger")
@@ -250,11 +254,12 @@ public class KeybindSettings: MonoBehaviour
                     {
                         bindingText = bindingText.Replace("Press", "").TrimStart()
                             .Replace("Hold", "")
-                        .Replace("LMB", "Left Button")
-                        .Replace("RMB", "Right Button")
-                        .Replace("Forward", "Forward Button")
-                        .Replace("Back", "Back Button")
-                        .Replace("MMB", "Middle Button")
+                        .Replace("LMB", "LMB")
+                    .Replace("RMB", "RMB")
+                    .Replace("Forward", "MB5")
+                    .Replace("Back", "MB4")
+                    .Replace("MMB", "MMB")
+                    .Replace("Scroll/Y", "Mouse Scroll")
                         .Replace("LB", "Left Bumper")
                         .Replace("RB", "Right Bumper")
                         .Replace("LT", "Left Trigger")
@@ -305,11 +310,12 @@ public class KeybindSettings: MonoBehaviour
                 keybindTextKeyboard.text = action.bindings[0].ToDisplayString()
                     .Replace("Hold", "")
                     .Replace("Press", "")
-                    .Replace("LMB", "Left Button")
-                    .Replace("RMB", "Right Button")
-                    .Replace("Forward", "Forward Button")
-                    .Replace("Back", "Back Button")
-                    .Replace("MMB", "Middle Button")
+                    .Replace("LMB", "LMB")
+                    .Replace("RMB", "RMB")
+                    .Replace("Forward", "MB5")
+                    .Replace("Back", "MB4")
+                    .Replace("MMB", "MMB")
+                    .Replace("Scroll/Y", "Mouse Scroll")
                     .Replace("LB", "Left Bumper")
                     .Replace("RB", "Right Bumper")
                     .Replace("LT", "Left Trigger")
@@ -341,11 +347,12 @@ public class KeybindSettings: MonoBehaviour
                 keybindTextController.text = action.bindings[1].ToDisplayString()
 
                     .Replace("Hold", "")
-                    .Replace("LMB", "Left Button")
-                    .Replace("RMB", "Right Button")
-                    .Replace("Forward", "Forward Button")
-                    .Replace("Back", "Back Button")
-                    .Replace("MMB", "Middle Button")
+                    .Replace("LMB", "LMB")
+                    .Replace("RMB", "RMB")
+                    .Replace("Forward", "MB5")
+                    .Replace("Back", "MB4")
+                    .Replace("MMB", "MMB")
+                    .Replace("Scroll/Y", "Mouse Scroll")
                     .Replace("LB", "Left Bumper")
                     .Replace("RB", "Right Bumper")
                     .Replace("LT", "Left Trigger")
@@ -373,11 +380,12 @@ public class KeybindSettings: MonoBehaviour
                 {
                     bindingText = bindingText.Replace("Press", "").TrimStart()
                         .Replace("Hold", "")
-                    .Replace("LMB", "Left Button")
-                    .Replace("RMB", "Right Button")
-                    .Replace("Forward", "Forward Button")
-                    .Replace("Back", "Back Button")
-                    .Replace("MMB", "Middle Button")
+                    .Replace("LMB", "LMB")
+                    .Replace("RMB", "RMB")
+                    .Replace("Forward", "MB5")
+                    .Replace("Back", "MB4")
+                    .Replace("MMB", "MMB")
+                    .Replace("Scroll/Y", "Mouse Scroll")
                     .Replace("LB", "Left Bumper")
                     .Replace("RB", "Right Bumper")
                     .Replace("LT", "Left Trigger")
@@ -674,11 +682,23 @@ public class KeybindSettings: MonoBehaviour
                 // Override keybind text to change specific keys to other text
                 if (newKey == "Back")
                 {
-                    keybindText.text = "Back Button"; 
+                    keybindText.text = "MB4"; 
                 }
                 if (newKey == "Forward")
                 {
-                    keybindText.text = "Forward Button";
+                    keybindText.text = "MB5";
+                }
+                if (newKey == "Left Button")
+                {
+                    keybindText.text = "LMB";
+                }
+                if (newKey == "Right Button")
+                {
+                    keybindText.text = "RMB";
+                }
+                if (newKey == "Scroll/Y")
+                {
+                    keybindText.text = "Mouse Scroll";
                 }
 
                 OnKeyBindingsChanged?.Invoke(action.name, newKey);
