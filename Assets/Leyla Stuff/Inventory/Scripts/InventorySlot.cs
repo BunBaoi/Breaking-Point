@@ -21,7 +21,6 @@ public class InventorySlot : MonoBehaviour
     public void ClearSlot()
     {
         item = null;
-        icon.sprite = defaultImage;
         icon.enabled = false;
         UpdateSelection(false);  // Make sure to clear the selection
     }
@@ -38,10 +37,10 @@ public class InventorySlot : MonoBehaviour
         {
             slotImage.sprite = equippedImage;
         }
-        /*else
+        else
         {
             slotImage.sprite = defaultImage;
-        }*/
+        }
     }
 
     // Toggle the selected state of the slot

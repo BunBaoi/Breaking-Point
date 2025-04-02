@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         // Clear all PlayerPrefs
-        PlayerPrefs.DeleteAll();
+        // PlayerPrefs.DeleteAll();
     }
 
     void Start()
