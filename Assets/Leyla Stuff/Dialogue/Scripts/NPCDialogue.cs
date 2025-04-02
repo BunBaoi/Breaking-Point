@@ -312,7 +312,7 @@ public class NPCDialogue : MonoBehaviour
         if (Physics.Raycast(ray, out hit, 3f))
         {
             Debug.Log("Raycast hit: " + hit.collider.name);
-            if (hit.collider != null && hit.collider.gameObject.name == "NPC Mesh" && hit.collider.transform.IsChildOf(transform))
+            if (hit.collider != null && hit.collider.gameObject.name == "NPC Mesh" && hit.collider.transform.IsChildOf(transform) && playerInRange)
             {
                 ShowInteractText();
             }

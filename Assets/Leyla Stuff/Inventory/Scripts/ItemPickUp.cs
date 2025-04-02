@@ -22,6 +22,7 @@ public class ItemPickUp : MonoBehaviour
     private GameObject interactTextInstance;
     private Transform player;
     private GameObject iconObject;
+    private SpriteRenderer spriteRenderer;
 
     [Header("Input Settings")]
     [SerializeField] private InputActionAsset inputActions;
@@ -118,6 +119,35 @@ public class ItemPickUp : MonoBehaviour
         }
     }
 
+    void UpdateSpriteScale()
+    {
+        if (spriteRenderer == null) return;
+
+        // Get the keybinding and check the device being used (controller or keyboard/mouse)
+        InputAction action = inputActions.FindAction(pickupActionName);
+        if (action == null) return;
+
+        int bindingIndex = KeyBindingManager.Instance.IsUsingController() ? 1 : 0;
+        if (action.bindings.Count <= bindingIndex) return;
+
+        InputBinding binding = action.bindings[bindingIndex];
+        string boundKeyOrButton = KeyBindingManager.Instance.GetSanitisedKeyName(binding.effectivePath);
+        if (string.IsNullOrEmpty(boundKeyOrButton))
+        {
+            Debug.LogWarning($"No key binding found for action: {pickupActionName}");
+            return;
+        }
+
+        Debug.Log($"Bound Key or Button for action '{pickupActionName}': {boundKeyOrButton}");
+
+        // Check if it's a mouse button
+        bool isMouseButton = boundKeyOrButton.Contains("Mouse") || boundKeyOrButton.Contains("Click") || boundKeyOrButton.Contains("Scroll");
+
+        // Set the scale based on whether it's a mouse button or not
+        float scale = isMouseButton ? 0.2f : 0.08f;
+        spriteRenderer.transform.localScale = new Vector3(scale, scale, scale);
+    }
+
     private void OnTriggerStay(Collider other)
     {
         if (other.CompareTag(playerTag))
@@ -207,11 +237,12 @@ public class ItemPickUp : MonoBehaviour
                         float horizontalOffset = -textMesh.preferredWidth / 2 - 0.04f; // Increased offset to add more space
                         iconObject.transform.localPosition = new Vector3(horizontalOffset, 0f, 0);
 
-                        SpriteRenderer spriteRenderer = iconObject.AddComponent<SpriteRenderer>();
+                        // Add a SpriteRenderer to display the icon
+                        spriteRenderer = iconObject.AddComponent<SpriteRenderer>();
                         spriteRenderer.sprite = icon;
                         spriteRenderer.sortingOrder = 1;
 
-                        spriteRenderer.transform.localScale = new Vector3(0.08f, 0.08f, 0.08f);
+                        UpdateSpriteScale();
 
                         UpdateSprite(iconObject.gameObject, pickupActionName);
                     }
@@ -314,6 +345,12 @@ public class ItemPickUp : MonoBehaviour
             else
             {
                 HideInteractText();
+            }
+
+            if (spriteRenderer != null)
+            {
+                // Dynamically update sprite scale if keybinding changes during the game
+                UpdateSpriteScale();
             }
         }                        
 

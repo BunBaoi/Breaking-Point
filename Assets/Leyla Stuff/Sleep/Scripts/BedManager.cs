@@ -28,6 +28,7 @@ public class BedManager : MonoBehaviour
     private GameObject interactTextInstance;
     private GameObject iconObject;
     private InputAction interactAction;
+    private SpriteRenderer spriteRenderer;
 
     [Header("Bool Conditions")]
     [SerializeField] private List<string> requiredBoolKeysTrue = new List<string>();
@@ -160,11 +161,11 @@ public class BedManager : MonoBehaviour
                         iconObject.transform.localPosition = new Vector3(horizontalOffset, 0f, 0);
 
                         // Add a SpriteRenderer to display the icon
-                        SpriteRenderer spriteRenderer = iconObject.AddComponent<SpriteRenderer>();
+                        spriteRenderer = iconObject.AddComponent<SpriteRenderer>();
                         spriteRenderer.sprite = icon;
-                        spriteRenderer.sortingOrder = 1; // Ensure the sprite is above the text
+                        spriteRenderer.sortingOrder = 1;
 
-                        spriteRenderer.transform.localScale = new Vector3(0.08f, 0.08f, 0.08f);
+                        UpdateSpriteScale();
 
                         UpdateSprite(iconObject.gameObject, interactActionName);
                     }
@@ -267,6 +268,35 @@ public class BedManager : MonoBehaviour
         }
     }
 
+    void UpdateSpriteScale()
+    {
+        if (spriteRenderer == null) return;
+
+        // Get the keybinding and check the device being used (controller or keyboard/mouse)
+        InputAction action = inputActions.FindAction(interactActionName);
+        if (action == null) return;
+
+        int bindingIndex = KeyBindingManager.Instance.IsUsingController() ? 1 : 0;
+        if (action.bindings.Count <= bindingIndex) return;
+
+        InputBinding binding = action.bindings[bindingIndex];
+        string boundKeyOrButton = KeyBindingManager.Instance.GetSanitisedKeyName(binding.effectivePath);
+        if (string.IsNullOrEmpty(boundKeyOrButton))
+        {
+            Debug.LogWarning($"No key binding found for action: {interactActionName}");
+            return;
+        }
+
+        Debug.Log($"Bound Key or Button for action '{interactActionName}': {boundKeyOrButton}");
+
+        // Check if it's a mouse button
+        bool isMouseButton = boundKeyOrButton.Contains("Mouse") || boundKeyOrButton.Contains("Click") || boundKeyOrButton.Contains("Scroll");
+
+        // Set the scale based on whether it's a mouse button or not
+        float scale = isMouseButton ? 0.2f : 0.08f;
+        spriteRenderer.transform.localScale = new Vector3(scale, scale, scale);
+    }
+
     private void OnTriggerStay(Collider other)
     {
         if (other.CompareTag("Player") && inTrigger)
@@ -318,40 +348,22 @@ public class BedManager : MonoBehaviour
 
         Debug.DrawRay(ray.origin, ray.direction * 3f, Color.red, 1f); // Visualize the ray
 
+        // Only perform the raycast once
         if (Physics.Raycast(ray, out hit, 3f))
         {
-            Debug.Log("Raycast hit: " + hit.collider.name);
-            if (hit.collider != null && hit.collider.gameObject.name == "Bed Mesh" && hit.collider.transform.IsChildOf(transform) && inTrigger)
+            // Check for the Bed Mesh and inTrigger condition
+            if (hit.collider.gameObject.name == "Bed Mesh" && inTrigger)
             {
-                Debug.Log("Bed Mesh hit, showing text");
                 ShowInteractText();
             }
             else
             {
-                Debug.Log("Not Bed Mesh or not in trigger, hiding text");
-                // HideInteractText();
-            }
-        }
-        else
-        {
-            Debug.Log("Raycast hit nothing, hiding text");
-            HideInteractText();
-        }
-
-        if (interactAction.triggered && inTrigger)
-        {
-            if (playerCamera == null)
-            {
-                Debug.LogError("PlayerCamera is null! Raycast cannot proceed.");
-                return;
+                HideInteractText();
             }
 
-            Debug.DrawRay(ray.origin, ray.direction * 3f, Color.red, 1f); // Visualise the ray
-
-            if (Physics.Raycast(ray, out hit, 3f))
+            // Check if the interact action was triggered
+            if (interactAction.triggered && inTrigger)
             {
-                Debug.Log("Raycast hit: " + hit.collider.name); // Check what is hit
-
                 if (hit.collider.CompareTag(bedTag) && !isInteracting)
                 {
                     Debug.Log("Bed detected! Starting interaction.");
@@ -364,14 +376,21 @@ public class BedManager : MonoBehaviour
                     Debug.Log("Raycast hit, but not a bed.");
                 }
             }
-            else
-            {
-                Debug.Log("No object hit by the raycast.");
-            }
+        }
+        else
+        {
+            Debug.Log("Raycast hit nothing, hiding text");
+            HideInteractText();
+        }
+
+        if (spriteRenderer != null)
+        {
+            // Dynamically update sprite scale if keybinding changes during the game
+            UpdateSpriteScale();
         }
     }
 
-    private IEnumerator HandleBedInteraction()
+        private IEnumerator HandleBedInteraction()
     {
         isInteracting = true;
         if (playerStats != null)
