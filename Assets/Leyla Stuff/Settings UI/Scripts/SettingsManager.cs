@@ -38,6 +38,7 @@ public class SettingsManager : MonoBehaviour
     [SerializeField] private Volume volume;
 
     [Header("Mouse Sensitivity Settings")]
+    [SerializeField] private Slider sensitivitySlider;
     [SerializeField] private TMP_InputField sensitivityInputField;
     public static float mouseSensitivity = 100f;
 
@@ -204,11 +205,22 @@ public class SettingsManager : MonoBehaviour
         }
 
         // Sensitivity settings
+        mouseSensitivity = PlayerPrefs.GetFloat("MouseSensitivity", 100f);
+
+        // Set up slider
+        if (sensitivitySlider != null)
+        {
+            sensitivitySlider.minValue = 0.01f;
+            sensitivitySlider.maxValue = 20f;
+            sensitivitySlider.value = mouseSensitivity / 100f;
+            sensitivitySlider.onValueChanged.AddListener(UpdateSensitivityFromSlider);
+        }
+
+        // Set up input field
         if (sensitivityInputField != null)
         {
-            mouseSensitivity = PlayerPrefs.GetFloat("MouseSensitivity", 100f);  // Load sensitivity from PlayerPrefs
             sensitivityInputField.text = (mouseSensitivity / 100f).ToString("0.00");
-            sensitivityInputField.onEndEdit.AddListener(UpdateSensitivity);
+            sensitivityInputField.onEndEdit.AddListener(UpdateSensitivityFromInput);
         }
 
         // Resume button
@@ -392,15 +404,28 @@ public class SettingsManager : MonoBehaviour
     }
 }
 
-    public void UpdateSensitivity(string input)
+    private void UpdateSensitivityFromSlider(float value)
+    {
+        mouseSensitivity = Mathf.Clamp(value * 100f, 1f, 2000f);
+        if (sensitivityInputField != null)
+        {
+            sensitivityInputField.text = value.ToString("0.00");
+        }
+        PlayerPrefs.SetFloat("MouseSensitivity", mouseSensitivity);
+    }
+
+    private void UpdateSensitivityFromInput(string input)
     {
         if (float.TryParse(input, out float newSensitivity))
         {
-            newSensitivity = Mathf.Clamp(newSensitivity, 0.01f, 20f) * 100f;
-            mouseSensitivity = newSensitivity;
-            sensitivityInputField.text = (newSensitivity / 100f).ToString("0.00");
-            PlayerPrefs.SetFloat("MouseSensitivity", mouseSensitivity);  // Save mouse sensitivity to PlayerPrefs
-            Debug.Log($"Mouse Sensitivity Updated: {mouseSensitivity}");
+            newSensitivity = Mathf.Clamp(newSensitivity, 0.01f, 20f);
+            mouseSensitivity = newSensitivity * 100f;
+
+            if (sensitivitySlider != null)
+            {
+                sensitivitySlider.value = newSensitivity;
+            }
+            PlayerPrefs.SetFloat("MouseSensitivity", mouseSensitivity);
         }
         else
         {

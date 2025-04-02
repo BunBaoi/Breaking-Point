@@ -4,6 +4,8 @@ using UnityEngine.Video;
 using TMPro;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.InputSystem;
+using System.Text.RegularExpressions;
 
 public class TipManager : MonoBehaviour
 {
@@ -13,6 +15,7 @@ public class TipManager : MonoBehaviour
     [SerializeField] private RawImage videoDisplay;     // Image that will display the video
     [SerializeField] private TextMeshProUGUI tipText;   // Text for displaying text tips
     [SerializeField] private VideoPlayer videoPlayer;   // VideoPlayer component
+    [SerializeField] private InputActionAsset inputActions;
 
     [Header("Tip Data")]
     [SerializeField] private Tip[] tips;  // Array to hold multiple tips
@@ -29,6 +32,9 @@ public class TipManager : MonoBehaviour
     private Vector3 targetVideoScale;
     private Vector3 targetTextScale;
 
+    private int currentTipIndex = -1;
+    [SerializeField] private string[] previousKeybinds;
+
     private void Awake()
     {
         targetVideoScale = videoPanelScale;
@@ -42,6 +48,79 @@ public class TipManager : MonoBehaviour
         // Set initial scales to zero
         videoPanel.transform.localScale = Vector3.zero;
         textPanel.transform.localScale = Vector3.zero;
+    }
+
+    private void Update()
+    {
+        // Ensure we have a valid current tip index and we're displaying the tip
+        if (isDisplaying && currentTipIndex >= 0 && currentTipIndex < tips.Length)
+        {
+            Tip currentTip = tips[currentTipIndex];
+
+            // Initialize the previousKeybinds array to store previous keybinds
+            if (previousKeybinds == null || previousKeybinds.Length != currentTip.selectedActions.Length)
+            {
+                previousKeybinds = new string[currentTip.selectedActions.Length];
+            }
+
+            // Check if any of the keybinds have changed since the last update
+            bool keybindsChanged = false;
+
+            // Process the action tags and check if the keybinds have changed
+            for (int i = 0; i < currentTip.selectedActions.Length; i++)
+            {
+                string currentKeybind = GetKeyBindForAction(currentTip.selectedActions[i]);
+
+                // If the keybind has changed, mark the flag as true
+                if (previousKeybinds[i] != currentKeybind)
+                {
+                    previousKeybinds[i] = currentKeybind;
+                    keybindsChanged = true;
+                }
+            }
+
+            // Only update if keybinds have changed
+            if (keybindsChanged)
+            {
+                // Find the icon parent and clear old icons
+                GameObject iconParent = textPanel.transform.Find("IconParent").gameObject;
+                foreach (Transform child in iconParent.transform)
+                {
+                    Destroy(child.gameObject);
+                }
+
+                // The processedTipText can now be updated based on keybinds
+                string processedTipText = currentTip.tipText;
+
+                // Process the action tags and update icons and keybinds
+                for (int i = 0; i < currentTip.selectedActions.Length; i++)
+                {
+                    string actionTag = $"<action{i}>";
+                    string actionNameTag = $"<actionname{i}>";  // The new tag for action names
+
+                    if (processedTipText.Contains(actionTag))  // If the <action{i}> tag is found
+                    {
+                        processedTipText = processedTipText.Replace(actionTag, " ");
+
+                        // Create the icon for this action
+                        GameObject iconObj = new GameObject($"Icon_{i}");
+                        iconObj.transform.SetParent(iconParent.transform, false);
+
+                        // Update the icon with the appropriate sprite for the action
+                        currentTip.UpdateSprite(iconObj, currentTip.selectedActions[i]);
+                    }
+
+                    if (processedTipText.Contains(actionNameTag))  // If the <actionname{i}> tag is found
+                    {
+                        string keybind = previousKeybinds[i];  // Use the updated keybind from previousKeybinds
+                        processedTipText = processedTipText.Replace(actionNameTag, keybind);
+                    }
+                }
+
+                // Set the processed tip text with the replaced actions
+                tipText.text = processedTipText;
+            }
+        }
     }
 
     public void ShowTip(int tipIndex)
@@ -62,15 +141,62 @@ public class TipManager : MonoBehaviour
         while (tipQueue.Count > 0)
         {
             int tipIndex = tipQueue.Dequeue();
+            currentTipIndex = tipIndex;  // Set the current tip index
             Tip currentTip = tips[tipIndex];
             isDisplaying = true;
 
-            tipText.text = currentTip.tipText;
+            // Process the tip text and replace actions with the corresponding images and text
+            string processedTipText = currentTip.tipText;
+            GameObject iconParent = textPanel.transform.Find("IconParent").gameObject;
+
+            // Clear any old icons from the previous tip
+            foreach (Transform child in iconParent.transform)
+            {
+                Destroy(child.gameObject);
+            }
+
+            List<GameObject> iconObjects = new List<GameObject>();
+
+            // Process the action tags (<action{i}> for icons and <actionname{i}> for action names)
+            for (int i = 0; i < currentTip.selectedActions.Length; i++)
+            {
+                string actionTag = $"<action{i}>";
+                string actionNameTag = $"<actionname{i}>";  // The new tag for action names
+
+                if (processedTipText.Contains(actionTag))  // If the <action{i}> tag is found
+                {
+                    // Replace <action{i}> with a space (or placeholder)
+                    processedTipText = processedTipText.Replace(actionTag, " ");
+
+                    // Create the icon for this action
+                    GameObject iconObj = new GameObject($"Icon_{i}");
+                    iconObj.transform.SetParent(iconParent.transform, false);
+                    iconObjects.Add(iconObj);
+
+                    // Update the icon with the appropriate sprite for the action
+                    currentTip.UpdateSprite(iconObj, currentTip.selectedActions[i]);
+                }
+
+                if (processedTipText.Contains(actionNameTag))  // If the <actionname{i}> tag is found
+                {
+                    // Get the keybinding for the action from InputActionAsset
+                    string keybind = GetKeyBindForAction(currentTip.selectedActions[i]);
+
+                    // Replace <actionname{i}> with the corresponding keybind
+                    processedTipText = processedTipText.Replace(actionNameTag, keybind);
+                }
+            }
+
+            // Set the processed tip text with the replaced actions
+            tipText.text = processedTipText;
+
+            // Set the video clip for the tip
             videoPlayer.clip = currentTip.tipVideo;
 
+            // Display the tip panel
             tipPanel.SetActive(true);
 
-            // Start both animations at the same time
+            // Start animations for text and video panels
             Coroutine textAnim = StartCoroutine(AnimateTextPanel(true));
             Coroutine videoAnim = StartCoroutine(AnimateVideoPanel(true));
 
@@ -78,30 +204,52 @@ public class TipManager : MonoBehaviour
             yield return textAnim;
             yield return videoAnim;
 
-            // Play the video after the panels are fully expanded
+            // Wait for video to finish playing
             videoPlayer.Play();
             yield return new WaitForSeconds((float)videoPlayer.clip.length);
 
-            yield return StartCoroutine(HideTip());
+            // Hide the tip after the video finishes
+            yield return StartCoroutine(HideTip(iconObjects));
         }
 
         isDisplaying = false;
+        currentTipIndex = -1; // Reset the current tip index when finished
     }
 
-    private IEnumerator HideTip()
+    private string GetKeyBindForAction(string actionName)
     {
-        // Start both animations to hide at the same time
+        // Find the action in the InputActionAsset
+        InputAction action = inputActions.FindAction(actionName);
+        if (action != null)
+        {
+            // Get the first binding (you can refine this if needed, depending on your input setup)
+            string keybind = action.bindings[0].ToDisplayString();
+
+            // Optionally trim any "Press" or "Hold" labels or other extra info
+            keybind = keybind.Replace("Press", "").Replace("Hold", "").Trim();
+
+            return keybind;
+        }
+
+        return "Unknown";  // If the action isn't found, return "Unknown"
+    }
+
+    private IEnumerator HideTip(List<GameObject> iconObjects)
+    {
         Coroutine textAnim = StartCoroutine(AnimateTextPanel(false));
         Coroutine videoAnim = StartCoroutine(AnimateVideoPanel(false));
 
-        // Wait until both animations are complete
         yield return textAnim;
         yield return videoAnim;
 
-        // Wait a little extra to ensure the panel has shrunk completely
+        // Destroy all the icon objects after hiding the tip
+        foreach (GameObject iconObj in iconObjects)
+        {
+            Destroy(iconObj);
+        }
+
         yield return new WaitForSeconds(0.1f);
 
-        // Deactivate the tip panel after both animations are done
         tipPanel.SetActive(false);
     }
 
