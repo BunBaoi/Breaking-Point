@@ -19,6 +19,13 @@ public class ClimbingSystem : MonoBehaviour
     public float maxClimbDistance = 4f;
     public string climbableTag = "Climbable";
 
+    [Header("Icepick Movement")]
+    public float icepickMoveSpeed = 5f; // How fast the icepick moves to target
+    private Vector3 leftHandTargetPosition; // Target position for left hand
+    private Vector3 rightHandTargetPosition; // Target position for right hand
+    private bool leftHandMoving = false; // Is left hand currently moving to target
+    private bool rightHandMoving = false; // Is right hand currently moving to target
+
     [Header("Body Positioning")]
     [Tooltip("Vertical offset from hands to position the body. Positive values position the body below the hands")]
     public float bodyPositionOffset = 1.5f; // This is the new offset parameter
@@ -37,6 +44,16 @@ public class ClimbingSystem : MonoBehaviour
     [Header("Climbing Feel Settings")]
     public float upwardBias = 0.1f; // Small upward force for natural climbing feel
 
+    [Header("Pickaxe Animation Settings")]
+    [Tooltip("Starting rotation angle on X axis when moving icepick")]
+    public float startRotationX = -45f; // Start with pickaxe tilted upward
+    [Tooltip("Ending rotation angle on X axis when 'digging in'")]
+    public float endRotationX = 30f; // End with pickaxe tilted downward for digging in
+    [Tooltip("Speed of the digging in animation")]
+    public float digInSpeed = 8f; // How fast the pickaxe rotates when digging in
+    [Tooltip("Whether to animate the entire hand or just the pickaxe")]
+    public bool animateEntireHand = false; // If true, rotates the hand; if false, finds the pickaxe
+
     [Header("Input Actions")]
     [SerializeField] private InputActionAsset inputActions;
     [SerializeField] private string leftGrabActionName = "LeftGrab";
@@ -51,6 +68,16 @@ public class ClimbingSystem : MonoBehaviour
     private Vector3 rightHandPosition;
     private Vector3 leftHandOriginalLocalPos;
     private Vector3 rightHandOriginalLocalPos;
+
+    // Pickaxe animation state
+    private Transform leftPickaxeTransform;
+    private Transform rightPickaxeTransform;
+    private Quaternion leftPickaxeOriginalRotation;
+    private Quaternion rightPickaxeOriginalRotation;
+    private bool leftPickaxeDiggingIn = false;
+    private bool rightPickaxeDiggingIn = false;
+    private float leftDigInProgress = 0f;
+    private float rightDigInProgress = 0f;
 
     // Debug and state management
     private bool isActivelyClimbing = false;
@@ -113,7 +140,37 @@ public class ClimbingSystem : MonoBehaviour
         leftHandOriginalLocalPos = leftHandTransform.localPosition;
         rightHandOriginalLocalPos = rightHandTransform.localPosition;
 
+        // Find and store references to the pickaxes
+        FindAndStorePickaxeReferences();
+
         SetupInputActions();
+    }
+
+    // New method to find and store pickaxe references
+    private void FindAndStorePickaxeReferences()
+    {
+        // We'll attempt to find pickaxe references, but it's okay if they don't exist yet
+        // The method will be called again when needed
+
+        // Find left pickaxe
+        if (leftHandTransform != null && leftHandTransform.childCount > 0)
+        {
+            leftPickaxeTransform = animateEntireHand ? leftHandTransform : leftHandTransform.GetChild(0);
+            if (leftPickaxeTransform != null)
+            {
+                leftPickaxeOriginalRotation = leftPickaxeTransform.localRotation;
+            }
+        }
+
+        // Find right pickaxe
+        if (rightHandTransform != null && rightHandTransform.childCount > 0)
+        {
+            rightPickaxeTransform = animateEntireHand ? rightHandTransform : rightHandTransform.GetChild(0);
+            if (rightPickaxeTransform != null)
+            {
+                rightPickaxeOriginalRotation = rightPickaxeTransform.localRotation;
+            }
+        }
     }
 
     void SetupInputActions()
@@ -145,8 +202,12 @@ public class ClimbingSystem : MonoBehaviour
                 rb.isKinematic = true; // Make rigidbody kinematic while climbing
             }
 
-            DirectClimbToIcepicks(); // Renamed to reflect direct movement
-            DrainEnergyWhileClimbing();
+            // Only move body if at least one hand is fully attached (not still moving)
+            if ((leftHandAttached && !leftHandMoving) || (rightHandAttached && !rightHandMoving))
+            {
+                DirectClimbToIcepicks(); // Renamed to reflect direct movement
+                DrainEnergyWhileClimbing();
+            }
 
             // Reset first frame flag after first frame processing
             if (isFirstClimbFrame)
@@ -159,6 +220,113 @@ public class ClimbingSystem : MonoBehaviour
     void Update()
     {
         UpdateHandVisuals();
+        UpdatePickaxeRotations();
+    }
+
+    // New method to update pickaxe rotations
+    void UpdatePickaxeRotations()
+    {
+        // Check if we need to find pickaxe references (in case pickaxes were equipped after Start)
+        if ((leftHandAttached && leftPickaxeTransform == null && leftHandTransform != null && leftHandTransform.childCount > 0) ||
+            (rightHandAttached && rightPickaxeTransform == null && rightHandTransform != null && rightHandTransform.childCount > 0))
+        {
+            // Pickaxe might have been equipped since last check - try to find references again
+            FindAndStorePickaxeReferences();
+        }
+
+        // Process left pickaxe animation if we have a valid reference
+        if (leftHandAttached && leftPickaxeTransform != null)
+        {
+            // Store the original rotation if we haven't already (might happen if pickaxe was equipped after climbing started)
+            if (leftPickaxeOriginalRotation == Quaternion.identity)
+            {
+                leftPickaxeOriginalRotation = leftPickaxeTransform.localRotation;
+            }
+
+            if (leftHandMoving)
+            {
+                // Set initial rotation when moving (pickaxe up)
+                Quaternion targetRotation = Quaternion.Euler(startRotationX, 0, 0) * leftPickaxeOriginalRotation;
+                leftPickaxeTransform.localRotation = targetRotation;
+
+                // Reset digging in progress
+                leftDigInProgress = 0f;
+                leftPickaxeDiggingIn = false;
+            }
+            else if (leftHandAttached)
+            {
+                if (!leftPickaxeDiggingIn)
+                {
+                    // Start digging in animation when hand reaches target
+                    leftPickaxeDiggingIn = true;
+                }
+
+                if (leftPickaxeDiggingIn)
+                {
+                    // Progress the digging in animation
+                    leftDigInProgress = Mathf.Min(leftDigInProgress + Time.deltaTime * digInSpeed, 1.0f);
+
+                    // Smoothly interpolate between start and end rotation
+                    float currentRotationX = Mathf.Lerp(startRotationX, endRotationX, leftDigInProgress);
+                    Quaternion targetRotation = Quaternion.Euler(currentRotationX, 0, 0) * leftPickaxeOriginalRotation;
+                    leftPickaxeTransform.localRotation = targetRotation;
+                }
+            }
+        }
+        else if (leftPickaxeTransform != null && leftPickaxeOriginalRotation != Quaternion.identity)
+        {
+            // Return to original rotation when detached
+            leftPickaxeTransform.localRotation = leftPickaxeOriginalRotation;
+            leftDigInProgress = 0f;
+            leftPickaxeDiggingIn = false;
+        }
+
+        // Process right pickaxe animation if we have a valid reference
+        if (rightHandAttached && rightPickaxeTransform != null)
+        {
+            // Store the original rotation if we haven't already (might happen if pickaxe was equipped after climbing started)
+            if (rightPickaxeOriginalRotation == Quaternion.identity)
+            {
+                rightPickaxeOriginalRotation = rightPickaxeTransform.localRotation;
+            }
+
+            if (rightHandMoving)
+            {
+                // Set initial rotation when moving (pickaxe up)
+                Quaternion targetRotation = Quaternion.Euler(startRotationX, 0, 0) * rightPickaxeOriginalRotation;
+                rightPickaxeTransform.localRotation = targetRotation;
+
+                // Reset digging in progress
+                rightDigInProgress = 0f;
+                rightPickaxeDiggingIn = false;
+            }
+            else if (rightHandAttached)
+            {
+                if (!rightPickaxeDiggingIn)
+                {
+                    // Start digging in animation when hand reaches target
+                    rightPickaxeDiggingIn = true;
+                }
+
+                if (rightPickaxeDiggingIn)
+                {
+                    // Progress the digging in animation
+                    rightDigInProgress = Mathf.Min(rightDigInProgress + Time.deltaTime * digInSpeed, 1.0f);
+
+                    // Smoothly interpolate between start and end rotation
+                    float currentRotationX = Mathf.Lerp(startRotationX, endRotationX, rightDigInProgress);
+                    Quaternion targetRotation = Quaternion.Euler(currentRotationX, 0, 0) * rightPickaxeOriginalRotation;
+                    rightPickaxeTransform.localRotation = targetRotation;
+                }
+            }
+        }
+        else if (rightPickaxeTransform != null && rightPickaxeOriginalRotation != Quaternion.identity)
+        {
+            // Return to original rotation when detached
+            rightPickaxeTransform.localRotation = rightPickaxeOriginalRotation;
+            rightDigInProgress = 0f;
+            rightPickaxeDiggingIn = false;
+        }
     }
 
     void DrainEnergyWhileClimbing()
@@ -178,6 +346,14 @@ public class ClimbingSystem : MonoBehaviour
 
     void AttachIcepick(bool isLeftHand)
     {
+        // Check if we need to find pickaxe references first (in case pickaxes were equipped after Start)
+        if ((isLeftHand && leftPickaxeTransform == null && leftHandTransform != null && leftHandTransform.childCount > 0) ||
+            (!isLeftHand && rightPickaxeTransform == null && rightHandTransform != null && rightHandTransform.childCount > 0))
+        {
+            // Pickaxe might have been equipped since last check - try to find references again
+            FindAndStorePickaxeReferences();
+        }
+
         // Fire a raycast from the camera center
         Ray ray = new Ray(cameraTransform.position, cameraTransform.forward);
         RaycastHit hit;
@@ -203,19 +379,17 @@ public class ClimbingSystem : MonoBehaviour
 
                     if (isLeftHand)
                     {
-                        leftHandAttached = true;
-                        leftHandPosition = handAttachPosition;
-
-                        // Immediately set hand to position to avoid any initial jitter
-                        leftHandTransform.position = handAttachPosition;
+                        // Set the target position instead of instantly moving there
+                        leftHandTargetPosition = handAttachPosition;
+                        leftHandMoving = true; // Hand is now moving to target
+                        leftHandAttached = true; // Mark as attached even during movement
                     }
                     else
                     {
-                        rightHandAttached = true;
-                        rightHandPosition = handAttachPosition;
-
-                        // Immediately set hand to position to avoid any initial jitter
-                        rightHandTransform.position = handAttachPosition;
+                        // Set the target position instead of instantly moving there
+                        rightHandTargetPosition = handAttachPosition;
+                        rightHandMoving = true; // Hand is now moving to target
+                        rightHandAttached = true; // Mark as attached even during movement
                     }
 
                     // Debug visualization
@@ -236,12 +410,7 @@ public class ClimbingSystem : MonoBehaviour
                             playerStats.stateOfPlayer = PlayerStats.PlayerStatus.RClimbing;
                         }
 
-                        // Perform initial snap movement if configured
-                        if (initialSnapPercentage > 0)
-                        {
-                            PerformInitialSnap();
-                        }
-
+                        // Initial snap will now happen only once both hands are fully attached
                         Debug.Log("Started climbing");
                     }
                 }
@@ -249,22 +418,18 @@ public class ClimbingSystem : MonoBehaviour
                 {
                     Debug.LogWarning("No icepick tip found for " + (isLeftHand ? "left" : "right") + " hand");
 
-                    // Fallback to original behavior if tip cannot be found
+                    // Fallback to original behavior if tip cannot be found, but still use gradual movement
                     if (isLeftHand)
                     {
+                        leftHandTargetPosition = hit.point;
+                        leftHandMoving = true;
                         leftHandAttached = true;
-                        leftHandPosition = hit.point;
-
-                        // Immediately set hand to position
-                        leftHandTransform.position = hit.point;
                     }
                     else
                     {
+                        rightHandTargetPosition = hit.point;
+                        rightHandMoving = true;
                         rightHandAttached = true;
-                        rightHandPosition = hit.point;
-
-                        // Immediately set hand to position
-                        rightHandTransform.position = hit.point;
                     }
                 }
             }
@@ -338,13 +503,13 @@ public class ClimbingSystem : MonoBehaviour
         Vector3 targetPosition = Vector3.zero;
         int attachedCount = 0;
 
-        if (leftHandAttached)
+        if (leftHandAttached && !leftHandMoving)
         {
             targetPosition += leftHandPosition;
             attachedCount++;
         }
 
-        if (rightHandAttached)
+        if (rightHandAttached && !rightHandMoving)
         {
             targetPosition += rightHandPosition;
             attachedCount++;
@@ -367,25 +532,30 @@ public class ClimbingSystem : MonoBehaviour
     private void PerformInitialSnap()
     {
         Vector3 targetPosition = GetCurrentTargetPosition();
-        Vector3 toTarget = targetPosition - transform.position;
 
-        // Only snap if we're not too close already
-        if (toTarget.magnitude > 0.2f)
+        // Only proceed if we have a valid target position
+        if (targetPosition != Vector3.zero)
         {
-            // Move a percentage of the way toward the target immediately
-            Vector3 snapMovement = toTarget * initialSnapPercentage;
+            Vector3 toTarget = targetPosition - transform.position;
 
-            // Cap the maximum initial movement to prevent teleporting too far
-            float maxSnapDistance = 0.5f;
-            if (snapMovement.magnitude > maxSnapDistance)
+            // Only snap if we're not too close already
+            if (toTarget.magnitude > 0.2f)
             {
-                snapMovement = snapMovement.normalized * maxSnapDistance;
+                // Move a percentage of the way toward the target immediately
+                Vector3 snapMovement = toTarget * initialSnapPercentage;
+
+                // Cap the maximum initial movement to prevent teleporting too far
+                float maxSnapDistance = 0.5f;
+                if (snapMovement.magnitude > maxSnapDistance)
+                {
+                    snapMovement = snapMovement.normalized * maxSnapDistance;
+                }
+
+                // Apply the immediate movement
+                controller.Move(snapMovement);
+
+                Debug.Log($"Initial snap applied: {snapMovement.magnitude} meters");
             }
-
-            // Apply the immediate movement
-            controller.Move(snapMovement);
-
-            Debug.Log($"Initial snap applied: {snapMovement.magnitude} meters");
         }
     }
 
@@ -395,10 +565,12 @@ public class ClimbingSystem : MonoBehaviour
         if (isLeftHand)
         {
             leftHandAttached = false;
+            leftHandMoving = false;
         }
         else
         {
             rightHandAttached = false;
+            rightHandMoving = false;
         }
 
         // If no longer climbing, restore normal movement
@@ -429,7 +601,9 @@ public class ClimbingSystem : MonoBehaviour
     void DetachAllIcepicks()
     {
         leftHandAttached = false;
+        leftHandMoving = false;
         rightHandAttached = false;
+        rightHandMoving = false;
 
         // Restore normal movement
         playerMovement.SetMovementState(true);
@@ -543,27 +717,97 @@ public class ClimbingSystem : MonoBehaviour
 
     void UpdateHandVisuals()
     {
-        // Direct hand visual updates for left hand with no smoothing
+        // Gradual movement for left hand
         if (leftHandAttached)
         {
-            // Use direct positioning with no interpolation
-            leftHandTransform.position = leftHandPosition;
+            if (leftHandMoving)
+            {
+                // Calculate direction to target
+                Vector3 toTarget = leftHandTargetPosition - leftHandTransform.position;
+                float distanceToTarget = toTarget.magnitude;
+
+                // Check if we've reached the target
+                if (distanceToTarget <= 0.01f)
+                {
+                    // We've reached the target
+                    leftHandTransform.position = leftHandTargetPosition;
+                    leftHandPosition = leftHandTargetPosition;
+                    leftHandMoving = false;
+
+                    // If this is the first hand to fully attach, do initial snap
+                    if (isFirstClimbFrame && !rightHandMoving)
+                    {
+                        PerformInitialSnap();
+                        isFirstClimbFrame = false;
+                    }
+                }
+                else
+                {
+                    // Move the hand toward the target at the configured speed
+                    float moveDistance = Mathf.Min(icepickMoveSpeed * Time.deltaTime, distanceToTarget);
+                    Vector3 movement = toTarget.normalized * moveDistance;
+
+                    // Update hand position
+                    leftHandTransform.position += movement;
+                    leftHandPosition = leftHandTransform.position;
+                }
+            }
+            else
+            {
+                // Keep hand at the stable position
+                leftHandTransform.position = leftHandPosition;
+            }
         }
         else
         {
-            // Immediately return hand to original position with no interpolation
+            // Return hand to original position
             leftHandTransform.localPosition = leftHandOriginalLocalPos;
         }
 
-        // Direct hand visual updates for right hand with no smoothing
+        // Gradual movement for right hand
         if (rightHandAttached)
         {
-            // Use direct positioning with no interpolation
-            rightHandTransform.position = rightHandPosition;
+            if (rightHandMoving)
+            {
+                // Calculate direction to target
+                Vector3 toTarget = rightHandTargetPosition - rightHandTransform.position;
+                float distanceToTarget = toTarget.magnitude;
+
+                // Check if we've reached the target
+                if (distanceToTarget <= 0.01f)
+                {
+                    // We've reached the target
+                    rightHandTransform.position = rightHandTargetPosition;
+                    rightHandPosition = rightHandTargetPosition;
+                    rightHandMoving = false;
+
+                    // If this is the first hand to fully attach, do initial snap
+                    if (isFirstClimbFrame && !leftHandMoving)
+                    {
+                        PerformInitialSnap();
+                        isFirstClimbFrame = false;
+                    }
+                }
+                else
+                {
+                    // Move the hand toward the target at the configured speed
+                    float moveDistance = Mathf.Min(icepickMoveSpeed * Time.deltaTime, distanceToTarget);
+                    Vector3 movement = toTarget.normalized * moveDistance;
+
+                    // Update hand position
+                    rightHandTransform.position += movement;
+                    rightHandPosition = rightHandTransform.position;
+                }
+            }
+            else
+            {
+                // Keep hand at the stable position
+                rightHandTransform.position = rightHandPosition;
+            }
         }
         else
         {
-            // Immediately return hand to original position with no interpolation
+            // Return hand to original position
             rightHandTransform.localPosition = rightHandOriginalLocalPos;
         }
     }
