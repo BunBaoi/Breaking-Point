@@ -14,27 +14,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dialogueNodes:
   - dialogueText: "Don\u2019t call me that."
-    fmodAudioEvent:
-      Guid:
-        Data1: 0
-        Data2: 0
-        Data3: 0
-        Data4: 0
-      Path: 
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
     eventIds: []
     options: []
     npcName: Alice
     npcTag: 
-  - dialogueText: Alright, alright! No 'madam.' Got it.
-    fmodAudioEvent:
+    useDialogueAudio: 1
+    fmodSoundEvent:
       Guid:
         Data1: 0
         Data2: 0
         Data3: 0
         Data4: 0
       Path: 
+  - dialogueText: Alright, alright! No 'madam.' Got it.
+    dialogueAudio: {fileID: 11400000, guid: 7aa603cac70ac442cbe1e5af68e9852b, type: 2}
     eventIds:
     - BaseCampArrivalDialogueFinished
     options: []
     npcName: Phillip
     npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 

@@ -14,25 +14,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dialogueNodes:
   - dialogueText: Oh absolutely. The real challenge here is surviving your ego.
-    fmodAudioEvent:
-      Guid:
-        Data1: 0
-        Data2: 0
-        Data3: 0
-        Data4: 0
-      Path: 
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
     eventIds: []
     options: []
     npcName: Alice
-  - dialogueText: "A burden I must bear. But in all seriousness, you\u2019re going
-      to be fine, Al. You\u2019ve prepared for this."
-    fmodAudioEvent:
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
       Guid:
         Data1: 0
         Data2: 0
         Data3: 0
         Data4: 0
       Path: 
+  - dialogueText: "A burden I must bear. But in all seriousness, you\u2019re going
+      to be fine, Al. You\u2019ve prepared for this."
+    dialogueAudio: {fileID: 11400000, guid: 7aa603cac70ac442cbe1e5af68e9852b, type: 2}
     eventIds: []
     options: []
     npcName: Phillip
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 

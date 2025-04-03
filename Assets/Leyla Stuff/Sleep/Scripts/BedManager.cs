@@ -14,6 +14,9 @@ public class BedManager : MonoBehaviour
     [SerializeField] private CanvasGroup fadeCanvas; // CanvasGroup for fading effect
     [SerializeField] private float fadeDuration = 0.5f;
     [SerializeField] private float rotationSpeed = 2f;
+    [SerializeField] private float zPositionOffset = 1f;
+    [SerializeField] private float xPositionOffset = 1f;
+    [SerializeField] private float yPositionOffset = 0.1f;
     [SerializeField] private string boolKey = "SleptInBed";
     [SerializeField] private CinematicSequence cinematicSequence;
     [SerializeField] private CameraController cameraController;
@@ -421,7 +424,7 @@ public class BedManager : MonoBehaviour
 
         // Teleport player to the center of the bed's collider but slightly above it (use the collider's center)
         Vector3 colliderCenter = bedCollider.bounds.center; // Center of the collider
-        Vector3 targetPosition = new Vector3(colliderCenter.x, colliderCenter.y + bedCollider.bounds.extents.y + 1f, colliderCenter.z); // Adjusted height above the bed
+        Vector3 targetPosition = new Vector3(colliderCenter.x + xPositionOffset, colliderCenter.y + bedCollider.bounds.extents.y + yPositionOffset, colliderCenter.z + zPositionOffset); // Adjusted height above the bed
 
         // Disable the CharacterController while teleporting the player
         CharacterController characterController = player.GetComponent<CharacterController>();
@@ -434,10 +437,10 @@ public class BedManager : MonoBehaviour
         player.position = targetPosition;
 
         // Re-enable the CharacterController
-        if (characterController != null)
+        /*if (characterController != null)
         {
             characterController.enabled = true;
-        }
+        }*/
 
         // Align player's Y rotation to match the bed's Y rotation (keeping the player's original X and Z rotations intact)
         player.rotation = Quaternion.Euler(player.eulerAngles.x, bed.rotation.eulerAngles.y, player.eulerAngles.z); // Align Y rotation with the bed's rotation
@@ -494,6 +497,10 @@ public class BedManager : MonoBehaviour
             dayNightCycle.StartTime();
             cameraController.SetLookState(true);
             playerMovement.SetMovementState(true);
+            if (characterController != null)
+            {
+                characterController.enabled = true; // Disable to avoid collision or unwanted behavior
+            }
             if (inventoryManager != null)
             {
                 inventoryManager.enabled = true;
@@ -566,6 +573,11 @@ public class BedManager : MonoBehaviour
         {
             inventoryManager.enabled = true;
             inventoryCanvas.gameObject.SetActive(true);
+        }
+        CharacterController characterController = player.GetComponent<CharacterController>();
+        if (characterController != null)
+        {
+            characterController.enabled = true; // Disable to avoid collision or unwanted behavior
         }
         cameraController.SetLookState(true);
         playerMovement.SetMovementState(true);

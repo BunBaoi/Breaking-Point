@@ -315,6 +315,16 @@ public class NPCDialogue : MonoBehaviour
             if (hit.collider != null && hit.collider.gameObject.name == "NPC Mesh" && hit.collider.transform.IsChildOf(transform) && playerInRange)
             {
                 ShowInteractText();
+                // Check if the interact key is pressed
+                if (playerInRange && interactAction.triggered && !isDialoguePressed && CanStartDialogue())
+                {
+                    isDialoguePressed = true;
+                    PlayerPrefs.SetInt(dialogueKey, 1);
+                    PlayerPrefs.Save();
+                    StartDialogue();
+
+                    HideInteractText();
+                }
             }
             else
             {
@@ -323,17 +333,6 @@ public class NPCDialogue : MonoBehaviour
         }
         else
         {
-            HideInteractText();
-        }
-
-// Check if the interact key is pressed
-if (playerInRange && interactAction.triggered && !isDialoguePressed && CanStartDialogue())
-        {
-            isDialoguePressed = true;
-            PlayerPrefs.SetInt(dialogueKey, 1);
-            PlayerPrefs.Save();
-            StartDialogue();
-
             HideInteractText();
         }
 

@@ -12,6 +12,7 @@ public class DialogueManager : MonoBehaviour
 
     [Header("Dialogue Settings")]
     [SerializeField] private TMP_Text dialogueTextUI;
+    [SerializeField] private GameObject dialoguePanel;
     // [SerializeField] private TMP_Text npcNameUI;
     [SerializeField] private Canvas dialogueCanvas;
     [SerializeField] private GameObject buttonPrefab;
@@ -19,7 +20,7 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private Image nextDialogueIndicatorImage;
     [SerializeField] private CanvasGroup nextDialogueIndicatorCanvasGroup;
     [SerializeField] private Camera mainCamera;  // Player camera
-    [SerializeField] private float scrollSpeed = 0.05f;
+    [SerializeField] private float scrollSpeed = 0.03f;
 
    [Header("Colour Settings")]
     [SerializeField] private string npcNameColorHex = "#D95959"; // Default colour
@@ -153,6 +154,11 @@ public class DialogueManager : MonoBehaviour
             {
                 Debug.LogError("PlayerInputs asset not found in Resources/Keybinds folder!");
             }
+        }
+
+        if (dialoguePanel != null)
+        {
+            dialoguePanel.SetActive(false);
         }
     }
 
@@ -559,6 +565,11 @@ public class DialogueManager : MonoBehaviour
         {
             Debug.LogWarning("Player object not found with tag 'Player'.");
         }
+
+        if (dialoguePanel != null)
+        {
+            dialoguePanel.SetActive(true);
+        }
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
         isDialogueActive = true;
@@ -637,6 +648,10 @@ public class DialogueManager : MonoBehaviour
                 {
                     hand.SetActive(true);
                 }
+            }
+            if (dialoguePanel != null)
+            {
+                dialoguePanel.SetActive(false);
             }
         }
     }

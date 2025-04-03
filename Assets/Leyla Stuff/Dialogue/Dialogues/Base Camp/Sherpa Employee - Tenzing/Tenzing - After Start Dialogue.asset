@@ -15,28 +15,32 @@ MonoBehaviour:
   dialogueNodes:
   - dialogueText: "Respect the mountain Al. And maybe don\u2019t trip over your crampons
       during the examination, yeah? "
-    fmodAudioEvent:
-      Guid:
-        Data1: 0
-        Data2: 0
-        Data3: 0
-        Data4: 0
-      Path: 
+    dialogueAudio: {fileID: 11400000, guid: 7aa603cac70ac442cbe1e5af68e9852b, type: 2}
     eventIds: []
     options: []
     npcName: Phillip
     npcTag: Phillip
-  - dialogueText: "One of these days, I\u2019ll learn to tune you out. But not today
-      it seems. Sad."
-    fmodAudioEvent:
+    useDialogueAudio: 1
+    fmodSoundEvent:
       Guid:
         Data1: 0
         Data2: 0
         Data3: 0
         Data4: 0
       Path: 
+  - dialogueText: "One of these days, I\u2019ll learn to tune you out. But not today
+      it seems. Sad."
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
     eventIds:
     - EntranceAfterWelcomeDialogueFinished
     options: []
     npcName: Alice
     npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
