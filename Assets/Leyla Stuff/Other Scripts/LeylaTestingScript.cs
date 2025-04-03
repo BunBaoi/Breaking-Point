@@ -8,6 +8,8 @@ public class LeylaTestingScript : MonoBehaviour
     [SerializeField] private string boolName = "";
     [SerializeField] private TipManager tipManager;
     [SerializeField] private int tipNumber = 0;
+    [SerializeField] private JournalPageAdder journalPageAdder;
+    [SerializeField] private ObjectivesPage objectivesPage;
 
     // Start is called before the first frame update
     void Start()
@@ -20,7 +22,9 @@ public class LeylaTestingScript : MonoBehaviour
     {
         if (Input.GetKeyDown(key))
         {
-            tipManager.ShowTip(tipNumber);
+            Debug.Log("add page");
+            journalPageAdder.AddObjectivesPage(objectivesPage);
+            // tipManager.ShowTip(tipNumber);
             /*if (BoolManager.Instance != null)
             {
                 BoolManager.Instance.SetBool(boolName, true);

@@ -8,6 +8,8 @@ public class ItemCheckerForTips : MonoBehaviour
     [SerializeField] private Item[] items;
     [SerializeField] private float[] tipIndexes;
     [SerializeField] private TipManager tipManager;
+    [SerializeField] private string[] boolNames;
+    [SerializeField] private ForBoolManager forBoolManager;
 
     private bool[] itemTipsShown;
 
@@ -25,10 +27,15 @@ public class ItemCheckerForTips : MonoBehaviour
         {
             if (inventoryManager.HasItem(items[i]) && !itemTipsShown[i])
             {
+                // Show the tip related to the item
                 int tipNumber = Mathf.FloorToInt(tipIndexes[i]);
                 tipManager.ShowTip(tipNumber);
 
-                // Mark the tip as shown and save the status
+                if (forBoolManager != null)
+                {
+                    forBoolManager.SetBoolVariable(boolNames[i]);
+                }
+
                 itemTipsShown[i] = true;
                 SaveTipStatus();
             }
