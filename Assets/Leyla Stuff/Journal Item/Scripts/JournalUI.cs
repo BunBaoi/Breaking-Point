@@ -40,6 +40,8 @@ public class JournalUI : MonoBehaviour
     private InputAction useItem;
     private InputAction nextPage;
     private InputAction previousPage;
+    [SerializeField] private int previousPageIndex = 0;
+    [SerializeField] private bool nextOrPreviousPageCalled = false;
 
     // [Header("Journal Pages")]
     [SerializeField] private List<JournalPage> pages => PageTracker.Instance != null ? PageTracker.Instance.Pages : new List<JournalPage>();
@@ -328,19 +330,25 @@ public class JournalUI : MonoBehaviour
                                             binding.controllerSprite : binding.keySprite;
     }
 
-    private int previousPageIndex = -1;
-
     private void UpdateJournalUI()
     {
         if (PageTracker.Instance == null || PageTracker.Instance.Pages.Count == 0) return;
 
         var pages = PageTracker.Instance.Pages;
 
-        if (currentPageIndex == previousPageIndex)
+        if (!nextOrPreviousPageCalled)
         {
-            Debug.Log("No new page added, skipping UI update.");
-            return; // Don't do anything if the page hasn't changed
+            if (pages.Count == previousPageIndex)
+            {
+                Debug.Log("No new page added, skipping UI update.");
+                return; // Don't do anything if the page hasn't changed
+            }
         }
+
+        previousPageIndex = pages.Count;
+
+        nextOrPreviousPageCalled = false;
+        Debug.Log("updated journal ui");
 
         // Clear previous content from both pages
         ClearPageUI(leftTitleText, leftContentText, leftChecklistContainer);
@@ -425,6 +433,7 @@ public class JournalUI : MonoBehaviour
 
         if (PageTracker.Instance == null) return;
 
+        nextOrPreviousPageCalled = true;
         // Check if there's a valid next page (if we're not already at the last page)
         if (currentPageIndex + 2 < PageTracker.Instance.Pages.Count)
         {
@@ -454,6 +463,7 @@ public class JournalUI : MonoBehaviour
 
         if (PageTracker.Instance == null) return;
 
+        nextOrPreviousPageCalled = true;
         // Check if we can move back by two pages
         if (currentPageIndex - 2 >= 0)
         {
