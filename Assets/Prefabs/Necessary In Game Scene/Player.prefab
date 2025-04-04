@@ -2979,7 +2979,6 @@ GameObject:
   - component: {fileID: 8519684001432960098}
   - component: {fileID: 897709939373269665}
   - component: {fileID: 5861964805009779517}
-  - component: {fileID: 6885791762203668991}
   - component: {fileID: 1278238817659047079}
   - component: {fileID: 1044431239221895828}
   - component: {fileID: 2841370886391303198}
@@ -3123,30 +3122,132 @@ MonoBehaviour:
   IsSprint: 0
   playerHeight: 0
   canMove: 1
+  leftFootstepEvents:
+  - Guid:
+      Data1: 212882463
+      Data2: 1142123839
+      Data3: 1451846570
+      Data4: -1437713695
+    Path: event:/Hard Snow Left Footstep 1 SFX
+  - Guid:
+      Data1: 1337914587
+      Data2: 1098732615
+      Data3: 333180568
+      Data4: 1675029421
+    Path: event:/Hard Snow Left Footstep 2 SFX
+  - Guid:
+      Data1: -1019077078
+      Data2: 1161338335
+      Data3: -384917593
+      Data4: -1688846125
+    Path: event:/Hard Snow Left Footstep 3 SFX
+  - Guid:
+      Data1: 279470748
+      Data2: 1099160710
+      Data3: 1285033652
+      Data4: 1003287642
+    Path: event:/Hard Snow Left Footstep 4 SFX
+  - Guid:
+      Data1: 2112080717
+      Data2: 1174985081
+      Data3: -1859142272
+      Data4: -554593352
+    Path: event:/Hard Snow Left Footstep 5 SFX
+  - Guid:
+      Data1: -2106544453
+      Data2: 1130359148
+      Data3: -151041150
+      Data4: -51444054
+    Path: event:/Hard Snow Left Footstep 6 SFX
+  - Guid:
+      Data1: 954328563
+      Data2: 1308171269
+      Data3: 903989666
+      Data4: -1584216910
+    Path: event:/Hard Snow Left Footstep 7 SFX
+  - Guid:
+      Data1: -658290950
+      Data2: 1261655183
+      Data3: 1689360010
+      Data4: -453404672
+    Path: event:/Hard Snow Left Footstep 8 SFX
+  - Guid:
+      Data1: -1295076156
+      Data2: 1081671785
+      Data3: 1336964510
+      Data4: 1559903467
+    Path: event:/Hard Snow Left Footstep 9 SFX
+  - Guid:
+      Data1: -103030512
+      Data2: 1136522114
+      Data3: -605535311
+      Data4: -65361323
+    Path: event:/Hard Snow Left Footstep 10 SFX
+  rightFootstepEvents:
+  - Guid:
+      Data1: 1774112452
+      Data2: 1342110690
+      Data3: -648488056
+      Data4: 1697144574
+    Path: event:/Hard Snow Right Footstep 1 SFX
+  - Guid:
+      Data1: 1146562800
+      Data2: 1233449343
+      Data3: -351927678
+      Data4: -20595837
+    Path: event:/Hard Snow Right Footstep 2 SFX
+  - Guid:
+      Data1: -2129987507
+      Data2: 1143598388
+      Data3: -1654803063
+      Data4: -2128187704
+    Path: event:/Hard Snow Right Footstep 3 SFX
+  - Guid:
+      Data1: -1018689425
+      Data2: 1091898335
+      Data3: 1160483720
+      Data4: 5047748
+    Path: event:/Hard Snow Right Footstep 4 SFX
+  - Guid:
+      Data1: 1258159539
+      Data2: 1191467499
+      Data3: -38938192
+      Data4: -1639636641
+    Path: event:/Hard Snow Right Footstep 5 SFX
+  - Guid:
+      Data1: -1579218987
+      Data2: 1129039684
+      Data3: -1016765053
+      Data4: -117561024
+    Path: event:/Hard Snow Right Footstep 6 SFX
+  - Guid:
+      Data1: 2110909588
+      Data2: 1105632443
+      Data3: 772772006
+      Data4: -1367782290
+    Path: event:/Hard Snow Right Footstep 7 SFX
+  - Guid:
+      Data1: -560775228
+      Data2: 1177587977
+      Data3: 732940180
+      Data4: -581021575
+    Path: event:/Hard Snow Right Footstep 8 SFX
+  - Guid:
+      Data1: -746735484
+      Data2: 1229974689
+      Data3: -1299225974
+      Data4: 1014428607
+    Path: event:/Hard Snow Right Footstep 9 SFX
+  - Guid:
+      Data1: -2140392911
+      Data2: 1086335482
+      Data3: -1450142827
+      Data4: -560918165
+    Path: event:/Hard Snow Right Footstep 10 SFX
+  animator: {fileID: 8536765049787210110}
   inputActions: {fileID: -944628639613478452, guid: 5ec57af691e024f5495721c1aec07891, type: 3}
   movementName: Move
   sprintName: Sprint
---- !u!95 &6885791762203668991
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1804318439799572251}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &1278238817659047079
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3166,6 +3267,7 @@ MonoBehaviour:
   climbSpeed: 3
   maxClimbDistance: 4
   climbableTag: Climbable
+  icepickMoveSpeed: 5
   bodyPositionOffset: 1.5
   initialSnapPercentage: 0.3
   targetOffsetDistance: 0.2
@@ -3173,6 +3275,10 @@ MonoBehaviour:
   lowEnergyClimbSpeedMultiplier: 0.5
   lowEnergyThreshold: 20
   upwardBias: 0.1
+  startRotationX: -45
+  endRotationX: 30
+  digInSpeed: 8
+  animateEntireHand: 0
   inputActions: {fileID: -944628639613478452, guid: 5ec57af691e024f5495721c1aec07891, type: 3}
   leftGrabActionName: Climb Left Grab
   rightGrabActionName: Climb Right Grab
@@ -5674,6 +5780,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2348770424696111876}
   - component: {fileID: 8536765049787210110}
+  - component: {fileID: 6158508262234058049}
   m_Layer: 2
   m_Name: Player
   m_TagString: Untagged
@@ -5721,6 +5828,19 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &6158508262234058049
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3157958943125592510}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ff59ec857052439d87c9c668636c462, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerMovement: {fileID: 5861964805009779517}
 --- !u!1 &3167197939626818540
 GameObject:
   m_ObjectHideFlags: 0

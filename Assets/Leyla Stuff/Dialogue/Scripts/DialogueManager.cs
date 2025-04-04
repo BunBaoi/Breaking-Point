@@ -250,6 +250,11 @@ public class DialogueManager : MonoBehaviour
             }
         }
 
+        if (isDialogueActive)
+        {
+            SetInventoryActive(false);
+        }
+
         // Only process manual dialogue advancement if not in automatic dialogue mode
         if (!isAutomaticDialogueActive && !optionsAreVisible)
         {
@@ -264,7 +269,7 @@ public class DialogueManager : MonoBehaviour
 
                     if (currentSound.isValid())
                     {
-                        currentSound.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+                        currentSound.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
                         currentSound.release();
                     }
 
@@ -693,7 +698,7 @@ public class DialogueManager : MonoBehaviour
         // Stop fmod event and if useDialogueAudio is false for the current node, play the fmodSoundEvent variable instead
         if (currentDialogueEvent.isValid())
         {
-            currentDialogueEvent.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+            currentDialogueEvent.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
             currentDialogueEvent.release();
         }
 
@@ -865,7 +870,7 @@ public class DialogueManager : MonoBehaviour
                     // Stop previous sound if any
                     if (currentSound.isValid())
                     {
-                        currentSound.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+                        currentSound.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
                         currentSound.release();
                     }
 

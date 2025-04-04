@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using FMODUnity;
+using FMOD.Studio;
 using static PlayerStats;
-//using static QTEMechanic;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -16,6 +17,7 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Settings")]
     public float objectSpeed = 3;
+    public float defaultWalkSpeed = 12f;
     public float walkSpeed = 12f;
     public float sprintSpeed = 20f;
     public float gravity = -9.81f;
@@ -24,6 +26,15 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Testing Purposes")]
     public bool canMove = true;
+
+    [Header("Footstep Sounds (FMOD)")]
+    public EventReference[] leftFootstepEvents; // Left footstep sounds
+    public EventReference[] rightFootstepEvents; // Right footstep sounds
+    private int leftFootstepIndex = 0;
+    private int rightFootstepIndex = 0;
+
+    [Header("Animator")]
+    public Animator animator;
 
     [Header("Keybinds")]
     [SerializeField] private InputActionAsset inputActions;
@@ -40,12 +51,9 @@ public class PlayerMovement : MonoBehaviour
 
     void Awake()
     {
-        // If inputActions is not assigned via the inspector, load it from the Resources/Keybinds folder
         if (inputActions == null)
         {
-            // Load from the "Keybinds" folder in Resources
             inputActions = Resources.Load<InputActionAsset>("Keybinds/PlayerInputs");
-
             if (inputActions == null)
             {
                 Debug.LogError("PlayerInputs asset not found in Resources/Keybinds folder!");
@@ -56,27 +64,11 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         playerStats = GetComponent<PlayerStats>();
-
         movement = inputActions.FindAction(movementName);
         sprint = inputActions.FindAction(sprintName);
 
-        if (movement != null)
-        {
-            movement.Enable(); // Enable the action
-        }
-        else
-        {
-            Debug.LogError($"Input action '{movementName}' not found in Input Action Asset!");
-        }
-
-        if (sprint != null)
-        {
-            sprint.Enable(); // Enable the action
-        }
-        else
-        {
-            Debug.LogError($"Input action '{sprintName}' not found in Input Action Asset!");
-        }
+        if (movement != null) movement.Enable();
+        if (sprint != null) sprint.Enable();
     }
 
     void Update()
@@ -87,18 +79,32 @@ public class PlayerMovement : MonoBehaviour
             HandleSprint();
         }
 
+        UpdateAnimation();
+
         ApplyGravity();
-        // OxyOutputRate();
         QTEControl();
     }
 
     void HandleGroundMovement()
     {
-        // Read movement input from InputActionAsset
         moveInput = movement.ReadValue<Vector2>();
-
         Vector3 move = transform.right * moveInput.x + transform.forward * moveInput.y;
+
+        // Move the player
         controller.Move(move * walkSpeed * Time.deltaTime);
+    }
+
+    void UpdateAnimation()
+    {
+        // Calculate the current speed based on movement input and sprinting
+        float currentSpeed = moveInput.magnitude * (IsSprint ? 1f : 0.5f);
+
+        if (!canMove)
+        {
+            currentSpeed = 0f;
+        }
+
+        animator.SetFloat("speed", currentSpeed);
     }
 
     void ApplyGravity()
@@ -110,7 +116,7 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            velocity.y = 0; // Reset vertical velocity when gravity is not applied
+            velocity.y = 0;
         }
     }
 
@@ -128,7 +134,7 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            walkSpeed = 12f;
+            walkSpeed = defaultWalkSpeed;
             IsSprint = false;
         }
     }
@@ -139,31 +145,42 @@ public class PlayerMovement : MonoBehaviour
         {
             qTEMechanicScript.QTEMove();
             canMove = false;
-            Debug.Log("Player Movement Locked");
             playerStats.QTEState = true;
-
         }
     }
-
-    /*public void OxyOutputRate()
-    {
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            playerStats.OxygenTankRefillRate++;
-            //Debug.log("Rate Up");
-        }
-        else if (Input.GetKeyDown(KeyCode.Q))
-        {
-            playerStats.OxygenTankRefillRate--;
-            //Debug.log("Rate Down");
-
-            // Need to add condition that the rate can't go negative
-
-        }
-    }*/
 
     public void SetMovementState(bool state)
     {
         canMove = state;
+    }
+
+    // Animation event for Left Footstep
+    public void PlayLeftFootstepSound()
+    {
+        if (leftFootstepEvents.Length == 0) return;
+
+        EventReference soundEventReference = leftFootstepEvents[leftFootstepIndex];
+
+        EventInstance footstepInstance = RuntimeManager.CreateInstance(soundEventReference);
+        footstepInstance.start();
+        footstepInstance.release();
+
+        // Move to the next footstep in the array, looping back if necessary
+        leftFootstepIndex = (leftFootstepIndex + 1) % leftFootstepEvents.Length;
+    }
+
+    // Animation event for Right Footstep
+    public void PlayRightFootstepSound()
+    {
+        if (rightFootstepEvents.Length == 0) return;
+
+        EventReference soundEventReference = rightFootstepEvents[rightFootstepIndex];
+
+        EventInstance footstepInstance = RuntimeManager.CreateInstance(soundEventReference);
+        footstepInstance.start();
+        footstepInstance.release();
+
+        // Move to the next footstep in the array, looping back if necessary
+        rightFootstepIndex = (rightFootstepIndex + 1) % rightFootstepEvents.Length;
     }
 }

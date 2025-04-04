@@ -68,6 +68,11 @@ public class SettingsManager : MonoBehaviour
     [SerializeField] private TMP_Text resetMessageText;
     private Coroutine resetMessageCoroutine;
 
+    [Header("Inventory Setups")]
+    [SerializeField] private string playerTag = "Player";
+    [SerializeField] private InventoryManager inventoryManager;
+    [SerializeField] private Canvas inventoryCanvas;
+
     private ColorAdjustments colorAdjustments;
     public static SettingsManager Instance;
 
@@ -329,18 +334,54 @@ public class SettingsManager : MonoBehaviour
         isMenuOpen = !isMenuOpen;
         settingsCanvas.SetActive(isMenuOpen);
 
+        GameObject playerObject = GameObject.FindGameObjectWithTag(playerTag);
+
         // Pause or resume time based on the menu state
         if (isMenuOpen)
         {
             Time.timeScale = 0f;
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
+
+            if (playerObject != null)
+            {
+                inventoryManager = playerObject.GetComponent<InventoryManager>();
+                if (inventoryManager != null)
+                {
+                    inventoryManager.enabled = false;
+                    Debug.Log("InventoryManager disabled.");
+                }
+                Transform inventoryCanvasTransform = playerObject.transform.Find("Inventory Canvas");
+                if (inventoryCanvasTransform != null)
+                {
+                    inventoryCanvas = inventoryCanvasTransform.GetComponent<Canvas>();
+                    if (inventoryCanvas != null)
+                    {
+                        inventoryCanvas.gameObject.SetActive(false);
+                        Debug.Log("Inventory Canvas disabled.");
+                    }
+                }
+            }
         }
         else
         {
             Time.timeScale = 1f;
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
+
+            if (inventoryManager != null)
+            {
+                inventoryManager.enabled = true;
+            }
+            Transform inventoryCanvasTransform = playerObject.transform.Find("Inventory Canvas");
+            if (inventoryCanvasTransform != null)
+            {
+                inventoryCanvas = inventoryCanvasTransform.GetComponent<Canvas>();
+                if (inventoryCanvas != null)
+                {
+                    inventoryCanvas.gameObject.SetActive(true);
+                }
+            }
         }
 
         Debug.Log("Settings Menu Toggled: " + isMenuOpen);
