@@ -32,7 +32,7 @@ public class SettingsManager : MonoBehaviour
     [Header("Scroll Text Speed")]
     [SerializeField] private Slider scrollSpeedSlider;
     [SerializeField] private TMP_InputField scrollSpeedInput;
-    [SerializeField] private float scrollSpeed = 0.05f;
+    [SerializeField] private float scrollSpeed = 0.03f;
 
     [Header("Brightness Settings")]
     [SerializeField] private Slider brightnessSlider;
@@ -67,6 +67,11 @@ public class SettingsManager : MonoBehaviour
     [SerializeField] private Button resetButton;
     [SerializeField] private TMP_Text resetMessageText;
     private Coroutine resetMessageCoroutine;
+
+    [Header("Inventory Setups")]
+    [SerializeField] private string playerTag = "Player";
+    [SerializeField] private InventoryManager inventoryManager;
+    [SerializeField] private Canvas inventoryCanvas;
 
     private ColorAdjustments colorAdjustments;
     public static SettingsManager Instance;
@@ -167,9 +172,9 @@ public class SettingsManager : MonoBehaviour
         // --- DIALOGUE TEXT SCROLL SPEED SETTINGS ---
         if (scrollSpeedSlider != null)
         {
-            scrollSpeed = PlayerPrefs.GetFloat("ScrollSpeed", 0.05f);
+            scrollSpeed = PlayerPrefs.GetFloat("ScrollSpeed", 0.03f);
             scrollSpeedSlider.minValue = 0.01f;
-            scrollSpeedSlider.maxValue = 5f;
+            scrollSpeedSlider.maxValue = 0.5f;
             scrollSpeedSlider.value = scrollSpeed;
 
             UpdateScrollSpeedText(scrollSpeed);
@@ -233,16 +238,17 @@ public class SettingsManager : MonoBehaviour
         FindAllScrollRects();
 
         scrollSensitivity = PlayerPrefs.GetFloat("ScrollSensitivity", defaultScrollSensitivity);
-        scrollSensitivitySlider.value = scrollSensitivity;
+
         scrollSensitivitySlider.minValue = 0.1f;
-        scrollSensitivitySlider.maxValue = 20f;
+        scrollSensitivitySlider.maxValue = 40f;
+
+        scrollSensitivitySlider.value = scrollSensitivity;
+        mouseScrollSensitivityInput.text = scrollSensitivity.ToString("0.0");
 
         UpdateScrollSensitivity(scrollSensitivity);
 
         scrollSensitivitySlider.onValueChanged.AddListener(UpdateScrollSensitivityFromSlider);
         mouseScrollSensitivityInput.onEndEdit.AddListener(UpdateScrollSensitivityFromInputField);
-
-        mouseScrollSensitivityInput.text = scrollSensitivity.ToString("0.0");
 
         // Resume button
         if (resumeButton != null)
@@ -328,18 +334,54 @@ public class SettingsManager : MonoBehaviour
         isMenuOpen = !isMenuOpen;
         settingsCanvas.SetActive(isMenuOpen);
 
+        GameObject playerObject = GameObject.FindGameObjectWithTag(playerTag);
+
         // Pause or resume time based on the menu state
         if (isMenuOpen)
         {
             Time.timeScale = 0f;
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
+
+            if (playerObject != null)
+            {
+                inventoryManager = playerObject.GetComponent<InventoryManager>();
+                if (inventoryManager != null)
+                {
+                    inventoryManager.enabled = false;
+                    Debug.Log("InventoryManager disabled.");
+                }
+                Transform inventoryCanvasTransform = playerObject.transform.Find("Inventory Canvas");
+                if (inventoryCanvasTransform != null)
+                {
+                    inventoryCanvas = inventoryCanvasTransform.GetComponent<Canvas>();
+                    if (inventoryCanvas != null)
+                    {
+                        inventoryCanvas.gameObject.SetActive(false);
+                        Debug.Log("Inventory Canvas disabled.");
+                    }
+                }
+            }
         }
         else
         {
             Time.timeScale = 1f;
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
+
+            if (inventoryManager != null)
+            {
+                inventoryManager.enabled = true;
+            }
+            Transform inventoryCanvasTransform = playerObject.transform.Find("Inventory Canvas");
+            if (inventoryCanvasTransform != null)
+            {
+                inventoryCanvas = inventoryCanvasTransform.GetComponent<Canvas>();
+                if (inventoryCanvas != null)
+                {
+                    inventoryCanvas.gameObject.SetActive(true);
+                }
+            }
         }
 
         Debug.Log("Settings Menu Toggled: " + isMenuOpen);
@@ -366,7 +408,7 @@ public class SettingsManager : MonoBehaviour
 
     private void UpdateScrollSpeed(float newSpeed)
     {
-        scrollSpeed = Mathf.Clamp(newSpeed, 0.01f, 5f);
+        scrollSpeed = Mathf.Clamp(newSpeed, 0.01f, 0.5f);
 
         UpdateScrollSpeedText(scrollSpeed);
 
@@ -387,7 +429,7 @@ public class SettingsManager : MonoBehaviour
         if (float.TryParse(input, out float newSpeed))
         {
             // Clamp the value and update
-            newSpeed = Mathf.Clamp(newSpeed, 0.01f, 5f);
+            newSpeed = Mathf.Clamp(newSpeed, 0.01f, 0.5f);
             scrollSpeed = newSpeed;
 
             if (scrollSpeedSlider != null)
@@ -395,9 +437,9 @@ public class SettingsManager : MonoBehaviour
                 scrollSpeedSlider.value = scrollSpeed;
             }
 
+            scrollSpeedInput.text = $"{scrollSpeed:0.00}";
             // Save to PlayerPrefs
             PlayerPrefs.SetFloat("ScrollSpeed", scrollSpeed);
-            Debug.Log($"Scroll Speed Updated from Input: {scrollSpeed}");
         }
         else
         {
@@ -434,6 +476,9 @@ public class SettingsManager : MonoBehaviour
         if (float.TryParse(input, out float newSensitivity))
         {
             newSensitivity = Mathf.Clamp(newSensitivity, 0.01f, 20f);
+
+            sensitivityInputField.text = newSensitivity.ToString("0.00");
+
             mouseSensitivity = newSensitivity * 100f;
 
             if (sensitivitySlider != null)
@@ -461,7 +506,10 @@ public class SettingsManager : MonoBehaviour
     {
         if (float.TryParse(value, out float newSensitivity))
         {
-            newSensitivity = Mathf.Clamp(newSensitivity, 0.1f, 20f);
+
+            newSensitivity = Mathf.Clamp(newSensitivity, 0.1f, 40f);
+
+            mouseScrollSensitivityInput.text = newSensitivity.ToString("0.0");
 
             scrollSensitivity = newSensitivity;
             scrollSensitivitySlider.value = scrollSensitivity;
@@ -508,7 +556,7 @@ public class SettingsManager : MonoBehaviour
 
     public void ResetToDefaultSettings()
     {
-        scrollSpeed = 0.05f;
+        scrollSpeed = 0.03f;
 
         if (scrollSpeedSlider != null)
         {

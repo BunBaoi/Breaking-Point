@@ -33,13 +33,15 @@ public class JournalUI : MonoBehaviour
     private CameraController cameraController;
 
     [Header("Keybinds")]
-    [SerializeField] private InputActionAsset inputActions; // Reference to the Input Action Asset
+    [SerializeField] private InputActionAsset inputActions;
     [SerializeField] private string useItemName = "Use";
     [SerializeField] private string nextPageName = "Next";
     [SerializeField] private string previousPageName = "Previous";
     private InputAction useItem;
     private InputAction nextPage;
     private InputAction previousPage;
+    [SerializeField] private int previousPageIndex = 0;
+    [SerializeField] private bool nextOrPreviousPageCalled = false;
 
     // [Header("Journal Pages")]
     [SerializeField] private List<JournalPage> pages => PageTracker.Instance != null ? PageTracker.Instance.Pages : new List<JournalPage>();
@@ -74,8 +76,8 @@ public class JournalUI : MonoBehaviour
         GameObject player = GameObject.Find("Player");
         if (player != null)
         {
-            inventoryManager = player.GetComponent<InventoryManager>(); // Get InventoryManager attached to "Player"
-            inventoryCanvas = player.transform.Find("Inventory Canvas")?.GetComponent<Canvas>(); // Get Inventory Canvas child
+            inventoryManager = player.GetComponent<InventoryManager>();
+            inventoryCanvas = player.transform.Find("Inventory Canvas")?.GetComponent<Canvas>(); 
         }
         journalUI.SetActive(false); // Ensure journal is hidden at start
         nextPageButton.onClick.AddListener(NextPage);
@@ -109,7 +111,7 @@ public class JournalUI : MonoBehaviour
             ToggleJournal();
         }
 
-        // Ensure cursor stays visible when journal is open
+        // cursor stays visible when journal is open
         if (isJournalOpen)
         {
             GameObject player = GameObject.FindGameObjectWithTag("Player");
@@ -171,7 +173,7 @@ public class JournalUI : MonoBehaviour
                     Debug.Log($"Page {i + 1} Title: {pages[i].pageTitle}");
                 }
 
-                // Optionally, log current left and right pages (as you already have it)
+                // log current left and right pages
                 if (currentPageIndex < pages.Count)
                 {
                     Debug.Log($"Left Page Title: {pages[currentPageIndex].pageTitle}");
@@ -313,7 +315,6 @@ public class JournalUI : MonoBehaviour
         KeyBinding binding = KeyBindingManager.Instance.GetKeybinding(previousPageName);
         if (binding == null) return;
 
-        // Choose the correct sprite based on input device
         prevPageImage.sprite = KeyBindingManager.Instance.IsUsingController() ?
                                             binding.controllerSprite : binding.keySprite;
     }
@@ -325,7 +326,6 @@ public class JournalUI : MonoBehaviour
         KeyBinding binding = KeyBindingManager.Instance.GetKeybinding(nextPageName);
         if (binding == null) return;
 
-        // Choose the correct sprite based on input device
         nextPageImage.sprite = KeyBindingManager.Instance.IsUsingController() ?
                                             binding.controllerSprite : binding.keySprite;
     }
@@ -336,11 +336,25 @@ public class JournalUI : MonoBehaviour
 
         var pages = PageTracker.Instance.Pages;
 
+        if (!nextOrPreviousPageCalled)
+        {
+            if (pages.Count == previousPageIndex)
+            {
+                Debug.Log("No new page added, skipping UI update.");
+                return; // Don't do anything if the page hasn't changed
+            }
+        }
+
+        previousPageIndex = pages.Count;
+
+        nextOrPreviousPageCalled = false;
+        Debug.Log("updated journal ui");
+
         // Clear previous content from both pages
         ClearPageUI(leftTitleText, leftContentText, leftChecklistContainer);
         ClearPageUI(rightTitleText, rightContentText, rightChecklistContainer);
 
-        // Update Left Page (always show the current page)
+        // Update Left Page
         if (currentPageIndex < pages.Count)
         {
             UpdatePageUI(pages[currentPageIndex], leftTitleText, leftContentText, leftChecklistContainer);
@@ -364,8 +378,7 @@ public class JournalUI : MonoBehaviour
         // Adjust button interactability based on available pages
         prevPageButton.interactable = currentPageIndex > 0;
 
-        // Disable nextPageButton if there are only two pages
-        nextPageButton.interactable = pages.Count > 2 && currentPageIndex + 1 < pages.Count;
+        nextPageButton.interactable = currentPageIndex + 2 < pages.Count;
     }
 
     private void UpdatePageUI(JournalPage page, TMP_Text title, TMP_Text content, Transform checklistContainer)
@@ -420,6 +433,7 @@ public class JournalUI : MonoBehaviour
 
         if (PageTracker.Instance == null) return;
 
+        nextOrPreviousPageCalled = true;
         // Check if there's a valid next page (if we're not already at the last page)
         if (currentPageIndex + 2 < PageTracker.Instance.Pages.Count)
         {
@@ -428,13 +442,13 @@ public class JournalUI : MonoBehaviour
             UpdateJournalUI();
             Debug.Log($"Pages {currentPageIndex + 1} and {currentPageIndex + 2} updated");
         }
-        else if (currentPageIndex + 1 < PageTracker.Instance.Pages.Count)
+        /*else if (currentPageIndex + 1 < PageTracker.Instance.Pages.Count)
         {
             currentPageIndex += 1; // Move to the last page (if we have an odd number of pages)
             PageTracker.Instance.SetCurrentPageIndex(currentPageIndex);
             UpdateJournalUI();
             Debug.Log($"Page {currentPageIndex + 1} updated with blank right side");
-        }
+        }*/
         else
         {
             // If there's no valid next page, do nothing
@@ -449,6 +463,7 @@ public class JournalUI : MonoBehaviour
 
         if (PageTracker.Instance == null) return;
 
+        nextOrPreviousPageCalled = true;
         // Check if we can move back by two pages
         if (currentPageIndex - 2 >= 0)
         {

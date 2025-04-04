@@ -14,156 +14,180 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dialogueNodes:
   - dialogueText: "Namaste. Welcome to Base Camp. What\u2019s your name?"
-    fmodAudioEvent:
-      Guid:
-        Data1: 0
-        Data2: 0
-        Data3: 0
-        Data4: 0
-      Path: 
+    dialogueAudio: {fileID: 11400000, guid: 98e125fe940c141babd5d8b069a031ad, type: 2}
     eventIds: []
     options: []
-    npcName: Sherpa Employee
+    npcName: Entrance Sherpa
     npcTag: 
-  - dialogueText: Alice. I just arrived.
-    fmodAudioEvent:
+    useDialogueAudio: 1
+    fmodSoundEvent:
       Guid:
         Data1: 0
         Data2: 0
         Data3: 0
         Data4: 0
       Path: 
+  - dialogueText: Alice. I just arrived.
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
     eventIds: []
     options: []
     npcName: Alice
     npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
   - dialogueText: "Glad to have you here. I\u2019m Tenzing, one of the Sherpa coordinators.
       Before you take on the mountain, we\u2019ll need to complete a short examination."
-    fmodAudioEvent:
+    dialogueAudio: {fileID: 11400000, guid: 98e125fe940c141babd5d8b069a031ad, type: 2}
+    eventIds: []
+    options: []
+    npcName: Tenzing
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
       Guid:
         Data1: 0
         Data2: 0
         Data3: 0
         Data4: 0
       Path: 
-    eventIds: []
-    options: []
-    npcName: Tenzing
-    npcTag: 
   - dialogueText: "It\u2019s just to make sure you\u2019re familiar with the basics
       and ready for what lies ahead."
-    fmodAudioEvent:
-      Guid:
-        Data1: 0
-        Data2: 0
-        Data3: 0
-        Data4: 0
-      Path: 
+    dialogueAudio: {fileID: 11400000, guid: 98e125fe940c141babd5d8b069a031ad, type: 2}
     eventIds: []
     options: []
     npcName: Tenzing
     npcTag: 
-  - dialogueText: "Of course. I\u2019m ready to do whatever\u2019s needed.\n"
-    fmodAudioEvent:
+    useDialogueAudio: 1
+    fmodSoundEvent:
       Guid:
         Data1: 0
         Data2: 0
         Data3: 0
         Data4: 0
       Path: 
+  - dialogueText: "Of course. I\u2019m ready to do whatever\u2019s needed.\n"
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
     eventIds: []
     options: []
     npcName: Alice
     npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
   - dialogueText: "The examination is straightforward. Gear checks, some basic climbing
       techniques and oxygen usage. There will be another Sherpa there to help you
       out. Take your time; there\u2019s no rush. "
-    fmodAudioEvent:
-      Guid:
-        Data1: 0
-        Data2: 0
-        Data3: 0
-        Data4: 0
-      Path: 
+    dialogueAudio: {fileID: 11400000, guid: 98e125fe940c141babd5d8b069a031ad, type: 2}
     eventIds: []
     options: []
     npcName: Tenzing
     npcTag: 
-  - dialogueText: "Examination huh? Better hope they don\u2019t quiz you on knots.
-      We both know how <i>that</i> went last time."
-    fmodAudioEvent:
+    useDialogueAudio: 1
+    fmodSoundEvent:
       Guid:
         Data1: 0
         Data2: 0
         Data3: 0
         Data4: 0
       Path: 
+  - dialogueText: "Examination huh? Better hope they don\u2019t quiz you on knots.
+      We both know how <i>that</i> went last time."
+    dialogueAudio: {fileID: 11400000, guid: 7aa603cac70ac442cbe1e5af68e9852b, type: 2}
     eventIds: []
     options: []
     npcName: Phillip
     npcTag: Phillip
-  - dialogueText: Phillip. Not now.
-    fmodAudioEvent:
+    useDialogueAudio: 1
+    fmodSoundEvent:
       Guid:
         Data1: 0
         Data2: 0
         Data3: 0
         Data4: 0
       Path: 
+  - dialogueText: Phillip. Not now.
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
     eventIds: []
     options: []
     npcName: Alice
     npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
   - dialogueText: "While you\u2019re here, feel free to talk to the other climbers
       and explore the camp. Everyone\u2019s got their own story, and you might pick
       some helpful tips."
-    fmodAudioEvent:
-      Guid:
-        Data1: 0
-        Data2: 0
-        Data3: 0
-        Data4: 0
-      Path: 
+    dialogueAudio: {fileID: 11400000, guid: 98e125fe940c141babd5d8b069a031ad, type: 2}
     eventIds: []
     options: []
     npcName: Tenzing
-    npcTag: Tenzing
-  - dialogueText: "Once you\u2019re done with the examination, let me know, and I\u2019ll
-      help you finalise your preparation. "
-    fmodAudioEvent:
+    npcTag: NPC
+    useDialogueAudio: 1
+    fmodSoundEvent:
       Guid:
         Data1: 0
         Data2: 0
         Data3: 0
         Data4: 0
       Path: 
+  - dialogueText: "Once you\u2019re done with the examination, let me know, and I\u2019ll
+      help you finalise your preparation. "
+    dialogueAudio: {fileID: 11400000, guid: 98e125fe940c141babd5d8b069a031ad, type: 2}
     eventIds: []
     options: []
     npcName: Tenzing
     npcTag: 
-  - dialogueText: "Got it. Thanks Tenzing, I\u2019ll get started right away."
-    fmodAudioEvent:
+    useDialogueAudio: 1
+    fmodSoundEvent:
       Guid:
         Data1: 0
         Data2: 0
         Data3: 0
         Data4: 0
       Path: 
+  - dialogueText: "Got it. Thanks Tenzing, I\u2019ll get started right away."
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
     eventIds: []
     options: []
     npcName: Alice
     npcTag: 
-  - dialogueText: Good luck Alice. The mountain rewards those who respect it. Welcome
-      to the journey.
-    fmodAudioEvent:
+    useDialogueAudio: 1
+    fmodSoundEvent:
       Guid:
         Data1: 0
         Data2: 0
         Data3: 0
         Data4: 0
       Path: 
+  - dialogueText: Good luck Alice. The mountain rewards those who respect it. Welcome
+      to the journey.
+    dialogueAudio: {fileID: 11400000, guid: 98e125fe940c141babd5d8b069a031ad, type: 2}
     eventIds:
     - EntranceWelcomeDialogueFinished
     options: []
     npcName: Tenzing
     npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 

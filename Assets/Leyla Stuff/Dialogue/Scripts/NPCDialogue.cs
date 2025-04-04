@@ -196,7 +196,8 @@ public class NPCDialogue : MonoBehaviour
         Debug.Log($"Bound Key or Button for action '{interactActionName}': {boundKeyOrButton}");
 
         // Check if it's a mouse button
-        bool isMouseButton = boundKeyOrButton.Contains("Mouse") || boundKeyOrButton.Contains("Click") || boundKeyOrButton.Contains("Scroll");
+        bool isMouseButton = boundKeyOrButton.Contains("Mouse") || boundKeyOrButton.Contains("Click") || boundKeyOrButton.Contains("Scroll") 
+            || boundKeyOrButton.Contains("leftStick") || boundKeyOrButton.Contains("rightStick");
 
         // Set the scale based on whether it's a mouse button or not
         float scale = isMouseButton ? 0.2f : 0.08f;
@@ -315,6 +316,16 @@ public class NPCDialogue : MonoBehaviour
             if (hit.collider != null && hit.collider.gameObject.name == "NPC Mesh" && hit.collider.transform.IsChildOf(transform) && playerInRange)
             {
                 ShowInteractText();
+                // Check if the interact key is pressed
+                if (playerInRange && interactAction.triggered && !isDialoguePressed && CanStartDialogue())
+                {
+                    isDialoguePressed = true;
+                    PlayerPrefs.SetInt(dialogueKey, 1);
+                    PlayerPrefs.Save();
+                    StartDialogue();
+
+                    HideInteractText();
+                }
             }
             else
             {
@@ -323,17 +334,6 @@ public class NPCDialogue : MonoBehaviour
         }
         else
         {
-            HideInteractText();
-        }
-
-// Check if the interact key is pressed
-if (playerInRange && interactAction.triggered && !isDialoguePressed && CanStartDialogue())
-        {
-            isDialoguePressed = true;
-            PlayerPrefs.SetInt(dialogueKey, 1);
-            PlayerPrefs.Save();
-            StartDialogue();
-
             HideInteractText();
         }
 

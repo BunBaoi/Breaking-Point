@@ -1503,7 +1503,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7040956172489799114}
-  - {fileID: 2279165280144733120}
   m_Father: {fileID: 1694757373622639524}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -2319,41 +2318,6 @@ Transform:
   - {fileID: 7592185029387535092}
   m_Father: {fileID: 5735232927136377859}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1394364296468676503
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2279165280144733120}
-  m_Layer: 2
-  m_Name: GameObject
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &2279165280144733120
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1394364296468676503}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 3118511377759837812}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1399313252623740391
 GameObject:
   m_ObjectHideFlags: 0
@@ -3015,12 +2979,12 @@ GameObject:
   - component: {fileID: 8519684001432960098}
   - component: {fileID: 897709939373269665}
   - component: {fileID: 5861964805009779517}
-  - component: {fileID: 6885791762203668991}
   - component: {fileID: 1278238817659047079}
   - component: {fileID: 1044431239221895828}
   - component: {fileID: 2841370886391303198}
   - component: {fileID: 7743932158934030851}
   - component: {fileID: 202046860805526261}
+  - component: {fileID: 4489766034500072145}
   m_Layer: 2
   m_Name: Player
   m_TagString: Player
@@ -3080,7 +3044,7 @@ MonoBehaviour:
   scrollActionName: Inventory Scroll
   dropActionName: Drop
   slotActionsName: Slot
-  scrollCooldown: 0.01
+  scrollCooldown: 0
 --- !u!54 &8519684001432960098
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3104,7 +3068,7 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 0
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
@@ -3158,30 +3122,132 @@ MonoBehaviour:
   IsSprint: 0
   playerHeight: 0
   canMove: 1
+  leftFootstepEvents:
+  - Guid:
+      Data1: 212882463
+      Data2: 1142123839
+      Data3: 1451846570
+      Data4: -1437713695
+    Path: event:/Hard Snow Left Footstep 1 SFX
+  - Guid:
+      Data1: 1337914587
+      Data2: 1098732615
+      Data3: 333180568
+      Data4: 1675029421
+    Path: event:/Hard Snow Left Footstep 2 SFX
+  - Guid:
+      Data1: -1019077078
+      Data2: 1161338335
+      Data3: -384917593
+      Data4: -1688846125
+    Path: event:/Hard Snow Left Footstep 3 SFX
+  - Guid:
+      Data1: 279470748
+      Data2: 1099160710
+      Data3: 1285033652
+      Data4: 1003287642
+    Path: event:/Hard Snow Left Footstep 4 SFX
+  - Guid:
+      Data1: 2112080717
+      Data2: 1174985081
+      Data3: -1859142272
+      Data4: -554593352
+    Path: event:/Hard Snow Left Footstep 5 SFX
+  - Guid:
+      Data1: -2106544453
+      Data2: 1130359148
+      Data3: -151041150
+      Data4: -51444054
+    Path: event:/Hard Snow Left Footstep 6 SFX
+  - Guid:
+      Data1: 954328563
+      Data2: 1308171269
+      Data3: 903989666
+      Data4: -1584216910
+    Path: event:/Hard Snow Left Footstep 7 SFX
+  - Guid:
+      Data1: -658290950
+      Data2: 1261655183
+      Data3: 1689360010
+      Data4: -453404672
+    Path: event:/Hard Snow Left Footstep 8 SFX
+  - Guid:
+      Data1: -1295076156
+      Data2: 1081671785
+      Data3: 1336964510
+      Data4: 1559903467
+    Path: event:/Hard Snow Left Footstep 9 SFX
+  - Guid:
+      Data1: -103030512
+      Data2: 1136522114
+      Data3: -605535311
+      Data4: -65361323
+    Path: event:/Hard Snow Left Footstep 10 SFX
+  rightFootstepEvents:
+  - Guid:
+      Data1: 1774112452
+      Data2: 1342110690
+      Data3: -648488056
+      Data4: 1697144574
+    Path: event:/Hard Snow Right Footstep 1 SFX
+  - Guid:
+      Data1: 1146562800
+      Data2: 1233449343
+      Data3: -351927678
+      Data4: -20595837
+    Path: event:/Hard Snow Right Footstep 2 SFX
+  - Guid:
+      Data1: -2129987507
+      Data2: 1143598388
+      Data3: -1654803063
+      Data4: -2128187704
+    Path: event:/Hard Snow Right Footstep 3 SFX
+  - Guid:
+      Data1: -1018689425
+      Data2: 1091898335
+      Data3: 1160483720
+      Data4: 5047748
+    Path: event:/Hard Snow Right Footstep 4 SFX
+  - Guid:
+      Data1: 1258159539
+      Data2: 1191467499
+      Data3: -38938192
+      Data4: -1639636641
+    Path: event:/Hard Snow Right Footstep 5 SFX
+  - Guid:
+      Data1: -1579218987
+      Data2: 1129039684
+      Data3: -1016765053
+      Data4: -117561024
+    Path: event:/Hard Snow Right Footstep 6 SFX
+  - Guid:
+      Data1: 2110909588
+      Data2: 1105632443
+      Data3: 772772006
+      Data4: -1367782290
+    Path: event:/Hard Snow Right Footstep 7 SFX
+  - Guid:
+      Data1: -560775228
+      Data2: 1177587977
+      Data3: 732940180
+      Data4: -581021575
+    Path: event:/Hard Snow Right Footstep 8 SFX
+  - Guid:
+      Data1: -746735484
+      Data2: 1229974689
+      Data3: -1299225974
+      Data4: 1014428607
+    Path: event:/Hard Snow Right Footstep 9 SFX
+  - Guid:
+      Data1: -2140392911
+      Data2: 1086335482
+      Data3: -1450142827
+      Data4: -560918165
+    Path: event:/Hard Snow Right Footstep 10 SFX
+  animator: {fileID: 8536765049787210110}
   inputActions: {fileID: -944628639613478452, guid: 5ec57af691e024f5495721c1aec07891, type: 3}
   movementName: Move
   sprintName: Sprint
---- !u!95 &6885791762203668991
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1804318439799572251}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &1278238817659047079
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3201,12 +3267,18 @@ MonoBehaviour:
   climbSpeed: 3
   maxClimbDistance: 4
   climbableTag: Climbable
+  icepickMoveSpeed: 5
+  bodyPositionOffset: 1.5
+  initialSnapPercentage: 0.3
+  targetOffsetDistance: 0.2
   climbingEnergyDrainRate: 1
   lowEnergyClimbSpeedMultiplier: 0.5
   lowEnergyThreshold: 20
-  movementSmoothTime: 0.15
-  directionSmoothTime: 0.1
   upwardBias: 0.1
+  startRotationX: -45
+  endRotationX: 30
+  digInSpeed: 8
+  animateEntireHand: 0
   inputActions: {fileID: -944628639613478452, guid: 5ec57af691e024f5495721c1aec07891, type: 3}
   leftGrabActionName: Climb Left Grab
   rightGrabActionName: Climb Right Grab
@@ -3308,11 +3380,35 @@ MonoBehaviour:
   inputActions: {fileID: -944628639613478452, guid: 5ec57af691e024f5495721c1aec07891, type: 3}
   tips:
   - {fileID: 11400000, guid: 6a8e1fefcb36b4570955edea0d2be7ee, type: 2}
+  - {fileID: 11400000, guid: 0352e95fac420401dbfb63c4870dab68, type: 2}
+  - {fileID: 11400000, guid: a1c116855fbcd4fd4ba326621eafc727, type: 2}
+  - {fileID: 11400000, guid: ad4d09de31df14e0aad6b64f0cfecad5, type: 2}
   expansionSpeed: 5
   videoScaleSpeed: 5
   textPanelScale: {x: 1, y: 1, z: 1}
   videoPanelScale: {x: 1, y: 1, z: 1}
   previousKeybinds: []
+--- !u!114 &4489766034500072145
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1804318439799572251}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f668abceeff8349f9a8d733472702611, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inventoryManager: {fileID: 1300195702366156244}
+  items:
+  - {fileID: 11400000, guid: 6715ea5907d7446e0b9069e1f81dba41, type: 2}
+  tipIndexes:
+  - 3
+  tipManager: {fileID: 202046860805526261}
+  boolNames:
+  - PickedUpOxygenTank
+  forBoolManager: {fileID: 0}
 --- !u!1 &1809019807711483397
 GameObject:
   m_ObjectHideFlags: 0
@@ -5684,6 +5780,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2348770424696111876}
   - component: {fileID: 8536765049787210110}
+  - component: {fileID: 6158508262234058049}
   m_Layer: 2
   m_Name: Player
   m_TagString: Untagged
@@ -5731,6 +5828,19 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &6158508262234058049
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3157958943125592510}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ff59ec857052439d87c9c668636c462, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerMovement: {fileID: 5861964805009779517}
 --- !u!1 &3167197939626818540
 GameObject:
   m_ObjectHideFlags: 0
@@ -7479,8 +7589,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1900, y: 80}
+  m_AnchoredPosition: {x: 0, y: -20}
+  m_SizeDelta: {x: 1900, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5363336558615847839
 CanvasRenderer:
@@ -7545,7 +7655,7 @@ MonoBehaviour:
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 2
-  m_VerticalAlignment: 1024
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -8140,7 +8250,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1727264608646006782
 RectTransform:
   m_ObjectHideFlags: 0
@@ -10199,7 +10309,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: -204.5}
-  m_SizeDelta: {x: 2000, y: 120}
+  m_SizeDelta: {x: 2000, y: 150}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4425520129928778671
 CanvasRenderer:
@@ -11341,7 +11451,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 20}
   m_SizeDelta: {x: 1920, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2664838463054495253
@@ -11364,7 +11474,7 @@ MonoBehaviour:
   m_ChildAlignment: 1
   m_StartCorner: 0
   m_StartAxis: 0
-  m_CellSize: {x: 50, y: 50}
+  m_CellSize: {x: 60, y: 60}
   m_Spacing: {x: 20, y: 0}
   m_Constraint: 0
   m_ConstraintCount: 2
@@ -11857,7 +11967,7 @@ Transform:
   m_GameObject: {fileID: 6689434991776137215}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.0000013262033, y: 1.6915503, z: 0.28769323}
+  m_LocalPosition: {x: 0, y: 1.6915503, z: 0.28769904}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
