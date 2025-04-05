@@ -3,6 +3,7 @@ using UnityEngine.InputSystem;
 using FMODUnity;
 using FMOD.Studio;
 using static PlayerStats;
+using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -188,6 +189,7 @@ public class PlayerMovement : MonoBehaviour
         rightFootstepIndex = (rightFootstepIndex + 1) % rightFootstepEvents.Length;
     }
 
+    
     public void binocularZoom()
     {
         if (Input.GetKey(KeyCode.Z))
@@ -202,4 +204,5 @@ public class PlayerMovement : MonoBehaviour
             binocularsUI.enabled = false;
         }
     }
+    
 }
