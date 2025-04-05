@@ -6,14 +6,192 @@
 [LOG] OutputWASAPI::init                       : Mix Format (WAVEFORMATEXTENSIBLE): wValidBitsPerSample=32, dwChannelMask=0x00000003, SubFormat=00000003-0000-0010-8000-00AA00389B71.
 [LOG] OutputWASAPI::init                       : Output buffer size: 4096 samples, latency: 0.00ms, period: 10.00ms, DSP buffer: 1024 * 4
 [LOG] Thread::initThread                       : Init FMOD stream thread. Affinity: 0x4000000000000003, Priority: 0xFFFF7FFB, Stack Size: 98304, Semaphore: No, Sleep Time: 10, Looping: Yes.
-[LOG] Thread::initThread                       : Init FMOD mixer thread. Affinity: 0x4000000000000001, Priority: 0xFFFF7FFA, Stack Size: 81920, Semaphore: Yes, Sleep Time: 0, Looping: Yes.
-[LOG] AsyncManager::init                       : manager 0x11cc06208 isAsync 0 updatePeriod 0.02
+[LOG] Thread::initThread                       : Init FMOD mixer thread. Affinity: 0x4000000000000001, Priority: 0xFFFF7FFA, Stack Size: 81920, Semaphore: No, Sleep Time: 0, Looping: Yes.
+[LOG] AsyncManager::init                       : manager 0000014EA8E41FF8 isAsync 0 updatePeriod 0.02
 [LOG] AsyncManager::init                       : done
 [LOG] PlaybackSystem::init                     : 
 [LOG] Thread::initThread                       : Init FMOD Studio sample load thread. Affinity: 0x4000000000000003, Priority: 0xFFFF7FFD, Stack Size: 98304, Semaphore: No, Sleep Time: 1, Looping: No.
 [LOG] PlaybackSystem::init                     : done
 [LOG] Thread::initThread                       : Init FMOD Studio bank load thread. Affinity: 0x4000000000000003, Priority: 0xFFFF7FFD, Stack Size: 98304, Semaphore: No, Sleep Time: 1, Looping: No.
 [LOG] Manager::init                            : done.
+[LOG] Manager::readBank                        : fileversion = 142, compatVersion = 140 (oldest = 44, newest = 142)
+[LOG] Manager::readBank                        : fileversion = 142, compatVersion = 140 (oldest = 44, newest = 142)
+[LOG] Manager::readBank                        : fileversion = 142, compatVersion = 140 (oldest = 44, newest = 142)
+[LOG] PlaybackSystem::acquireMasterBus         : Setting master channel group format to 6
+[LOG] Manager::readBank                        : fileversion = 142, compatVersion = 140 (oldest = 44, newest = 142)
+[LOG] Manager::readBank                        : fileversion = 142, compatVersion = 140 (oldest = 44, newest = 142)
+[LOG] Manager::readBank                        : fileversion = 142, compatVersion = 140 (oldest = 44, newest = 142)
+[LOG] PlaybackSystem::acquireMasterBus         : Setting master channel group format to 6
+[LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
+[LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 224
+[LOG] SystemI::createSoundInternal             : exinfo->length             = 23083168
+[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 119712
+[LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
+[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000001B1EA5EF98
+[LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
+[LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
+[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 00007FF999E43CE0
+[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 00007FF999E43CA0
+[LOG] SystemI::createSoundInternal             : exinfo->userread           = 00007FF999E43DC0
+[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 00007FF999E43E80
+[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 0000014EA17B9968
+[LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
+[LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
+[LOG] SystemI::createSoundInternal             : Sample 0/1: name='BP_SFX_Ice_Pick_Hit_5', format=5, channels=2, frequency=48000, lengthbytes=9760, lengthpcm=58800, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.707946.
+[LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
+[LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 224
+[LOG] SystemI::createSoundInternal             : exinfo->length             = 23083168
+[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 119712
+[LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
+[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000001B1EA5EF98
+[LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
+[LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
+[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 00007FF999E43CE0
+[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 00007FF999E43CA0
+[LOG] SystemI::createSoundInternal             : exinfo->userread           = 00007FF999E43DC0
+[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 00007FF999E43E80
+[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 0000014EA17B9968
+[LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
+[LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
+[LOG] SystemI::createSoundInternal             : Sample 0/1: name='BP_SFX_Ice_Pick_Hit_6', format=5, channels=2, frequency=48000, lengthbytes=12224, lengthpcm=58800, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.707946.
+[LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
+[LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 224
+[LOG] SystemI::createSoundInternal             : exinfo->length             = 23083168
+[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 119712
+[LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
+[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000001B1EA5EF98
+[LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
+[LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
+[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 00007FF999E43CE0
+[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 00007FF999E43CA0
+[LOG] SystemI::createSoundInternal             : exinfo->userread           = 00007FF999E43DC0
+[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 00007FF999E43E80
+[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 0000014EA17B9968
+[LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
+[LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
+[LOG] SystemI::createSoundInternal             : Sample 0/1: name='BP_SFX_Ice_Pick_Hit_7', format=5, channels=2, frequency=48000, lengthbytes=8736, lengthpcm=57600, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.707946.
+[LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
+[LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 224
+[LOG] SystemI::createSoundInternal             : exinfo->length             = 23083168
+[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 119712
+[LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
+[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000001B1EA5EF98
+[LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
+[LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
+[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 00007FF999E43CE0
+[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 00007FF999E43CA0
+[LOG] SystemI::createSoundInternal             : exinfo->userread           = 00007FF999E43DC0
+[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 00007FF999E43E80
+[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 0000014EA17B9968
+[LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
+[LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
+[LOG] SystemI::createSoundInternal             : Sample 0/1: name='BP_SFX_Ice_Pick_Hit_1', format=5, channels=2, frequency=48000, lengthbytes=11680, lengthpcm=57600, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.707946.
+[LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
+[LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 224
+[LOG] SystemI::createSoundInternal             : exinfo->length             = 23083168
+[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 119712
+[LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
+[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000001B1EA5EF98
+[LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
+[LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
+[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 00007FF999E43CE0
+[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 00007FF999E43CA0
+[LOG] SystemI::createSoundInternal             : exinfo->userread           = 00007FF999E43DC0
+[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 00007FF999E43E80
+[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 0000014EA17B9968
+[LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
+[LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
+[LOG] SystemI::createSoundInternal             : Sample 0/1: name='BP_SFX_Ice_Pick_Hit_2', format=5, channels=2, frequency=48000, lengthbytes=11360, lengthpcm=57600, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.710720.
+[LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
+[LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 224
+[LOG] SystemI::createSoundInternal             : exinfo->length             = 23083168
+[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 119712
+[LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
+[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000001B1EA5EF98
+[LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
+[LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
+[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 00007FF999E43CE0
+[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 00007FF999E43CA0
+[LOG] SystemI::createSoundInternal             : exinfo->userread           = 00007FF999E43DC0
+[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 00007FF999E43E80
+[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 0000014EA17B9968
+[LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
+[LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
+[LOG] SystemI::createSoundInternal             : Sample 0/1: name='BP_SFX_Ice_Pick_Hit_4', format=5, channels=2, frequency=48000, lengthbytes=9312, lengthpcm=57750, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.707946.
+[LOG] SystemI::createSoundInternal             : Create name='', mode=0x02000202
+[LOG] SystemI::createSoundInternal             : exinfo->cbsize             = 224
+[LOG] SystemI::createSoundInternal             : exinfo->length             = 23083168
+[LOG] SystemI::createSoundInternal             : exinfo->fileoffset         = 119712
+[LOG] SystemI::createSoundInternal             : exinfo->numsubsounds       = 1
+[LOG] SystemI::createSoundInternal             : exinfo->inclusionlist      = 0000001B1EA5EF98
+[LOG] SystemI::createSoundInternal             : exinfo->inclusionlistnum   = 1
+[LOG] SystemI::createSoundInternal             : exinfo->suggestedsoundtype = 5
+[LOG] SystemI::createSoundInternal             : exinfo->useropen           = 00007FF999E43CE0
+[LOG] SystemI::createSoundInternal             : exinfo->userclose          = 00007FF999E43CA0
+[LOG] SystemI::createSoundInternal             : exinfo->userread           = 00007FF999E43DC0
+[LOG] SystemI::createSoundInternal             : exinfo->userseek           = 00007FF999E43E80
+[LOG] SystemI::createSoundInternal             : exinfo->fileuserdata       = 0000014EA17B9968
+[LOG] SystemI::createSoundInternal             : exinfo->initialseekpostype = 1
+[LOG] SystemI::DSPCodecPoolRegister            : register codec pool for pool type 5
+[LOG] SystemI::createSoundInternal             : Sample 0/1: name='BP_SFX_Ice_Pick_Hit_3', format=5, channels=2, frequency=48000, lengthbytes=10720, lengthpcm=58200, pcmblocksize=0, loopstart=0, loopend=0, mode=0x00000000, channelmask=0x00000000, channelorder=0, peakvolume=0.707946.
+[LOG] SoundI::release                          :  (0000014D50A01408)
+[LOG] SoundI::release                          :     BP_SFX_Ice_Pick_Hit_6 (0000014CEDA4C778)
+[LOG] SoundI::release                          :  (0000014D50A01578)
+[LOG] SoundI::release                          :     BP_SFX_Ice_Pick_Hit_5 (0000014CEDA4C5D8)
+[LOG] SoundI::release                          :  (0000014CE3A6FD78)
+[LOG] SoundI::release                          :     BP_SFX_Ice_Pick_Hit_3 (0000014F0D051098)
+[LOG] SoundI::release                          :  (0000014D50A016E8)
+[LOG] SoundI::release                          :     BP_SFX_Ice_Pick_Hit_7 (0000014CEDA4CC58)
+[LOG] SoundI::release                          :  (0000014D50A01128)
+[LOG] SoundI::release                          :     BP_SFX_Ice_Pick_Hit_1 (0000014CEDA4CDF8)
+[LOG] SoundI::release                          :  (0000014CE3A6F4D8)
+[LOG] SoundI::release                          :     BP_SFX_Ice_Pick_Hit_2 (0000014CEDA4C438)
+[LOG] SoundI::release                          :  (0000014CE3A6F648)
+[LOG] SoundI::release                          :     BP_SFX_Ice_Pick_Hit_4 (0000014F0D051718)
+[LOG] SoundI::release                          :  (0000014CBF53CAD8)
+[LOG] SoundI::release                          :     BP_SFX_Footstep_Hard_Snow_Left_1 (0000014E8F61C088)
+[LOG] SoundI::release                          :  (0000014CBF53CDB8)
+[LOG] SoundI::release                          :     BP_SFX_Footstep_Hard_Snow_Right_1 (0000014E8F61CD88)
+[LOG] SoundI::release                          :  (0000014DE9CF1548)
+[LOG] SoundI::release                          :     BP_SFX_Footstep_Hard_Snow_Left_2 (0000014CEF62B668)
+[LOG] SoundI::release                          :  (0000014DE9CF1998)
+[LOG] SoundI::release                          :     BP_SFX_Footstep_Hard_Snow_Right_2 (0000014CEF62C028)
+[LOG] SoundI::release                          :  (0000014DE9CF0F88)
+[LOG] SoundI::release                          :     BP_SFX_Footstep_Hard_Snow_Left_3 (0000014ED7222D88)
+[LOG] SoundI::release                          :  (0000014DE9CF10F8)
+[LOG] SoundI::release                          :     BP_SFX_Footstep_Hard_Snow_Left_4 (0000014ED72223C8)
+[LOG] SoundI::release                          :  (0000014DE9CF1268)
+[LOG] SoundI::release                          :     BP_SFX_Footstep_Hard_Snow_Right_3 (0000014CEE9E8738)
+[LOG] SoundI::release                          :  (0000014EDFCA67A8)
+[LOG] SoundI::release                          :     BP_SFX_Footstep_Hard_Snow_Left_5 (0000014CEE9E83F8)
+[LOG] SoundI::release                          :  (0000014EDFCA6918)
+[LOG] SoundI::release                          :     BP_SFX_Footstep_Hard_Snow_Left_6 (0000014CEE9E88D8)
+[LOG] SoundI::release                          :  (0000014EDFCA6358)
+[LOG] SoundI::release                          :     BP_SFX_Footstep_Hard_Snow_Right_4 (0000014CEE9E8C18)
+[LOG] SoundI::release                          :  (0000014DE9CF13D8)
+[LOG] SoundI::release                          :     BP_SFX_Ice_Pick_Hit_7 (0000014ED7222228)
+[LOG] SoundI::release                          :  (0000014CBF53CF28)
+[LOG] SoundI::release                          :     BP_SFX_Ice_Pick_Hit_1 (0000014E8F61CBE8)
+[LOG] SoundI::release                          :  (0000014CBF53C968)
+[LOG] SoundI::release                          :     BP_SFX_Ice_Pick_Hit_2 (0000014E8F61C708)
+[LOG] SoundI::release                          :  (0000014DE9CF1B08)
+[LOG] SoundI::release                          :     BP_SFX_Ice_Pick_Hit_3 (0000014CEF62BB48)
+[LOG] SoundI::release                          :  (0000014DE9CF1828)
+[LOG] SoundI::release                          :     BP_SFX_Ice_Pick_Hit_4 (0000014CEF62C1C8)
+[LOG] SoundI::release                          :  (0000014DE9CF16B8)
+[LOG] SoundI::release                          :     BP_SFX_Ice_Pick_Hit_5 (0000014CEF62BCE8)
+[LOG] SoundI::release                          :  (0000014DE9CF0E18)
+[LOG] SoundI::release                          :     BP_SFX_Ice_Pick_Hit_6 (0000014ED72228A8)
+[LOG] Thread::callback                         : FMOD Studio update thread finished.
+[LOG] Thread::callback                         : FMOD Studio bank load thread finished.
+[LOG] Profile::disconnectAll                   : Profiler disconnecting all clients
+[LOG] Thread::callback                         : FMOD Studio sample load thread finished.
+[LOG] LiveUpdate::release                      : 
+[LOG] LiveUpdate::reset                        : Reset connection (reason Disconnected)
+[LOG] Thread::callback                         : FMOD stream thread finished.
+[LOG] Thread::callback                         : FMOD mixer thread finished.
+[LOG] Profile::disconnectAll                   : Profiler disconnecting all clients
+[LOG] SystemI::close                           : Closed.
 [LOG] Thread::callback                         : FMOD Studio bank load thread finished.
 [LOG] Thread::callback                         : FMOD Studio sample load thread finished.
 [LOG] LiveUpdate::release                      : 
