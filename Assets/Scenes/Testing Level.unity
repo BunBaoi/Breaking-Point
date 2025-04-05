@@ -6220,6 +6220,7 @@ MonoBehaviour:
   targetPos: {fileID: 59562490}
   playerPos: {fileID: 1665698384}
   objectSpeed: 3
+  defaultWalkSpeed: 12
   walkSpeed: 12
   sprintSpeed: 20
   gravity: -9.81
@@ -6229,6 +6230,9 @@ MonoBehaviour:
   normalFOV: 90
   binocularsUI: {fileID: 32976447}
   canMove: 1
+  leftFootstepEvents: []
+  rightFootstepEvents: []
+  animator: {fileID: 0}
   inputActions: {fileID: -944628639613478452, guid: 5ec57af691e024f5495721c1aec07891, type: 3}
   movementName: Move
   sprintName: Sprint

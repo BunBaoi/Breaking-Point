@@ -1817,6 +1817,78 @@ Transform:
   - {fileID: 6599870396200890462}
   m_Father: {fileID: 3371713841007462401}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1130411639063487903
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1487842511187749732}
+  - component: {fileID: 474740588460353308}
+  - component: {fileID: 8987766354780862489}
+  m_Layer: 2
+  m_Name: Binoculars
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!224 &1487842511187749732
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1130411639063487903}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 3345893290249792295}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 1920, y: 1080}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!222 &474740588460353308
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1130411639063487903}
+  m_CullTransparentMesh: 1
+--- !u!114 &8987766354780862489
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1130411639063487903}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Texture: {fileID: 2800000, guid: b32238bf4b763054690526ac33067b17, type: 3}
+  m_UVRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
 --- !u!1 &1150368352202145861
 GameObject:
   m_ObjectHideFlags: 0
@@ -2985,6 +3057,7 @@ GameObject:
   - component: {fileID: 7743932158934030851}
   - component: {fileID: 202046860805526261}
   - component: {fileID: 4489766034500072145}
+  - component: {fileID: 8552126682404272956}
   m_Layer: 2
   m_Name: Player
   m_TagString: Player
@@ -2992,16 +3065,15 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1694757373622639524
-Transform:
+--- !u!224 &1694757373622639524
+RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1804318439799572251}
-  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3015,6 +3087,11 @@ Transform:
   - {fileID: 3118511377759837812}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 1}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1300195702366156244
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3113,14 +3190,19 @@ MonoBehaviour:
   qTEvent: {fileID: 0}
   qTEMechanicScript: {fileID: 0}
   controller: {fileID: 897709939373269665}
+  playerCamera: {fileID: 0}
   targetPos: {fileID: 0}
   playerPos: {fileID: 0}
   objectSpeed: 3
+  defaultWalkSpeed: 12
   walkSpeed: 12
   sprintSpeed: 20
   gravity: -9.81
   IsSprint: 0
   playerHeight: 0
+  zoomFOV: 0
+  normalFOV: 0
+  binocularsUI: {fileID: 8987766354780862489}
   canMove: 1
   leftFootstepEvents:
   - Guid:
@@ -3409,6 +3491,14 @@ MonoBehaviour:
   boolNames:
   - PickedUpOxygenTank
   forBoolManager: {fileID: 0}
+--- !u!222 &8552126682404272956
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1804318439799572251}
+  m_CullTransparentMesh: 1
 --- !u!1 &1809019807711483397
 GameObject:
   m_ObjectHideFlags: 0
@@ -12071,7 +12161,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mouseSensitivity: 300
-  playerBody: {fileID: 1694757373622639524}
+  playerBody: {fileID: 0}
   virtualCamera: {fileID: 8065920046792557807}
   inputActions: {fileID: -944628639613478452, guid: 5ec57af691e024f5495721c1aec07891, type: 3}
   lookName: Look
@@ -14735,6 +14825,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4959472152246650600}
+  - {fileID: 1487842511187749732}
   m_Father: {fileID: 1694757373622639524}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
