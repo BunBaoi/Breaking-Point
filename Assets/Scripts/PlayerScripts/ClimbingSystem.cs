@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using FMODUnity;
+using FMOD.Studio;
 
 public class ClimbingSystem : MonoBehaviour
 {
@@ -25,6 +27,22 @@ public class ClimbingSystem : MonoBehaviour
     private Vector3 rightHandTargetPosition; // Target position for right hand
     private bool leftHandMoving = false; // Is left hand currently moving to target
     private bool rightHandMoving = false; // Is right hand currently moving to target
+
+    [Header("Climbing Animation and Feel")]
+    [Tooltip("Delay in seconds after pickaxe digs in before pulling the player")]
+    public float digInDelay = 0.5f; // Time to wait after dig in before pulling
+    [Tooltip("Whether player is currently being pulled toward climb position")]
+    private bool isPulling = false; // Flag to track if actively pulling
+    [Tooltip("Screen shake intensity when pickaxe connects")]
+    public float screenShakeIntensity = 0.05f;
+    [Tooltip("Screen shake duration when pickaxe connects")]
+    public float screenShakeDuration = 0.2f;
+    private float screenShakeTimer = 0f;
+    private Vector3 originalCameraPosition;
+
+    [Header("Climbing Sounds (FMOD)")]
+    public EventReference[] icepickSounds; // Universal icepick strike sounds
+    private int icepickSoundIndex = 0;
 
     [Header("Body Positioning")]
     [Tooltip("Vertical offset from hands to position the body. Positive values position the body below the hands")]
@@ -82,6 +100,9 @@ public class ClimbingSystem : MonoBehaviour
     // Debug and state management
     private bool isActivelyClimbing = false;
     private bool isFirstClimbFrame = false; // Added to track first climb frame
+
+    private bool leftSoundPlayed = false;
+    private bool rightSoundPlayed = false;
 
     private void Awake()
     {
@@ -173,6 +194,40 @@ public class ClimbingSystem : MonoBehaviour
         }
     }
 
+    private void ApplyScreenShake()
+    {
+        if (screenShakeTimer > 0)
+        {
+            // Store original position on first frame of shake
+            if (screenShakeTimer == screenShakeDuration)
+            {
+                originalCameraPosition = cameraTransform.localPosition;
+            }
+
+            // Calculate shake amount (decreases over time)
+            float currentIntensity = screenShakeIntensity * (screenShakeTimer / screenShakeDuration);
+
+            // Apply random offset
+            Vector3 shakeOffset = new Vector3(
+                Random.Range(-currentIntensity, currentIntensity),
+                Random.Range(-currentIntensity, currentIntensity),
+                0
+            );
+
+            // Apply to camera
+            cameraTransform.localPosition = originalCameraPosition + shakeOffset;
+
+            // Decrease timer
+            screenShakeTimer -= Time.deltaTime;
+
+            // Reset position when done
+            if (screenShakeTimer <= 0)
+            {
+                cameraTransform.localPosition = originalCameraPosition;
+            }
+        }
+    }
+
     void SetupInputActions()
     {
         leftGrab = inputActions.FindAction(leftGrabActionName);
@@ -202,8 +257,8 @@ public class ClimbingSystem : MonoBehaviour
                 rb.isKinematic = true; // Make rigidbody kinematic while climbing
             }
 
-            // Only move body if at least one hand is fully attached (not still moving)
-            if ((leftHandAttached && !leftHandMoving) || (rightHandAttached && !rightHandMoving))
+            // Only move body if at least one hand is fully attached and the pull delay has elapsed
+            if (((leftHandAttached && !leftHandMoving) || (rightHandAttached && !rightHandMoving)) && isPulling)
             {
                 DirectClimbToIcepicks(); // Renamed to reflect direct movement
                 DrainEnergyWhileClimbing();
@@ -221,6 +276,7 @@ public class ClimbingSystem : MonoBehaviour
     {
         UpdateHandVisuals();
         UpdatePickaxeRotations();
+        ApplyScreenShake();
     }
 
     // New method to update pickaxe rotations
@@ -252,6 +308,7 @@ public class ClimbingSystem : MonoBehaviour
                 // Reset digging in progress
                 leftDigInProgress = 0f;
                 leftPickaxeDiggingIn = false;
+                leftSoundPlayed = false; // Reset sound flag when moving
             }
             else if (leftHandAttached)
             {
@@ -263,13 +320,27 @@ public class ClimbingSystem : MonoBehaviour
 
                 if (leftPickaxeDiggingIn)
                 {
-                    // Progress the digging in animation
-                    leftDigInProgress = Mathf.Min(leftDigInProgress + Time.deltaTime * digInSpeed, 1.0f);
+                    // Only progress the animation if not complete
+                    if (leftDigInProgress < 1.0f)
+                    {
+                        // Progress the digging in animation
+                        leftDigInProgress = Mathf.Min(leftDigInProgress + Time.deltaTime * digInSpeed, 1.0f);
 
-                    // Smoothly interpolate between start and end rotation
-                    float currentRotationX = Mathf.Lerp(startRotationX, endRotationX, leftDigInProgress);
-                    Quaternion targetRotation = Quaternion.Euler(currentRotationX, 0, 0) * leftPickaxeOriginalRotation;
-                    leftPickaxeTransform.localRotation = targetRotation;
+                        // Smoothly interpolate between start and end rotation
+                        float currentRotationX = Mathf.Lerp(startRotationX, endRotationX, leftDigInProgress);
+                        Quaternion targetRotation = Quaternion.Euler(currentRotationX, 0, 0) * leftPickaxeOriginalRotation;
+                        leftPickaxeTransform.localRotation = targetRotation;
+
+                        // Play sound exactly once when animation reaches completion point
+                        if (leftDigInProgress >= 0.95f && !leftSoundPlayed)
+                        {
+                            PlayIcepickSound(); // Use universal sound method
+                            leftSoundPlayed = true;
+
+                            // Start the delay timer for pulling
+                            StartCoroutine(StartPulling(digInDelay));
+                        }
+                    }
                 }
             }
         }
@@ -279,6 +350,7 @@ public class ClimbingSystem : MonoBehaviour
             leftPickaxeTransform.localRotation = leftPickaxeOriginalRotation;
             leftDigInProgress = 0f;
             leftPickaxeDiggingIn = false;
+            leftSoundPlayed = false;
         }
 
         // Process right pickaxe animation if we have a valid reference
@@ -299,6 +371,7 @@ public class ClimbingSystem : MonoBehaviour
                 // Reset digging in progress
                 rightDigInProgress = 0f;
                 rightPickaxeDiggingIn = false;
+                rightSoundPlayed = false; // Reset sound flag when moving
             }
             else if (rightHandAttached)
             {
@@ -310,13 +383,27 @@ public class ClimbingSystem : MonoBehaviour
 
                 if (rightPickaxeDiggingIn)
                 {
-                    // Progress the digging in animation
-                    rightDigInProgress = Mathf.Min(rightDigInProgress + Time.deltaTime * digInSpeed, 1.0f);
+                    // Only progress the animation if not complete
+                    if (rightDigInProgress < 1.0f)
+                    {
+                        // Progress the digging in animation
+                        rightDigInProgress = Mathf.Min(rightDigInProgress + Time.deltaTime * digInSpeed, 1.0f);
 
-                    // Smoothly interpolate between start and end rotation
-                    float currentRotationX = Mathf.Lerp(startRotationX, endRotationX, rightDigInProgress);
-                    Quaternion targetRotation = Quaternion.Euler(currentRotationX, 0, 0) * rightPickaxeOriginalRotation;
-                    rightPickaxeTransform.localRotation = targetRotation;
+                        // Smoothly interpolate between start and end rotation
+                        float currentRotationX = Mathf.Lerp(startRotationX, endRotationX, rightDigInProgress);
+                        Quaternion targetRotation = Quaternion.Euler(currentRotationX, 0, 0) * rightPickaxeOriginalRotation;
+                        rightPickaxeTransform.localRotation = targetRotation;
+
+                        // Play sound exactly once when animation reaches completion point
+                        if (rightDigInProgress >= 0.95f && !rightSoundPlayed)
+                        {
+                            PlayIcepickSound(); // Use universal sound method
+                            rightSoundPlayed = true;
+
+                            // Start the delay timer for pulling
+                            StartCoroutine(StartPulling(digInDelay));
+                        }
+                    }
                 }
             }
         }
@@ -326,7 +413,17 @@ public class ClimbingSystem : MonoBehaviour
             rightPickaxeTransform.localRotation = rightPickaxeOriginalRotation;
             rightDigInProgress = 0f;
             rightPickaxeDiggingIn = false;
+            rightSoundPlayed = false;
         }
+    }
+
+    private IEnumerator StartPulling(float delay)
+    {
+        // Wait for the specified delay
+        yield return new WaitForSeconds(delay);
+
+        // Start pulling the player
+        isPulling = true;
     }
 
     void DrainEnergyWhileClimbing()
@@ -343,9 +440,14 @@ public class ClimbingSystem : MonoBehaviour
             }
         }
     }
-
     void AttachIcepick(bool isLeftHand)
     {
+        // Fix for allowing same-side reattachment
+        if (isLeftHand && leftHandAttached && leftHandMoving)
+            return; // Already moving this hand
+        if (!isLeftHand && rightHandAttached && rightHandMoving)
+            return; // Already moving this hand
+
         // Check if we need to find pickaxe references first (in case pickaxes were equipped after Start)
         if ((isLeftHand && leftPickaxeTransform == null && leftHandTransform != null && leftHandTransform.childCount > 0) ||
             (!isLeftHand && rightPickaxeTransform == null && rightHandTransform != null && rightHandTransform.childCount > 0))
@@ -573,6 +675,12 @@ public class ClimbingSystem : MonoBehaviour
             rightHandMoving = false;
         }
 
+        // Reset pulling state if no hands attached
+        if (!leftHandAttached && !rightHandAttached)
+        {
+            isPulling = false;
+        }
+
         // If no longer climbing, restore normal movement
         if (!IsClimbing() && isActivelyClimbing)
         {
@@ -604,6 +712,7 @@ public class ClimbingSystem : MonoBehaviour
         leftHandMoving = false;
         rightHandAttached = false;
         rightHandMoving = false;
+        isPulling = false; // Reset pulling flag
 
         // Restore normal movement
         playerMovement.SetMovementState(true);
@@ -661,6 +770,7 @@ public class ClimbingSystem : MonoBehaviour
                     if ((adjustedTargetPosition - transform.position).magnitude <= 0.05f)
                     {
                         // We're close enough, no need to move
+                        isPulling = false; // Reset pulling flag once we've reached the target
                         return;
                     }
 
@@ -711,6 +821,11 @@ public class ClimbingSystem : MonoBehaviour
                 // Debug visualization
                 Debug.DrawLine(transform.position, targetPosition, Color.yellow);
                 Debug.DrawRay(transform.position, climbDirection * 2f, Color.green);
+            }
+            else
+            {
+                // We're very close to target
+                isPulling = false; // Reset pulling flag
             }
         }
     }
@@ -810,6 +925,24 @@ public class ClimbingSystem : MonoBehaviour
             // Return hand to original position
             rightHandTransform.localPosition = rightHandOriginalLocalPos;
         }
+    }
+
+    // Universal method for Icepick Sound
+    public void PlayIcepickSound()
+    {
+        if (icepickSounds.Length == 0) return;
+
+        EventReference soundEventReference = icepickSounds[icepickSoundIndex];
+
+        EventInstance icepickInstance = RuntimeManager.CreateInstance(soundEventReference);
+        icepickInstance.start();
+        icepickInstance.release();
+
+        // Start screen shake
+        screenShakeTimer = screenShakeDuration;
+
+        // Move to the next sound in the array, looping back if necessary
+        icepickSoundIndex = (icepickSoundIndex + 1) % icepickSounds.Length;
     }
 
     private void OnEnable()
