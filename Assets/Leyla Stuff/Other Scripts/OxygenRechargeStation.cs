@@ -2,6 +2,8 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
+using FMODUnity;
+using FMOD.Studio;
 
 public class OxygenRechargeStation : MonoBehaviour
 {
@@ -25,6 +27,12 @@ public class OxygenRechargeStation : MonoBehaviour
     private Transform player; // Reference to the player's transform
     private SpriteRenderer spriteRenderer;
 
+    [Header("FMOD")]
+    [SerializeField] private EventReference refillSoundEvent;
+
+    private EventInstance refillSoundInstance;
+    private bool isRefillSoundPlaying = false;
+
     private void Start()
     {
         GameObject player = GameObject.Find("Player");
@@ -32,6 +40,9 @@ public class OxygenRechargeStation : MonoBehaviour
         {
             inventoryManager = player.GetComponent<InventoryManager>();
         }
+
+        refillSoundInstance = RuntimeManager.CreateInstance(refillSoundEvent);
+        RuntimeManager.AttachInstanceToGameObject(refillSoundInstance, transform, GetComponent<Rigidbody>());
     }
 
     private void OnEnable()
@@ -56,6 +67,8 @@ public class OxygenRechargeStation : MonoBehaviour
         {
             interactAction.Disable();
         }
+
+        refillSoundInstance.release();
     }
 
     private void Update()
@@ -116,6 +129,13 @@ public class OxygenRechargeStation : MonoBehaviour
         {
             Debug.Log("Refilling oxygen...");
             isRefilling = true;
+
+            if (!isRefillSoundPlaying && playerStats.Oxygen < 100)
+            {
+                refillSoundInstance.start();
+                isRefillSoundPlaying = true;
+            }
+
             StartCoroutine(RefillOxygen());
         }
     }
@@ -126,6 +146,12 @@ public class OxygenRechargeStation : MonoBehaviour
         {
             Debug.Log("Stopped refilling oxygen");
             isRefilling = false;
+
+            if (isRefillSoundPlaying)
+            {
+                refillSoundInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+                isRefillSoundPlaying = false;
+            }
         }
     }
 
@@ -412,10 +438,18 @@ if (interactTextInstance != null && !IsHoldingRequiredItem() && !IsLookingAtOxyg
 
     private IEnumerator RefillOxygen()
     {
-        while (isRefilling && playerStats != null && playerStats.OxygenTank < 100)
+        while (isRefilling && playerStats != null && playerStats.Oxygen < 100)
         {
-            playerStats.OxygenTank += refillRate * Time.deltaTime;
-            playerStats.OxygenTank = Mathf.Min(playerStats.OxygenTank, 100f);
+            playerStats.Oxygen += refillRate * Time.deltaTime;
+
+            playerStats.Oxygen = Mathf.Min(playerStats.Oxygen, 100f);
+
+            if (playerStats.Oxygen >= 100f && isRefillSoundPlaying)
+            {
+                refillSoundInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+                isRefillSoundPlaying = false;
+            }
+
             yield return null;
         }
     }
