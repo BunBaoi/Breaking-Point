@@ -180,37 +180,29 @@ public class ItemPickUp : MonoBehaviour
         {
             interactTextInstance = Instantiate(interactTextPrefab);
 
-            // Set the parent of the interact text instance
             interactTextInstance.transform.SetParent(transform, false);
 
-            // Find the "Pick Up Collider" child
             Transform pickUpColliderTransform = transform.Find("Pick Up Collider");
 
             if (pickUpColliderTransform != null)
             {
-                // Get the collider of the "Pick Up Collider"
                 Collider pickUpCollider = pickUpColliderTransform.GetComponent<Collider>();
 
                 if (pickUpCollider != null)
                 {
-                    // Get the top position of the "Pick Up Collider" in world space
                     Vector3 pickUpTopWorldPos = pickUpCollider.bounds.max;
 
-                    // Convert the world position to local position relative to the parent
                     Vector3 pickUpTopLocalPos = interactTextInstance.transform.InverseTransformPoint(pickUpTopWorldPos);
 
-                    // Position the interact text just above the top of the "Pick Up Collider"
-                    interactTextInstance.transform.localPosition = new Vector3(0, pickUpTopLocalPos.y + 0.2f, 0); // Adjust the Y offset as needed
+                    interactTextInstance.transform.localPosition = new Vector3(0, pickUpTopLocalPos.y + 0.2f, 0);
                 }
                 else
                 {
-                    // If no collider is attached to "Pick Up Collider", fallback position
                     interactTextInstance.transform.localPosition = new Vector3(0, 0.2f, 0);
                 }
             }
             else
             {
-                // If no "Pick Up Collider" child is found, fallback position
                 interactTextInstance.transform.localPosition = new Vector3(0, 0.2f, 0);
             }
 
@@ -251,7 +243,6 @@ public class ItemPickUp : MonoBehaviour
                     {
                         string keyText = "";
 
-                        // Get the "Interact" action
                         var interactAction = inputActions.FindAction(pickupActionName);
 
                         if (interactAction != null)
@@ -266,10 +257,8 @@ public class ItemPickUp : MonoBehaviour
                                 keyText = interactAction.bindings[0].ToDisplayString();  // First binding (keyboard)
                             }
 
-                            // Remove the word "Press" from the keyText if it exists
                             keyText = keyText.Replace("Press ", "").Trim();
 
-                            // Set the fallback text to show the keybinding for "Interact"
                             interactText = $"[{keyText}] Pick Up";
                         }
                         else
@@ -332,9 +321,9 @@ public class ItemPickUp : MonoBehaviour
                 // Check if the hit collider matches the 'Pick Up Collider' child
                 if (IsHitOnPickUpCollider(hit.collider))
                 {
-                    // Check if the item is within the camera's view frustum
                     if (IsWithinCameraView(playerCamera, hit.point))
                     {
+                        ObjectTracker.Instance.MarkAsDestroyed(gameObject.name);
                         ShowInteractText();
                         if (isPickingUp)
                         {
@@ -350,7 +339,6 @@ public class ItemPickUp : MonoBehaviour
 
             if (spriteRenderer != null)
             {
-                // Dynamically update sprite scale if keybinding changes during the game
                 UpdateSpriteScale();
             }
         }                        
@@ -365,20 +353,17 @@ public class ItemPickUp : MonoBehaviour
                 RaycastHit hit;
                 Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
 
-                // Create a layer mask that includes pickUpColliderLayer but excludes itemLayer
                 LayerMask combinedMask = pickUpColliderLayer & ~itemLayer;
 
-                // Perform a raycast to find the item in the center of the view
                 if (Physics.Raycast(ray, out hit, raycastDistance, combinedMask))
                 {
-                    // Check if the hit collider matches the 'Pick Up Collider' child
                     if (IsHitOnPickUpCollider(hit.collider))
                     {
-                        // Check if the item is within the camera's view frustum
                         if (IsWithinCameraView(playerCamera, hit.point))
                         {
                             if (isPickingUp)
                             {
+                                ObjectTracker.Instance.MarkAsDestroyed(gameObject.name);
                                 HideInteractText();
                                 Debug.Log("Already picking up an item.");
                                 return;
@@ -390,7 +375,7 @@ public class ItemPickUp : MonoBehaviour
 
                             if (inventory != null)
                             {
-                                if (inventory.HasItem(item)) // Check if player already has the item
+                                if (inventory.HasItem(item))
                                 {
                                     Debug.Log("Player already has this item.");
                                     return;

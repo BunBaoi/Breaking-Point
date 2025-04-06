@@ -19,7 +19,7 @@ public class PlayerStats : MonoBehaviour
 
     [Header("Energy Stats")]
     [SerializeField] private float previousEnergy;
-    [SerializeField] private float Energy = 100f;  // Current Energy
+    public float Energy = 100f;  // Current Energy
     [SerializeField] private float EnergyDrainRate = 5f;  // Energy drain per second in an EnergyDrain zone
     [SerializeField] private float SprintEnergyDrainRate = 10f; // Energy drain when sprinting
     [SerializeField] private bool isInEnergyDrainZone = false;

@@ -7,6 +7,8 @@ using System.Linq;
 
 public class InventoryManager : MonoBehaviour
 {
+    public static InventoryManager Instance;
+
     private List<InventorySlot> slots = new List<InventorySlot>();
     private int selectedSlotIndex = 0; // Currently selected inventory slot
     private GameObject heldLeftHandItemInstance; // Instance of the item in the player's left hand
@@ -90,36 +92,79 @@ public class InventoryManager : MonoBehaviour
                 slotAction.Enable();
             }
         }
+
+        if (Instance == null)
+        {
+            Instance = this;
+        }
     }
 
     private void Start()
     {
-        /*DisableScriptsOnInventoryItems();
-        CreateSlots(defaultSlotCount);
+        SelectSlot(0, -1);
 
-        scrollAction = inputActions.FindAction(scrollActionName);
-        dropAction = inputActions.FindAction(dropActionName);
+        UpdateSlotImageForAllSlots(selectedSlotIndex);
+    }
 
-        if (scrollAction != null)
+    public void SaveInventory()
+    {
+        for (int i = 0; i < slots.Count; i++)
         {
-            scrollAction.Enable();
-        }
-
-        if (dropAction != null)
-        {
-            dropAction.Enable();
-        }
-
-        for (int i = 0; i < defaultSlotCount; i++)
-        {
-            string actionName = slotActionsName + (i + 1); 
-            InputAction slotAction = inputActions.FindAction(actionName);
-            if (slotAction != null)
+            // Save item in the current slot
+            Item item = slots[i].GetItem();
+            if (item != null)
             {
-                slotActions.Add(slotAction);
-                slotAction.Enable();
+                PlayerPrefs.SetString("Inventory_Slot_" + i, item.name);
             }
-        }*/
+            else
+            {
+                PlayerPrefs.SetString("Inventory_Slot_" + i, "");
+            }
+        }
+        PlayerPrefs.SetInt("SelectedSlotIndex", selectedSlotIndex);
+        PlayerPrefs.Save();
+    }
+
+    public void LoadInventory(List<string> inventoryItems)
+    {
+        for (int i = 0; i < inventoryItems.Count; i++)
+        {
+            string itemName = inventoryItems[i];
+            Item item = FindItemByName(itemName); // Find the item by name
+            if (item != null && i < slots.Count)
+            {
+                slots[i].AddItem(item); // Add item to the corresponding slot
+            }
+            else
+            {
+                Debug.LogWarning($"Item {itemName} not found or slot index out of range.");
+            }
+        }
+
+        // Load selected slot index if available
+        selectedSlotIndex = PlayerPrefs.GetInt("SelectedSlotIndex", 0);
+        UpdateSlotImageForAllSlots(selectedSlotIndex); // Update the UI
+    }
+
+    public List<string> GetInventoryIDs()
+    {
+        List<string> itemIDs = new List<string>();
+
+        foreach (InventorySlot slot in slots)
+        {
+            Item item = slot.GetItem();
+            if (item != null)
+            {
+                itemIDs.Add(item.itemName);
+            }
+        }
+
+        return itemIDs;
+    }
+
+    private Item FindItemByName(string itemName)
+    {
+        return ItemDatabase.Instance.GetItemByName(itemName);
     }
 
     private void Update()

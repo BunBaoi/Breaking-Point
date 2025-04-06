@@ -17,7 +17,7 @@ public class ItemCheckerForTips : MonoBehaviour
     {
         itemTipsShown = new bool[items.Length];
 
-        LoadTipStatus();
+        // LoadTipStatus();
     }
 
     void Update()
@@ -37,7 +37,7 @@ public class ItemCheckerForTips : MonoBehaviour
                 }
 
                 itemTipsShown[i] = true;
-                SaveTipStatus();
+                // SaveTipStatus();
             }
         }
     }

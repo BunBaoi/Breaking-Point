@@ -9,25 +9,29 @@ using System.Text.RegularExpressions;
 
 public class TipManager : MonoBehaviour
 {
-    [SerializeField] private GameObject tipPanel;       // Main panel that contains both text and video
-    [SerializeField] private GameObject videoPanel;     // Panel specifically for displaying video
-    [SerializeField] private GameObject textPanel;      // Panel specifically for displaying text
-    [SerializeField] private RawImage videoDisplay;     // Image that will display the video
-    [SerializeField] private TextMeshProUGUI tipText;   // Text for displaying text tips
-    [SerializeField] private VideoPlayer videoPlayer;   // VideoPlayer component
+    public static TipManager Instance;
+
+    [Header("Tip UI Setup")]
+    [SerializeField] private GameObject tipPanel;
+    [SerializeField] private GameObject videoPanel;
+    [SerializeField] private GameObject textPanel;
+    [SerializeField] private RawImage videoDisplay;
+    [SerializeField] private TextMeshProUGUI tipText;
+    [SerializeField] private VideoPlayer videoPlayer;
     [SerializeField] private InputActionAsset inputActions;
 
     [Header("Tip Data")]
-    [SerializeField] private Tip[] tips;  // Array to hold multiple tips
-    [SerializeField] private float expansionSpeed = 5f;  // Speed of the text panel expansion
-    [SerializeField] private float videoScaleSpeed = 5f; // Speed of the video panel scaling
+    [SerializeField] private Tip[] tips;
+    [SerializeField] private float expansionSpeed = 5f;
+    [SerializeField] private float videoScaleSpeed = 5f;
+    private List<string> shownTipIDs = new List<string>();
 
     [Header("Panel Dimensions")]
-    [SerializeField] private Vector3 textPanelScale = new Vector3(1f, 1f, 1f); // Scale for the text panel (x, y, z)
-    [SerializeField] private Vector3 videoPanelScale = new Vector3(1f, 1f, 1f); // Scale for the video panel (x, y, z)
+    [SerializeField] private Vector3 textPanelScale = new Vector3(1f, 1f, 1f);
+    [SerializeField] private Vector3 videoPanelScale = new Vector3(1f, 1f, 1f);
 
-    private Queue<int> tipQueue = new Queue<int>();     // Queue to manage tips
-    private bool isDisplaying = false;                  // Check if a tip is currently being shown
+    private Queue<int> tipQueue = new Queue<int>();
+    private bool isDisplaying = false;
 
     private Vector3 targetVideoScale;
     private Vector3 targetTextScale;
@@ -39,6 +43,11 @@ public class TipManager : MonoBehaviour
     {
         targetVideoScale = videoPanelScale;
         targetTextScale = textPanelScale;
+
+        if (Instance == null)
+        {
+            Instance = this;
+        }
     }
 
     void Start()
@@ -122,8 +131,15 @@ public class TipManager : MonoBehaviour
 
     public void ShowTip(int tipIndex)
     {
+        if (shownTipIDs.Contains(tips[tipIndex].tipID))
+        {
+            return; // Skip this tip if it's already been shown
+        }
+
         if (tipIndex >= 0 && tipIndex < tips.Length)
         {
+            shownTipIDs.Add(tips[tipIndex].tipID);
+
             tipQueue.Enqueue(tipIndex);
 
             if (!isDisplaying)
@@ -131,6 +147,18 @@ public class TipManager : MonoBehaviour
                 StartCoroutine(ProcessTipQueue());
             }
         }
+    }
+
+    // Get the list of shown tip IDs
+    public List<string> GetShownTipIDs()
+    {
+        return new List<string>(shownTipIDs);
+    }
+
+    // Set the list of shown tip IDs
+    public void SetShownTipIDs(List<string> ids)
+    {
+        shownTipIDs = ids;
     }
 
     private IEnumerator ProcessTipQueue()

@@ -21,8 +21,9 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private CanvasGroup nextDialogueIndicatorCanvasGroup;
     [SerializeField] private Camera mainCamera;  // Player camera
     [SerializeField] private float scrollSpeed = 0.03f;
+    public Dictionary<string, bool> dialogueTreeProgress = new Dictionary<string, bool>();
 
-   [Header("Colour Settings")]
+    [Header("Colour Settings")]
     [SerializeField] private string npcNameColorHex = "#D95959"; // Default colour
     [SerializeField] private string dialogueTextColorHex = "#4DB7C0"; // Default colour
 
@@ -210,6 +211,26 @@ public class DialogueManager : MonoBehaviour
             if (hand != null)
                 hand.SetActive(isActive);
         }
+    }
+
+    // current state of the dialogue tree (completed or not)
+    public void SetDialogueProgress(string treeID, bool isCompleted)
+    {
+        dialogueTreeProgress[treeID] = isCompleted;
+    }
+
+    // progress of a dialogue tree (true = completed, false = not completed)
+    public bool GetDialogueProgress(string treeID)
+    {
+        if (dialogueTreeProgress.ContainsKey(treeID))
+            return dialogueTreeProgress[treeID];
+
+        return false;
+    }
+
+    public List<string> GetAllDialogueIDs()
+    {
+        return new List<string>(dialogueTreeProgress.Keys);
     }
 
     private void Update()
@@ -536,6 +557,14 @@ public class DialogueManager : MonoBehaviour
         {
             return; // Prevent dialogue from advancing while the settings menu is open
         }
+
+        if (GetDialogueProgress(dialogueTree.treeID))
+        {
+            Debug.Log("Dialogue with treeID " + dialogueTree.treeID + " has already been completed.");
+            return; // Exit without showing the dialogue
+        }
+
+        SetDialogueProgress(dialogueTree.treeID, true);
 
         if (inventoryManager != null)
         {

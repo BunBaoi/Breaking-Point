@@ -49,7 +49,7 @@ public class NPCDialogue : MonoBehaviour
 
     private void Start()
     {
-        isDialoguePressed = PlayerPrefs.GetInt(dialogueKey, 0) == 1;
+        // isDialoguePressed = PlayerPrefs.GetInt(dialogueKey, 0) == 1;
 
         // Find the action dynamically using the interactActionName string
         interactAction = inputActions.FindAction(interactActionName);
@@ -66,6 +66,12 @@ public class NPCDialogue : MonoBehaviour
 
     void ShowInteractText()
     {
+        if (DialogueManager.Instance.GetDialogueProgress(npcDialogueTree.treeID))
+        {
+            Debug.Log("Dialogue with treeID " + npcDialogueTree.treeID + " has already been completed.");
+            return;
+        }
+
         if (!isDialoguePressed && interactTextPrefab != null && interactTextInstance == null && CanStartDialogue())
         {
             interactTextInstance = Instantiate(interactTextPrefab);
@@ -319,9 +325,9 @@ public class NPCDialogue : MonoBehaviour
                 // Check if the interact key is pressed
                 if (playerInRange && interactAction.triggered && !isDialoguePressed && CanStartDialogue())
                 {
-                    isDialoguePressed = true;
+                    /*isDialoguePressed = true;
                     PlayerPrefs.SetInt(dialogueKey, 1);
-                    PlayerPrefs.Save();
+                    PlayerPrefs.Save();*/
                     StartDialogue();
 
                     HideInteractText();
@@ -343,10 +349,10 @@ public class NPCDialogue : MonoBehaviour
             UpdateSpriteScale();
         }
 
-        if (Input.GetKeyDown(clearPlayerPrefs))
+        /*if (Input.GetKeyDown(clearPlayerPrefs))
         {
             ClearPlayerPrefs();
-        }
+        }*/
     }
 
     private bool CanStartDialogue()

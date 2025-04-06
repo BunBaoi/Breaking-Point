@@ -11,9 +11,9 @@ public class SunriseSunsetTimes
 public class DayNightCycle : MonoBehaviour
 {
     [Header("Time Settings")]
-    [SerializeField] private int day = 1; // Track in-game days
-    [SerializeField] private int hours = 6;
-    [SerializeField] private int minutes = 0;
+    public int day = 1; // Track in-game days
+    public int hours = 6;
+    public int minutes = 0;
     [SerializeField] private float realSecondsPerGameMinute = 1f; // Every second increases time by 1 in-game minute
 
     [Header("Light Settings")]
@@ -81,7 +81,7 @@ public class DayNightCycle : MonoBehaviour
         }
     }
 
-    private void UpdateLighting()
+    public void UpdateLighting()
     {
         int currentTotalMinutes = hours * 60 + minutes;
         int sunriseTotalMinutes = sunriseTime.hour * 60 + sunriseTime.minute;
@@ -114,7 +114,7 @@ public class DayNightCycle : MonoBehaviour
         RenderSettings.ambientLight = ambientColourGradient.Evaluate(currentTotalMinutes / 1440f);
     }
 
-    private void UpdateTimeUI()
+    public void UpdateTimeUI()
     {
         timeText.text = $"Day {day}\n{hours:00}:{minutes:00}";
     }
