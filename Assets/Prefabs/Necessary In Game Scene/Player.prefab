@@ -3058,7 +3058,7 @@ GameObject:
   - component: {fileID: 202046860805526261}
   - component: {fileID: 4489766034500072145}
   - component: {fileID: 8552126682404272956}
-  m_Layer: 2
+  m_Layer: 21
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -3144,7 +3144,7 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 0
+  m_UseGravity: 1
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 112
@@ -3190,7 +3190,7 @@ MonoBehaviour:
   qTEvent: {fileID: 0}
   qTEMechanicScript: {fileID: 0}
   controller: {fileID: 897709939373269665}
-  playerCamera: {fileID: 0}
+  playerCamera: {fileID: 2206885108856580092}
   targetPos: {fileID: 0}
   playerPos: {fileID: 0}
   objectSpeed: 3
@@ -3199,9 +3199,9 @@ MonoBehaviour:
   sprintSpeed: 20
   gravity: -9.81
   IsSprint: 0
-  playerHeight: 0
-  zoomFOV: 0
-  normalFOV: 0
+  playerHeight: 1.8
+  zoomFOV: 40
+  normalFOV: 60
   binocularsUI: {fileID: 8987766354780862489}
   canMove: 1
   leftFootstepEvents:
@@ -3343,23 +3343,69 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controller: {fileID: 897709939373269665}
-  cameraTransform: {fileID: 4116197491859869406}
+  cameraTransform: {fileID: 1474353053519105979}
   leftHandTransform: {fileID: 3250508413225319028}
   rightHandTransform: {fileID: 6812937287833296610}
   climbSpeed: 3
-  maxClimbDistance: 4
+  maxClimbDistance: 3
   climbableTag: Climbable
   icepickMoveSpeed: 5
-  bodyPositionOffset: 1.5
+  digInDelay: 0.2
+  screenShakeIntensity: 0.02
+  screenShakeDuration: 0.1
+  icepickSounds:
+  - Guid:
+      Data1: 2122759780
+      Data2: 1132098285
+      Data3: 1595012763
+      Data4: 210047484
+    Path: event:/Ice Pick Hit 1 SFX
+  - Guid:
+      Data1: -712854032
+      Data2: 1121176254
+      Data3: 1150052501
+      Data4: -1895450888
+    Path: event:/Ice Pick Hit 2 SFX
+  - Guid:
+      Data1: 1447305997
+      Data2: 1128081862
+      Data3: 565417631
+      Data4: 534938009
+    Path: event:/Ice Pick Hit 3 SFX
+  - Guid:
+      Data1: -1307476797
+      Data2: 1160327710
+      Data3: 1955532959
+      Data4: -1974773970
+    Path: event:/Ice Pick Hit 4 SFX
+  - Guid:
+      Data1: -1205670799
+      Data2: 1170734033
+      Data3: -1277572931
+      Data4: -741309922
+    Path: event:/Ice Pick Hit 5 SFX
+  - Guid:
+      Data1: -1840544145
+      Data2: 1336788591
+      Data3: 931732383
+      Data4: 853693443
+    Path: event:/Ice Pick Hit 6 SFX
+  - Guid:
+      Data1: 1738842322
+      Data2: 1261433797
+      Data3: -1876999761
+      Data4: 1040392763
+    Path: event:/Ice Pick Hit 7 SFX
+  bodyPositionOffset: 1
   initialSnapPercentage: 0.3
   targetOffsetDistance: 0.2
   climbingEnergyDrainRate: 1
   lowEnergyClimbSpeedMultiplier: 0.5
   lowEnergyThreshold: 20
-  upwardBias: 0.1
+  upwardBias: 0.5
   startRotationX: -45
   endRotationX: 30
-  digInSpeed: 8
+  digInSpeed: 15
   animateEntireHand: 0
   inputActions: {fileID: -944628639613478452, guid: 5ec57af691e024f5495721c1aec07891, type: 3}
   leftGrabActionName: Climb Left Grab
@@ -3377,7 +3423,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Oxygen: 100
-  OxygenTank: 0
   OxygenDeductionRate: 0.3
   SprintOxygenDrainRate: 2
   OxygenTankRefillRate: 0
@@ -6898,7 +6943,7 @@ Transform:
   m_GameObject: {fileID: 3727002403780506984}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.43000233, y: 0.13999987, z: 0.79999745}
+  m_LocalPosition: {x: 0.25, y: 0.85, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -9833,7 +9878,7 @@ Transform:
   m_GameObject: {fileID: 5291443422802714608}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.4300032, y: 0.13999987, z: 0.7999943}
+  m_LocalPosition: {x: -0.25, y: 0.85, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -12056,13 +12101,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6689434991776137215}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1.6915503, z: 0.28769904}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1694757373622639524}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0.03, z: 0}
 --- !u!114 &443547395185132783
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12161,7 +12206,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mouseSensitivity: 300
-  playerBody: {fileID: 0}
+  playerBody: {fileID: 1694757373622639524}
   virtualCamera: {fileID: 8065920046792557807}
   inputActions: {fileID: -944628639613478452, guid: 5ec57af691e024f5495721c1aec07891, type: 3}
   lookName: Look
