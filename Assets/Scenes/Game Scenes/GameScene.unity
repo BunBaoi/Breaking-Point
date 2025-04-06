@@ -2163,6 +2163,26 @@ PrefabInstance:
       propertyPath: inventoryManager
       value: 
       objectReference: {fileID: 1114315170}
+    - target: {fileID: 6153531203544138019, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
+      propertyPath: refillSoundEvent.Path
+      value: event:/Oxygen Tank Gas Refill SFX
+      objectReference: {fileID: 0}
+    - target: {fileID: 6153531203544138019, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
+      propertyPath: refillSoundEvent.Guid.Data1
+      value: 1926593592
+      objectReference: {fileID: 0}
+    - target: {fileID: 6153531203544138019, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
+      propertyPath: refillSoundEvent.Guid.Data2
+      value: 1154656911
+      objectReference: {fileID: 0}
+    - target: {fileID: 6153531203544138019, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
+      propertyPath: refillSoundEvent.Guid.Data3
+      value: 420773506
+      objectReference: {fileID: 0}
+    - target: {fileID: 6153531203544138019, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
+      propertyPath: refillSoundEvent.Guid.Data4
+      value: 828340840
+      objectReference: {fileID: 0}
     - target: {fileID: 7347471784184561044, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
       propertyPath: m_Name
       value: Refill Oxygen Tank Trigger
@@ -3086,6 +3106,8 @@ MonoBehaviour:
   boolName: BaseCampTrainingCompleted
   tipManager: {fileID: 0}
   tipNumber: 0
+  journalPageAdder: {fileID: 0}
+  objectivesPage: {fileID: 0}
 --- !u!4 &737598464
 Transform:
   m_ObjectHideFlags: 0
@@ -4779,7 +4801,7 @@ PlayableDirector:
   m_InitialTime: 0
   m_SceneBindings:
   - key: {fileID: 6230135722362933340, guid: f89f1834bb39fcc46b095caeb7692aa2, type: 2}
-    value: {fileID: 1572524228}
+    value: {fileID: 0}
   - key: {fileID: 2774462798033425968, guid: f89f1834bb39fcc46b095caeb7692aa2, type: 2}
     value: {fileID: 240963888}
   m_ExposedReferences:
@@ -5081,13 +5103,13 @@ PlayableDirector:
   m_InitialTime: 0
   m_SceneBindings:
   - key: {fileID: 6230135722362933340, guid: f89f1834bb39fcc46b095caeb7692aa2, type: 2}
-    value: {fileID: 1572524228}
+    value: {fileID: 0}
   - key: {fileID: 2774462798033425968, guid: f89f1834bb39fcc46b095caeb7692aa2, type: 2}
     value: {fileID: 240963888}
   - key: {fileID: 460174130263519270, guid: 3d9baf02ffb8e5948904a61fc81b25e0, type: 2}
     value: {fileID: 240963888}
   - key: {fileID: -4113612450299123610, guid: 3d9baf02ffb8e5948904a61fc81b25e0, type: 2}
-    value: {fileID: 1572524228}
+    value: {fileID: 0}
   m_ExposedReferences:
     m_References: []
 --- !u!4 &1072355831
@@ -5469,6 +5491,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8694347061015249834, guid: 02c89fe4ba7034d1d9472c403fbf195b, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8694347061015249834, guid: 02c89fe4ba7034d1d9472c403fbf195b, type: 3}
       propertyPath: deletionRules.Array.size
       value: 0
       objectReference: {fileID: 0}
@@ -5555,8 +5581,8 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 1c0fc668c18050542882204e066b8585, type: 3}
   m_PrefabInstance: {fileID: 1178051251}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &1183533464 stripped
-Transform:
+--- !u!224 &1183533464 stripped
+RectTransform:
   m_CorrespondingSourceObject: {fileID: 1694757373622639524, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
   m_PrefabInstance: {fileID: 857086513}
   m_PrefabAsset: {fileID: 0}
@@ -7417,11 +7443,6 @@ Transform:
 Transform:
   m_CorrespondingSourceObject: {fileID: 7204685475145536357, guid: 1a7c33efe8cd742d98de760985fe3a04, type: 3}
   m_PrefabInstance: {fileID: 5045219648748663439}
-  m_PrefabAsset: {fileID: 0}
---- !u!95 &1572524228 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 6885791762203668991, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
-  m_PrefabInstance: {fileID: 857086513}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1611480257
 GameObject:

@@ -17,7 +17,7 @@ public class MainMenuUI : MonoBehaviour
     public void NewGame()
     {
 
-        SceneManager.LoadScene("Level3");
+        SceneManager.LoadScene("GameScene");
         //SceneManager.LoadScene("Testing Level"); // Just for Testing
 
     }

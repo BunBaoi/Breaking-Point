@@ -3190,7 +3190,7 @@ MonoBehaviour:
   qTEvent: {fileID: 0}
   qTEMechanicScript: {fileID: 0}
   controller: {fileID: 897709939373269665}
-  playerCamera: {fileID: 0}
+  playerCamera: {fileID: 2206885108856580092}
   targetPos: {fileID: 0}
   playerPos: {fileID: 0}
   objectSpeed: 3
@@ -3350,6 +3350,10 @@ MonoBehaviour:
   maxClimbDistance: 4
   climbableTag: Climbable
   icepickMoveSpeed: 5
+  digInDelay: 0.5
+  screenShakeIntensity: 0.05
+  screenShakeDuration: 0.2
+  icepickSounds: []
   bodyPositionOffset: 1.5
   initialSnapPercentage: 0.3
   targetOffsetDistance: 0.2
@@ -3377,7 +3381,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Oxygen: 100
-  OxygenTank: 0
   OxygenDeductionRate: 0.3
   SprintOxygenDrainRate: 2
   OxygenTankRefillRate: 0
