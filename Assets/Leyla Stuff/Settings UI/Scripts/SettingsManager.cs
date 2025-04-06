@@ -14,6 +14,9 @@ public class SettingsManager : MonoBehaviour
     [Header("Settings UI")]
     public GameObject settingsCanvas;
 
+    [Header("Game Over Menu")]
+    public GameObject gameOverCanvas;
+
     [Header("Panels & Buttons")]
     public Button[] panelButtons;
     public GameObject[] panels;
@@ -331,6 +334,12 @@ public class SettingsManager : MonoBehaviour
 
     void ToggleMenu(InputAction.CallbackContext context)
     {
+        if (gameOverCanvas.activeSelf)
+        {
+            Debug.Log("Game Over is active. Cannot access settings.");
+            return;
+        }
+
         isMenuOpen = !isMenuOpen;
         settingsCanvas.SetActive(isMenuOpen);
 

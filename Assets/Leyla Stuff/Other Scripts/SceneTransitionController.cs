@@ -8,6 +8,9 @@ public class SceneTransitionController : MonoBehaviour
     public float transitionDuration = 1.0f;
     public Image transitionImage;
 
+    private PlayerMovement playerMovement;
+    private InventoryManager inventoryManager;
+
     private CanvasGroup canvasGroup;
 
     private void Start()
@@ -22,6 +25,22 @@ public class SceneTransitionController : MonoBehaviour
         // Start the transition coroutine
         StartCoroutine(Transition(sceneName));
         DontDestroyOnLoad(gameObject);
+
+        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+        if (playerObject != null)
+        {
+            playerMovement = playerObject.GetComponent<PlayerMovement>();
+            inventoryManager = playerObject.GetComponent<InventoryManager>();
+
+            if (playerMovement != null)
+            {
+                playerMovement.SetMovementState(false);
+            }
+            if (inventoryManager != null)
+            {
+                inventoryManager.enabled = false;
+            }
+        }
     }
 
     private IEnumerator Transition(string sceneName)
@@ -32,6 +51,11 @@ public class SceneTransitionController : MonoBehaviour
             Time.timeScale = 1;
             canvasGroup.alpha += Time.deltaTime / transitionDuration;
             yield return null;
+        }
+
+        if (GameOverMenu.Instance != null)
+        {
+            GameOverMenu.Instance.HideGameOverPanel();
         }
 
         canvasGroup.alpha = 1f;
@@ -59,5 +83,20 @@ public class SceneTransitionController : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
 
         Destroy(gameObject);
+        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+        if (playerObject != null)
+        {
+            playerMovement = playerObject.GetComponent<PlayerMovement>();
+            inventoryManager = playerObject.GetComponent<InventoryManager>();
+
+            if (playerMovement != null)
+            {
+                playerMovement.SetMovementState(true);
+            }
+            if (inventoryManager != null)
+            {
+                inventoryManager.enabled = true;
+            }
+        }
     }
 }

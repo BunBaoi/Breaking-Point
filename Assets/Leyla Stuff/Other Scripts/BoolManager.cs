@@ -21,7 +21,6 @@ public class BoolManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            LoadBools();
         }
         else
         {
@@ -129,7 +128,7 @@ public class BoolManager : MonoBehaviour
         Debug.Log("clear all bools");
         boolDictionary.Clear();
         boolKeys.Clear();
-        PlayerPrefs.DeleteKey("BoolKeys"); // Clear the stored keys
-        PlayerPrefs.Save(); // Ensure PlayerPrefs is saved
+        PlayerPrefs.DeleteKey("BoolKeys");
+        PlayerPrefs.Save();
     }
 }
