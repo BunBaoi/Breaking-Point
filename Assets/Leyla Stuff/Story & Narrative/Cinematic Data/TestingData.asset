@@ -16,22 +16,14 @@ MonoBehaviour:
   eventIds:
   - Chapter1CinematicTriggered
   dialoguesAndAudio:
-  - dialogue: hi
-    fmodAudioEvent:
-      Guid:
-        Data1: -824021375
-        Data2: 1215717741
-        Data3: 1917500314
-        Data4: -1955761802
-      Path: event:/TestingSoundEvent
-  - dialogue: Tehe
-    fmodAudioEvent:
-      Guid:
-        Data1: 1765606322
-        Data2: 1118326076
-        Data3: -1774001520
-        Data4: 1115765450
-      Path: event:/TestingSoundEvent2
+  - dialogue: i am testing something i am testing something i am testing something
+    npcName: Alice
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
+  - dialogue: 'abcdefghijk lmnop qrs tuv wx yz
+
+'
+    npcName: Alice
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
   randomTexts:
   - Hello 1
   - Tehe 1

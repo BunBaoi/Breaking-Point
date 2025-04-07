@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using UnityEngine.UI;
 
 public class SaveManager : MonoBehaviour
 {
@@ -11,7 +12,10 @@ public class SaveManager : MonoBehaviour
     public bool useEncryption = true;
 
     public CanvasGroup fadeCanvasGroup;
-    private bool isFading = false;
+
+    [SerializeField] private GameObject savePanel;
+    [SerializeField] private Image saveImage;
+    [SerializeField] private float rotationSpeed = 100f;
 
     private void Awake()
     {
@@ -60,6 +64,8 @@ public class SaveManager : MonoBehaviour
 
     public void SaveGame()
     {
+        StartCoroutine(ShowSavePanelAndStartRotation());
+
         SaveData data = new SaveData();
         data.sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
 
@@ -156,6 +162,46 @@ public class SaveManager : MonoBehaviour
             File.WriteAllText(savePath, json);
             Debug.Log("Game saved without encryption.");
         }
+
+        StartCoroutine(HideSavePanel());
+    }
+
+    private IEnumerator ShowSavePanelAndStartRotation()
+    {
+        savePanel.SetActive(true);
+
+        float fadeDuration = 1f;
+        float timeElapsed = 0f;
+        CanvasGroup panelCanvasGroup = savePanel.GetComponent<CanvasGroup>();
+        while (timeElapsed < fadeDuration)
+        {
+            panelCanvasGroup.alpha = Mathf.Lerp(0f, 1f, timeElapsed / fadeDuration);
+            timeElapsed += Time.unscaledDeltaTime;
+            yield return null;
+        }
+        panelCanvasGroup.alpha = 1f;
+
+        while (true)
+        {
+            saveImage.transform.Rotate(Vector3.forward, rotationSpeed * Time.deltaTime);
+            yield return null;
+        }
+    }
+
+    private IEnumerator HideSavePanel()
+    {
+        float fadeDuration = 1f;
+        float timeElapsed = 0f;
+        CanvasGroup panelCanvasGroup = savePanel.GetComponent<CanvasGroup>();
+        while (timeElapsed < fadeDuration)
+        {
+            panelCanvasGroup.alpha = Mathf.Lerp(1f, 0f, timeElapsed / fadeDuration);
+            timeElapsed += Time.unscaledDeltaTime;
+            yield return null;
+        }
+        panelCanvasGroup.alpha = 0f;
+
+        savePanel.SetActive(false);
     }
 
     public void LoadGame()

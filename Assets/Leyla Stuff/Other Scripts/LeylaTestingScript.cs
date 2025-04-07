@@ -15,6 +15,7 @@ public class LeylaTestingScript : MonoBehaviour
     [SerializeField] private JournalPageAdder journalPageAdder;
     [SerializeField] private ObjectivesPage objectivesPage;
     [SerializeField] private GameOverMenu gameOverMenu;
+    [SerializeField] private CinematicSequence cinematicSequence;
 
     // Start is called before the first frame update
     void Start()
@@ -27,7 +28,8 @@ public class LeylaTestingScript : MonoBehaviour
     {
         if (Input.GetKeyDown(key))
         {
-            SceneManager.LoadScene("MainMenu");
+            cinematicSequence.StartCinematic();
+            // SceneManager.LoadScene("MainMenu");
             // SaveManager.Instance.SaveGame();
             // Debug.Log("save game");
             /*Debug.Log("add page");

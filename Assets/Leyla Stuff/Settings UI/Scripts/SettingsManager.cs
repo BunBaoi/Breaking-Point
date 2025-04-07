@@ -15,6 +15,7 @@ public class SettingsManager : MonoBehaviour
     [Header("Settings UI")]
     public GameObject settingsCanvas;
     public bool isPlayerFound = false;
+    public bool isCinematicActive = false;
 
     [Header("Game Over Menu")]
     public GameObject gameOverCanvas;
@@ -448,6 +449,11 @@ public class SettingsManager : MonoBehaviour
         }
     }
 
+    public void SetCinematicActive(bool isActive)
+    {
+        isCinematicActive = isActive;
+    }
+
     void ToggleMenu(InputAction.CallbackContext context)
     {
         if (context.performed)
@@ -461,6 +467,12 @@ public class SettingsManager : MonoBehaviour
         if (gameOverCanvas.activeSelf)
         {
             Debug.Log("Game Over is active. Cannot access settings.");
+            return;
+        }
+
+        if (isCinematicActive)
+        {
+            Debug.Log("Cinematic is playing. Cannot open settings.");
             return;
         }
 
