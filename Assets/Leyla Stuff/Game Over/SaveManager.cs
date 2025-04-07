@@ -37,7 +37,7 @@ public class SaveManager : MonoBehaviour
         {
             float alpha = Mathf.Lerp(0f, 1f, timeElapsed / duration);
             fadeCanvasGroup.alpha = alpha;
-            timeElapsed += Time.deltaTime;
+            timeElapsed += Time.unscaledDeltaTime; ;
             yield return null;
         }
         fadeCanvasGroup.alpha = 1f;
@@ -51,7 +51,7 @@ public class SaveManager : MonoBehaviour
         {
             float alpha = Mathf.Lerp(1f, 0f, timeElapsed / duration);
             fadeCanvasGroup.alpha = alpha;
-            timeElapsed += Time.deltaTime;
+            timeElapsed += Time.unscaledDeltaTime;
             yield return null;
         }
         fadeCanvasGroup.alpha = 0f;
@@ -190,7 +190,7 @@ public class SaveManager : MonoBehaviour
 
     private IEnumerator LoadSceneAndApplyData(SaveData data)
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSecondsRealtime(1f);
 
         if (GameOverMenu.Instance != null)
         {
@@ -311,7 +311,7 @@ public class SaveManager : MonoBehaviour
         // Restore Inventory
         InventoryManager.Instance.LoadInventory(data.inventoryItems);
 
-        StartCoroutine(FadeFromBlack(1f));
+        StartCoroutine(FadeFromBlack(2f));
 
         Debug.Log("Game loaded.");
     }

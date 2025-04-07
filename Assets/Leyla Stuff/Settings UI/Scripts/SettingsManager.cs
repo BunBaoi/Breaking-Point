@@ -8,11 +8,13 @@ using System.Collections;
 using FMOD.Studio;
 using FMODUnity;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class SettingsManager : MonoBehaviour
 {
     [Header("Settings UI")]
     public GameObject settingsCanvas;
+    public bool isPlayerFound = false;
 
     [Header("Game Over Menu")]
     public GameObject gameOverCanvas;
@@ -191,25 +193,34 @@ public class SettingsManager : MonoBehaviour
         }
 
         // --- BRIGHTNESS SETTINGS ---
-        if (volume.profile.TryGet(out ColorAdjustments colorAdjustments))
+        GameObject mainCamera = GameObject.FindWithTag("MainCamera");
+        if (mainCamera != null)
         {
-            float savedBrightness = PlayerPrefs.GetFloat("Brightness", 0.5f);
-            brightnessSlider.value = savedBrightness;
-            UpdateBrightness(savedBrightness);
-        }
-        else
-        {
-            Debug.LogError("Color Adjustments effect not found in the Volume profile.");
-        }
-        if (volume.profile.TryGet(out colorAdjustments))
-        {
-            float savedBrightness = PlayerPrefs.GetFloat("Brightness", 0.5f);
-            brightnessSlider.value = savedBrightness;
-            UpdateBrightness(savedBrightness);
-        }
-        else
-        {
-            Debug.LogError("Color Adjustments effect not found in the Volume profile.");
+            // Get the Volume component from the MainCamera
+            volume = mainCamera.GetComponent<Volume>();
+            if (volume != null)
+            {
+                if (volume.profile.TryGet(out ColorAdjustments colorAdjustments))
+                {
+                    float savedBrightness = PlayerPrefs.GetFloat("Brightness", 0.5f);
+                    brightnessSlider.value = savedBrightness;
+                    UpdateBrightness(savedBrightness);
+                }
+                else
+                {
+                    Debug.LogError("Color Adjustments effect not found in the Volume profile.");
+                }
+                if (volume.profile.TryGet(out colorAdjustments))
+                {
+                    float savedBrightness = PlayerPrefs.GetFloat("Brightness", 0.5f);
+                    brightnessSlider.value = savedBrightness;
+                    UpdateBrightness(savedBrightness);
+                }
+                else
+                {
+                    Debug.LogError("Color Adjustments effect not found in the Volume profile.");
+                }
+            }
         }
 
         if (brightnessSlider != null)
@@ -307,6 +318,94 @@ public class SettingsManager : MonoBehaviour
             masterMusicSlider.onValueChanged.AddListener(UpdateMasterMusicVolume);
             menuMusicSlider.onValueChanged.AddListener(UpdateMenuMusicVolume);
         }
+
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name.Contains("Level") || scene.name.Contains("Game") || scene.name.Contains("Test"))
+        {
+            ApplyPlayerSettings();
+        }
+
+        if (settingsCanvas.activeSelf)
+        {
+            settingsCanvas.SetActive(false);
+            isMenuOpen = false;
+            Time.timeScale = 1f;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+
+            GameObject playerObject = GameObject.FindGameObjectWithTag(playerTag);
+            if (playerObject != null)
+            {
+                inventoryManager = playerObject.GetComponent<InventoryManager>();
+                if (inventoryManager != null)
+                {
+                    inventoryManager.enabled = true;
+                }
+
+                Transform inventoryCanvasTransform = playerObject.transform.Find("Inventory Canvas");
+                if (inventoryCanvasTransform != null)
+                {
+                    inventoryCanvas = inventoryCanvasTransform.GetComponent<Canvas>();
+                    if (inventoryCanvas != null)
+                    {
+                        inventoryCanvas.gameObject.SetActive(true);
+                    }
+                }
+            }
+        }
+    }
+
+    private void ApplyPlayerSettings()
+    {
+        GameObject player = GameObject.FindWithTag(playerTag);
+
+        GameObject playerCamera = GameObject.FindWithTag("PlayerCamera");
+        if (playerCamera != null)
+        {
+            volume = playerCamera.GetComponent<Volume>();
+            if (volume != null)
+            {
+                if (volume.profile.TryGet(out ColorAdjustments colorAdjustments))
+                {
+                    float savedBrightness = PlayerPrefs.GetFloat("Brightness", 0.5f);
+                    brightnessSlider.value = savedBrightness;
+                    UpdateBrightness(savedBrightness);
+                }
+                else
+                {
+                    Debug.LogError("Color Adjustments effect not found in the Volume profile.");
+                }
+                if (volume.profile.TryGet(out colorAdjustments))
+                {
+                    float savedBrightness = PlayerPrefs.GetFloat("Brightness", 0.5f);
+                    brightnessSlider.value = savedBrightness;
+                    UpdateBrightness(savedBrightness);
+                }
+                else
+                {
+                    Debug.LogError("Color Adjustments effect not found in the Volume profile.");
+                }
+            }
+        }
+
+        if (brightnessSlider != null)
+        {
+            brightnessSlider.onValueChanged.AddListener(UpdateBrightness);
+        }
     }
 
     void OnDestroy()
@@ -332,7 +431,32 @@ public class SettingsManager : MonoBehaviour
         sfxSlider.onValueChanged.RemoveListener(UpdateSFXVolume);
     }
 
+    private void Update()
+    {
+        if (gameOverCanvas.activeSelf && settingsCanvas.activeSelf)
+        {
+            OnGameOverMenuActivated();
+        }
+    }
+
+    public void OnGameOverMenuActivated()
+    {
+        if (settingsCanvas.activeSelf)
+        {
+            settingsCanvas.SetActive(false);
+            isMenuOpen = false;
+        }
+    }
+
     void ToggleMenu(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            ToggleMenu();
+        }
+    }
+
+    public void ToggleMenu()
     {
         if (gameOverCanvas.activeSelf)
         {
@@ -378,17 +502,20 @@ public class SettingsManager : MonoBehaviour
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
 
-            if (inventoryManager != null)
+            if (playerObject != null)
             {
-                inventoryManager.enabled = true;
-            }
-            Transform inventoryCanvasTransform = playerObject.transform.Find("Inventory Canvas");
-            if (inventoryCanvasTransform != null)
-            {
-                inventoryCanvas = inventoryCanvasTransform.GetComponent<Canvas>();
-                if (inventoryCanvas != null)
+                if (inventoryManager != null)
                 {
-                    inventoryCanvas.gameObject.SetActive(true);
+                    inventoryManager.enabled = true;
+                }
+                Transform inventoryCanvasTransform = playerObject.transform.Find("Inventory Canvas");
+                if (inventoryCanvasTransform != null)
+                {
+                    inventoryCanvas = inventoryCanvasTransform.GetComponent<Canvas>();
+                    if (inventoryCanvas != null)
+                    {
+                        inventoryCanvas.gameObject.SetActive(true);
+                    }
                 }
             }
         }

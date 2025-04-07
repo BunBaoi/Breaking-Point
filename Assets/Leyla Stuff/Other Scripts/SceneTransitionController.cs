@@ -24,7 +24,13 @@ public class SceneTransitionController : MonoBehaviour
     {
         // Start the transition coroutine
         StartCoroutine(Transition(sceneName));
-        DontDestroyOnLoad(gameObject);
+
+        Transform parent = transform.parent;
+
+        if ((parent == null || parent.name != "GameManager"))
+        {
+            DontDestroyOnLoad(gameObject);
+        }
 
         GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
         if (playerObject != null)
@@ -82,7 +88,13 @@ public class SceneTransitionController : MonoBehaviour
     {
         yield return new WaitForSeconds(0.1f);
 
-        Destroy(gameObject);
+        Transform parent = transform.parent;
+
+        if ((parent == null || parent.name != "GameManager"))
+        {
+            Destroy(gameObject);
+        }
+
         GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
         if (playerObject != null)
         {

@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using TMPro;
 
 public class LeylaTestingScript : MonoBehaviour
 {
@@ -25,8 +27,8 @@ public class LeylaTestingScript : MonoBehaviour
     {
         if (Input.GetKeyDown(key))
         {
-
-            SaveManager.Instance.SaveGame();
+            SceneManager.LoadScene("MainMenu");
+            // SaveManager.Instance.SaveGame();
             // Debug.Log("save game");
             /*Debug.Log("add page");
             journalPageAdder.AddObjectivesPage(objectivesPage);

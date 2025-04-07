@@ -45,7 +45,7 @@ public class GameOverMenu : MonoBehaviour
         }
     }
 
-    void HideAllPanels()
+    public void HideAllPanels()
     {
         foreach (var panel in optionPanels)
         {

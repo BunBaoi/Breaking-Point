@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using static PlayerStats;
+using FMOD.Studio;
+using FMODUnity;
 
 public class PlayerStats : MonoBehaviour
 {
@@ -17,6 +18,17 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private Item oxygenTankItem;
     [SerializeField] private bool HasOxygenTank => inventoryManager.HasItem(oxygenTankItem); // Checks inventory
 
+    [Header("Oxygen FMOD Audio")]
+    [SerializeField] private EventReference oxygenRange100_75;
+    [SerializeField] private EventReference oxygenRange74_50;
+    [SerializeField] private EventReference oxygenRange49_25;
+    [SerializeField] private EventReference oxygenRange24_15;
+    [SerializeField] private EventReference oxygenRange14_10;
+    [SerializeField] private EventReference oxygenRange9_0;
+
+    private EventInstance oxygenLoopInstance;
+    private int currentOxygenRange = -1;
+
     [Header("Energy Stats")]
     [SerializeField] private float previousEnergy;
     public float Energy = 100f;  // Current Energy
@@ -26,6 +38,7 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private bool energyChanged = false;
 
     [Header("UI Elements")]
+    [SerializeField] private CanvasGroup transitionCanvasGroup;
     [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private CanvasGroup oxygenUIParent;
     [SerializeField] private CanvasGroup energyUIParent;
@@ -44,7 +57,10 @@ public class PlayerStats : MonoBehaviour
     public PlayerStatus stateOfPlayer;
 
     private PlayerMovement playerMovement;
+    [SerializeField] private CameraController cameraController;
     private InventoryManager inventoryManager;
+    [SerializeField] private Canvas inventoryCanvas;
+    [SerializeField] private GameObject[] playerHands;
     [SerializeField] public QTEMechanicScript qTEMechanicScript;
     public QTEvent qTEvent;
     public Vector3 targetPosition;
@@ -66,9 +82,12 @@ public class PlayerStats : MonoBehaviour
 
         controller.slopeLimit = 45.0f;
 
+        if (transitionCanvasGroup != null)
+        {
+            transitionCanvasGroup.gameObject.SetActive(false);
+        }
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (Energy != previousEnergy)
@@ -82,8 +101,6 @@ public class PlayerStats : MonoBehaviour
 
         previousEnergy = Energy;
 
-        // DeadZone();
-        PlayerAlive();
         HandleEnergyDrain();
         HandleOxygenDrain();
         UpdateUIElements();
@@ -205,12 +222,11 @@ public class PlayerStats : MonoBehaviour
         {
             float drainRate = playerMovement.IsSprint ? SprintEnergyDrainRate : EnergyDrainRate;
             Energy -= drainRate * Time.deltaTime;
-            Energy = Mathf.Max(Energy, 0); // Prevent Energy from going below 0
+            Energy = Mathf.Max(Energy, 0);
 
-            if (Energy == 0)
+            if (Energy >= 0)
             {
-                Debug.Log("Player has no energy left");
-                // add pass out here / game over
+                PlayerDeath();
             }
         }
     }
@@ -219,30 +235,26 @@ public class PlayerStats : MonoBehaviour
     {
             if (isInOxygenDrainZone)
             {
-                // If no oxygen tank is present, do not allow oxygen to drain
-                if (!HasOxygenTank)
+                // If no oxygen tank is present, do not allow oxygen to drain and insta death
+                if (!HasOxygenTank || !IsAlive)
                 {
-                    Debug.Log("No Oxygen Tank: Oxygen drain is stopped.");
-                // add a death / pass out event here
-                    return;
+                PlayerDeath();
+                StopOxygenSound();
+                return;
                 }
 
                 // Oxygen deduction based on sprinting
                 float currentOxygenDrainRate = playerMovement.IsSprint ? SprintOxygenDrainRate : OxygenDeductionRate;
                 Oxygen -= currentOxygenDrainRate * Time.deltaTime;
-                Oxygen = Mathf.Max(Oxygen, 0); // Prevent Oxygen from going below 0
+                Oxygen = Mathf.Max(Oxygen, 0);
 
                 // Death
-                if (Oxygen == 0 && HasOxygenTank)
+                if (Oxygen <= 0 && HasOxygenTank)
                 {
-                    Debug.Log("Player has no oxygen left");
-                    // add pass out or game over logic
+                PlayerDeath();
                 }
 
-                if (Oxygen < 25) // This should play an effect to signify low oxygen & oxygen rate
-                {
-                    
-                }
+            HandleOxygenSound();
 
             // Tank replenish Oxygen
             if (Oxygen < 100 && HasOxygenTank)
@@ -251,13 +263,82 @@ public class PlayerStats : MonoBehaviour
                 Oxygen = Mathf.Min(Oxygen, 100f);
             }
         }
+        else
+        {
+            StopOxygenSound();
+        }
+    }
+
+    void HandleOxygenSound()
+    {
+        int newRange = -1;
+
+        if (Oxygen >= 75f) newRange = 5;
+        else if (Oxygen >= 50f) newRange = 4;
+        else if (Oxygen >= 25f) newRange = 3;
+        else if (Oxygen >= 15f) newRange = 2;
+        else if (Oxygen >= 10f) newRange = 1;
+        else newRange = 0;
+
+        // Check if the range has changed
+        if (newRange != currentOxygenRange)
+        {
+            currentOxygenRange = newRange;
+
+            if (oxygenLoopInstance.isValid())
+            {
+                oxygenLoopInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+                oxygenLoopInstance.release();
+            }
+
+            EventReference soundToPlay = new EventReference();
+
+            switch (currentOxygenRange)
+            {
+                case 5: soundToPlay = oxygenRange100_75; break;
+                case 4: soundToPlay = oxygenRange74_50; break;
+                case 3: soundToPlay = oxygenRange49_25; break;
+                case 2: soundToPlay = oxygenRange24_15; break;
+                case 1: soundToPlay = oxygenRange14_10; break;
+                case 0: soundToPlay = oxygenRange9_0; break;
+            }
+
+            if (!soundToPlay.IsNull)
+            {
+                oxygenLoopInstance = FMODUnity.RuntimeManager.CreateInstance(soundToPlay);
+                oxygenLoopInstance.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(gameObject));
+                oxygenLoopInstance.start();
+            }
+        }
+        else
+        {
+            if (oxygenLoopInstance.isValid())
+            {
+                FMOD.Studio.PLAYBACK_STATE playbackState;
+                oxygenLoopInstance.getPlaybackState(out playbackState);
+
+                if (playbackState == FMOD.Studio.PLAYBACK_STATE.STOPPED)
+                {
+                    oxygenLoopInstance.start();
+                }
+            }
+        }
+    }
+
+    void StopOxygenSound()
+    {
+        if (oxygenLoopInstance.isValid())
+        {
+            oxygenLoopInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+            oxygenLoopInstance.release();
+            currentOxygenRange = -1;
+        }
     }
 
     public void ReplenishEnergy(float amount)
     {
         energyChanged = true;
         Energy = Mathf.Clamp(amount, 0f, 100f);
-        Debug.Log("Energy replenished to: " + Energy);
     }
 
     void UpdateUIElements()
@@ -314,10 +395,10 @@ public class PlayerStats : MonoBehaviour
                 break;
 
             case PlayerStatus.OxygenZone:
-                Debug.Log("Status: DeadZone");
+                Debug.Log("Status: OxygenZone");
                 break;
             case PlayerStatus.QTE:
-                Debug.Log("Status: DeadZone");
+                Debug.Log("Status: QTE");
                 break;
 
         }
@@ -327,7 +408,7 @@ public class PlayerStats : MonoBehaviour
     {
         Debug.Log($"Entered Trigger: {other.gameObject.name}");
 
-        if (other.CompareTag("OxygenZone"))
+        if (other.CompareTag("OxygenDrain"))
         {
             stateOfPlayer = PlayerStatus.OxygenZone;
             isInOxygenDrainZone = true;
@@ -338,7 +419,7 @@ public class PlayerStats : MonoBehaviour
             stateOfPlayer = PlayerStatus.QTE;
             Debug.Log("Level2QTE.1 Enter");
         }
-        else if (other.CompareTag("EnergyDrain")) // Energy drain trigger
+        else if (other.CompareTag("EnergyDrain"))
         {
             isInEnergyDrainZone = true;
             Debug.Log("Energy Drain Zone Entered");
@@ -349,7 +430,7 @@ public class PlayerStats : MonoBehaviour
     {
         Debug.Log($"Exited Trigger: {other.gameObject.name}");
 
-        if (other.CompareTag("OxygenZone") || other.CompareTag("Level2QTE.1"))
+        if (other.CompareTag("OxygenDrain") || other.CompareTag("Level2QTE.1"))
         {
             stateOfPlayer = PlayerStatus.FreeRoam;
             isInOxygenDrainZone = false;
@@ -362,17 +443,118 @@ public class PlayerStats : MonoBehaviour
         }
     }
     
-    public void PlayerAlive()
+    public void PlayerDeath()
     {
-        // Oxygen Death
-        if (Oxygen <= 0)
+        if (!IsAlive) return;
+
+        IsAlive = false;
+
+        if (inventoryManager != null)
         {
-            IsAlive = false;
-            Debug.Log("Player Died From No Oxygen");
+            inventoryManager.enabled = false;
+            inventoryCanvas.gameObject.SetActive(false);
+        }
+        if (cameraController != null)
+        {
+            cameraController.SetLookState(false);
+        }
+        if (playerMovement != null)
+        {
+            playerMovement.SetMovementState(false);
+        }
+
+        if (inventoryManager != null)
+        {
+            inventoryManager.enabled = false;
+            inventoryCanvas.gameObject.SetActive(false);
+        }
+
+        if (playerHands != null)
+        {
+            foreach (GameObject hand in playerHands)
+            {
+                hand.SetActive(false);
+            }
+        }
+
+        if (controller != null)
+        {
+            controller.enabled = false;
+        }
+
+        if (transitionCanvasGroup != null)
+        {
+            transitionCanvasGroup.gameObject.SetActive(true);
+        }
+
+        StartCoroutine(PlayerDeathSequence());
+        }
+    
+
+    private IEnumerator PlayerDeathSequence()
+    {
+        float targetRotation = 90f;
+        float rotationSpeed = 30f;
+
+        Vector3 currentRotation = transform.rotation.eulerAngles;
+
+        while (Mathf.Abs(Mathf.DeltaAngle(currentRotation.x, targetRotation)) > 0.1f)
+        {
+            float step = rotationSpeed * Time.unscaledDeltaTime;
+            currentRotation.x = Mathf.MoveTowardsAngle(currentRotation.x, targetRotation, step);
+
+            transform.rotation = Quaternion.Euler(currentRotation);
+            yield return null;
+        }
+
+        currentRotation.x = targetRotation;
+        transform.rotation = Quaternion.Euler(currentRotation);
+
+        if (transitionCanvasGroup != null)
+        {
+            yield return StartCoroutine(FadeCanvasGroup(transitionCanvasGroup, 0f, 1f, 1f));
+        }
+
+        StopOxygenSound();
+        Time.timeScale = 1;
+        GameOverMenu.Instance.ShowGameOver();
+
+        yield return new WaitForSecondsRealtime(0.5f);
+
+        if (transitionCanvasGroup != null)
+        {
+            yield return StartCoroutine(FadeCanvasGroup(transitionCanvasGroup, 1f, 0f, 1f));
+        }
+
+        if (transitionCanvasGroup != null)
+        {
+            transitionCanvasGroup.gameObject.SetActive(false);
+        }
+
+        if (controller != null)
+        {
+            controller.enabled = true;
         }
     }
 
-    public IEnumerator MoveCube(Vector3 targetPosition) // targetPosition = Player <-
+    private IEnumerator FadeCanvasGroup(CanvasGroup canvasGroup, float startAlpha, float endAlpha, float duration)
+    {
+        // Set initial alpha
+        canvasGroup.alpha = startAlpha;
+
+        float timeElapsed = 0f;
+        while (timeElapsed < duration)
+        {
+            canvasGroup.alpha = Mathf.Lerp(startAlpha, endAlpha, timeElapsed / duration);
+            timeElapsed += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        // Ensure the final alpha value is exactly what we need
+        canvasGroup.alpha = endAlpha;
+    }
+
+public IEnumerator MoveCube(Vector3 targetPosition) // targetPosition = Player <-
     {
         Vector3 startPosition = qTEMechanicScript.objectPlayer.position;
         float timeElapsed = 0;
@@ -409,10 +591,9 @@ public class PlayerStats : MonoBehaviour
         Energy -= amount;
         Energy = Mathf.Max(Energy, 0); // Prevent Energy from going below 0
 
-        if (Energy == 0)
+        if (Energy >= 0)
         {
-            Debug.Log("Player has no energy left");
-            // Handle zero energy state
+            PlayerDeath();
         }
     }
 
