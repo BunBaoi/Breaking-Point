@@ -2,33 +2,23 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
-using System.Collections.Generic;
 
-public class NPCDialogue : MonoBehaviour
+public class VentureForthInteraction : MonoBehaviour
 {
-    [Header("Dialogue Settings")]
-    [SerializeField] private DialogueTree npcDialogueTree;
-    [SerializeField] private CompanionScript companionScript;
-    [SerializeField] private string dialogueKey = "DialogueTriggered";
-
-    [Header("Testing Purposes")]
-    [SerializeField] private bool playerInRange = false; // Is player in range?
-    [SerializeField] private bool isDialoguePressed;
-
-    [Header("Keybinds")]
-    [SerializeField] private InputActionAsset inputActions;
-    [SerializeField] private string interactActionName = "Interact";
-    [SerializeField] private KeyCode clearPlayerPrefs = KeyCode.C;
     [SerializeField] private GameObject interactTextPrefab;
-
     private GameObject interactTextInstance;
-    private Transform player;
+    private bool playerInRange = false;
+    [SerializeField] private string interactActionName = "Interact";
+    [SerializeField] private InputActionAsset inputActions;
+    private SpriteRenderer spriteRenderer; 
     private GameObject iconObject;
-    private SpriteRenderer spriteRenderer;
+    [SerializeField] private GameObject ventureForthPanel;
+    [SerializeField] private InventoryManager inventoryManager;
+    [SerializeField] private Canvas inventoryCanvas;
+    [SerializeField] private Button ventureForthButton;
 
-    [Header("Bool Conditions")]
-    [SerializeField] private List<string> requiredBoolKeysTrue = new List<string>(); 
-    [SerializeField] private List<string> requiredBoolKeysFalse = new List<string>();
+    [SerializeField] private string sceneName;
+    [SerializeField] private string teleportLocationTag = "";
 
     private InputAction interactAction;
 
@@ -47,11 +37,8 @@ public class NPCDialogue : MonoBehaviour
         }
     }
 
-    private void Start()
+    void Start()
     {
-        // isDialoguePressed = PlayerPrefs.GetInt(dialogueKey, 0) == 1;
-
-        // Find the action dynamically using the interactActionName string
         interactAction = inputActions.FindAction(interactActionName);
 
         if (interactAction != null)
@@ -62,23 +49,62 @@ public class NPCDialogue : MonoBehaviour
         {
             Debug.LogError($"Input action '{interactActionName}' not found in Input Action Asset!");
         }
+
+        if (ventureForthButton != null)
+        {
+            ventureForthButton.onClick.AddListener(OnVentureForthButtonClicked);
+        }
+    }
+
+    void OnVentureForthButtonClicked()
+    {
+        PlayerManager.Instance.TeleportToScene(sceneName, teleportLocationTag);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            playerInRange = true;
+            ShowInteractText();
+
+            if (interactTextInstance != null)
+            {
+                UpdateSprite(iconObject.gameObject, interactActionName);
+            }
+        }
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.CompareTag("Player") && playerInRange)
+        {
+            if (interactTextInstance != null)
+            {
+                UpdateSprite(iconObject.gameObject, interactActionName);
+            }
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            playerInRange = false;
+            HideInteractText();
+        }
     }
 
     void ShowInteractText()
     {
-        if (DialogueManager.Instance.GetDialogueProgress(npcDialogueTree.treeID))
-        {
-            Debug.Log("Dialogue with treeID " + npcDialogueTree.treeID + " has already been completed.");
-            return;
-        }
 
-        if (!isDialoguePressed && interactTextPrefab != null && interactTextInstance == null && CanStartDialogue())
+        if (interactTextPrefab != null && interactTextInstance == null)
         {
             interactTextInstance = Instantiate(interactTextPrefab);
 
             interactTextInstance.transform.SetParent(transform, false);
 
-            Transform objectColliderTransform = transform.Find("NPC Mesh");
+            Transform objectColliderTransform = transform.Find("Venture Forth");
 
             if (objectColliderTransform != null)
             {
@@ -91,7 +117,7 @@ public class NPCDialogue : MonoBehaviour
                     // Convert the world position to local position relative to the parent
                     Vector3 pickUpTopLocalPos = interactTextInstance.transform.InverseTransformPoint(objectTopWorldPos);
 
-                    interactTextInstance.transform.localPosition = new Vector3(0, pickUpTopLocalPos.y + 0.2f, 0); // Adjust the Y offset as needed
+                    interactTextInstance.transform.localPosition = new Vector3(0, pickUpTopLocalPos.y + -5f, 0);
                 }
                 else
                 {
@@ -104,7 +130,7 @@ public class NPCDialogue : MonoBehaviour
                 interactTextInstance.transform.localPosition = new Vector3(0, 0.2f, 0);
             }
 
-            string interactText = "Talk"; // Default text
+            string interactText = "Venture Forth"; // Default text
 
             KeyBinding keyBinding = KeyBindingManager.Instance.GetKeybinding(interactActionName);
 
@@ -112,7 +138,7 @@ public class NPCDialogue : MonoBehaviour
             TextMeshPro textMesh = interactTextInstance.GetComponent<TextMeshPro>();
             if (textMesh != null)
             {
-                textMesh.text = "Talk";
+                textMesh.text = "Venture Forth";
 
                 // Now check if we have a keybinding sprite
                 if (keyBinding != null)
@@ -148,16 +174,16 @@ public class NPCDialogue : MonoBehaviour
                             // If using a controller, get the second binding (controller binding)
                             if (KeyBindingManager.Instance.IsUsingController())
                             {
-                                keyText = interactAction.bindings[1].ToDisplayString(); 
+                                keyText = interactAction.bindings[1].ToDisplayString();
                             }
                             else
                             {
                                 keyText = interactAction.bindings[0].ToDisplayString();
                             }
 
-                            keyText = keyText.Replace("Press ", "").Trim(); // Removes "Press" and any extra spaces
+                            keyText = keyText.Replace("Press ", "").Trim();
 
-                            interactText = $"[{keyText}] Talk";
+                            interactText = $"[{keyText}] Venture Forth";
                         }
                         else
                         {
@@ -202,21 +228,12 @@ public class NPCDialogue : MonoBehaviour
         Debug.Log($"Bound Key or Button for action '{interactActionName}': {boundKeyOrButton}");
 
         // Check if it's a mouse button
-        bool isMouseButton = boundKeyOrButton.Contains("Mouse") || boundKeyOrButton.Contains("Click") || boundKeyOrButton.Contains("Scroll") 
+        bool isMouseButton = boundKeyOrButton.Contains("Mouse") || boundKeyOrButton.Contains("Click") || boundKeyOrButton.Contains("Scroll")
             || boundKeyOrButton.Contains("leftStick") || boundKeyOrButton.Contains("rightStick");
 
         // Set the scale based on whether it's a mouse button or not
         float scale = isMouseButton ? 0.2f : 0.08f;
         spriteRenderer.transform.localScale = new Vector3(scale, scale, scale);
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            playerInRange = true;
-            player = other.transform;
-        }
     }
 
     private void UpdateSprite(GameObject iconObject, string actionName)
@@ -270,130 +287,81 @@ public class NPCDialogue : MonoBehaviour
         }
     }
 
-    private void OnTriggerStay(Collider other)
+    void Update()
     {
-        if (other.CompareTag("Player") && playerInRange)
+        if (playerInRange && interactAction.triggered)
         {
-            if (interactTextInstance != null)
-            {
-                UpdateSprite(iconObject.gameObject, interactActionName);
-            }
+            OpenVentureForthPanel();
         }
     }
 
-    private void OnTriggerExit(Collider other)
+    void OpenVentureForthPanel()
     {
-        if (other.CompareTag("Player"))
+        if (ventureForthPanel != null)
         {
-            playerInRange = false;
-            player = null;
-            Debug.Log("Player exited NPC trigger zone.");
-
-            HideInteractText();
+            ventureForthPanel.SetActive(true);
         }
-    }
 
-    private void Update()
-    {
-        GameObject playerCamera = GameObject.FindGameObjectWithTag("PlayerCamera");
-        if (playerInRange && interactTextInstance != null && player != null)
+        Time.timeScale = 0f;
+
+        // Unlock and show the cursor
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+
+        if (playerObject != null)
         {
-            if (playerCamera != null)
+            inventoryManager = playerObject.GetComponent<InventoryManager>();
+            if (inventoryManager != null)
             {
-                Vector3 lookDirection = player.position - interactTextInstance.transform.position;
-                lookDirection.y = 0; // Keep the text rotation horizontal (no vertical tilt)
-
-                interactTextInstance.transform.forward = -lookDirection.normalized;
-
-                Vector3 currentEulerAngles = interactTextInstance.transform.eulerAngles;
-
-                // Set the Y rotation of the interaction text based on the camera's X rotation
-                currentEulerAngles.x = playerCamera.transform.eulerAngles.x;
-                interactTextInstance.transform.eulerAngles = currentEulerAngles;
+                inventoryManager.enabled = false;
+                Debug.Log("InventoryManager disabled.");
             }
-        }
-
-        RaycastHit hit;
-        Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
-
-        if (Physics.Raycast(ray, out hit, 3f))
-        {
-            Debug.Log("Raycast hit: " + hit.collider.name);
-            if (hit.collider != null && hit.collider.gameObject.name == "NPC Mesh" && hit.collider.transform.IsChildOf(transform) && playerInRange)
+            Transform inventoryCanvasTransform = playerObject.transform.Find("Inventory Canvas");
+            if (inventoryCanvasTransform != null)
             {
-                ShowInteractText();
-                // Check if the interact key is pressed
-                if (playerInRange && interactAction.triggered && !isDialoguePressed && CanStartDialogue())
+                inventoryCanvas = inventoryCanvasTransform.GetComponent<Canvas>();
+                if (inventoryCanvas != null)
                 {
-                    /*isDialoguePressed = true;
-                    PlayerPrefs.SetInt(dialogueKey, 1);
-                    PlayerPrefs.Save();*/
-                    StartDialogue();
-
-                    HideInteractText();
+                    inventoryCanvas.gameObject.SetActive(false);
+                    Debug.Log("Inventory Canvas disabled.");
                 }
             }
-            else
-            {
-                HideInteractText();
-            }
-        }
-        else
-        {
-            HideInteractText();
-        }
-
-        if (spriteRenderer != null)
-        {
-            // Dynamically update sprite scale if keybinding changes during the game
-            UpdateSpriteScale();
-        }
-
-        /*if (Input.GetKeyDown(clearPlayerPrefs))
-        {
-            ClearPlayerPrefs();
-        }*/
-    }
-
-    private bool CanStartDialogue()
-    {
-        // Check if all required bool conditions are met (true or false based on lists)
-        foreach (string boolKey in requiredBoolKeysTrue)
-        {
-            if (!BoolManager.Instance.GetBool(boolKey))
-            {
-                return false; // If any bool is false when it should be true, return false
-            }
-        }
-
-        foreach (string boolKey in requiredBoolKeysFalse)
-        {
-            if (BoolManager.Instance.GetBool(boolKey))
-            {
-                return false; // If any bool is true when it should be false, return false
-            }
-        }
-
-        return true; // All conditions are met, return true
-    }
-
-    private void StartDialogue()
-    {
-        if (npcDialogueTree != null)
-        {
-            DialogueManager.Instance.StartDialogue(npcDialogueTree);
-        }
-        if (companionScript != null)
-        {
-            companionScript.TeleportToPlayer();
         }
     }
 
-    private void ClearPlayerPrefs()
+    public void HideVentureForthPanel()
     {
-        PlayerPrefs.DeleteAll();
-        PlayerPrefs.Save();
-        Debug.Log("PlayerPrefs cleared!");
-        isDialoguePressed = false;
+        if (ventureForthPanel != null)
+        {
+            ventureForthPanel.SetActive(false);
+        }
+
+        Time.timeScale = 1f;
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+
+        if (playerObject != null)
+        {
+            inventoryManager = playerObject.GetComponent<InventoryManager>();
+            if (inventoryManager != null)
+            {
+                inventoryManager.enabled = true;
+            }
+            Transform inventoryCanvasTransform = playerObject.transform.Find("Inventory Canvas");
+            if (inventoryCanvasTransform != null)
+            {
+                inventoryCanvas = inventoryCanvasTransform.GetComponent<Canvas>();
+                if (inventoryCanvas != null)
+                {
+                    inventoryCanvas.gameObject.SetActive(true);
+                }
+            }
+        }
     }
 }
+

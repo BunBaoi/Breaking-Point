@@ -196,20 +196,45 @@ public class DialogueManager : MonoBehaviour
 
     public void SetInventoryActive(bool isActive)
     {
-        // Activate or deactivate the InventoryManager script itself
-        if (inventoryManager != null)
+
+        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+
+        if (playerObject != null)
         {
-            inventoryManager.enabled = isActive;
+            inventoryManager = playerObject.GetComponent<InventoryManager>();
+            if (inventoryManager != null)
+            {
+                inventoryManager.enabled = isActive;
+            }
+            Transform inventoryCanvasTransform = playerObject.transform.Find("Inventory Canvas");
+            if (inventoryCanvasTransform != null)
+            {
+                inventoryCanvas = inventoryCanvasTransform.GetComponent<Canvas>();
+                if (inventoryCanvas != null)
+                {
+                    inventoryCanvas.gameObject.SetActive(isActive);
+                }
+            }
         }
 
-        // Also manage the other objects
-        if (inventoryCanvas != null)
-            inventoryCanvas.gameObject.SetActive(isActive); 
+        GameObject leftHand = GameObject.Find("Left Hand");
+        if (leftHand != null)
+        {
+            playerHands[0] = leftHand;
+        }
+
+        GameObject rightHand = GameObject.Find("Right Hand");
+        if (rightHand != null)
+        {
+            playerHands[1] = rightHand;
+        }
 
         foreach (var hand in playerHands)
         {
             if (hand != null)
+            {
                 hand.SetActive(isActive);
+            }
         }
     }
 
@@ -566,10 +591,38 @@ public class DialogueManager : MonoBehaviour
 
         SetDialogueProgress(dialogueTree.treeID, true);
 
-        if (inventoryManager != null)
+        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+
+        if (playerObject != null)
         {
-            inventoryManager.enabled = false;
-            inventoryCanvas.gameObject.SetActive(false);
+            inventoryManager = playerObject.GetComponent<InventoryManager>();
+            if (inventoryManager != null)
+            {
+                inventoryManager.enabled = false;
+                Debug.Log("InventoryManager disabled.");
+            }
+            Transform inventoryCanvasTransform = playerObject.transform.Find("Inventory Canvas");
+            if (inventoryCanvasTransform != null)
+            {
+                inventoryCanvas = inventoryCanvasTransform.GetComponent<Canvas>();
+                if (inventoryCanvas != null)
+                {
+                    inventoryCanvas.gameObject.SetActive(false);
+                    Debug.Log("Inventory Canvas disabled.");
+                }
+            }
+        }
+
+        GameObject leftHand = GameObject.Find("Left Hand");
+        if (leftHand != null)
+        {
+            playerHands[0] = leftHand;
+        }
+
+        GameObject rightHand = GameObject.Find("Right Hand");
+        if (rightHand != null)
+        {
+            playerHands[1] = rightHand;
         }
 
         if (playerHands != null)
@@ -580,7 +633,6 @@ public class DialogueManager : MonoBehaviour
             }
         }
 
-        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
         if (playerObject != null)
         {
             playerMovement = playerObject.GetComponent<PlayerMovement>();
@@ -594,10 +646,6 @@ public class DialogueManager : MonoBehaviour
             {
                 Debug.LogWarning("PlayerMovement component not found on Player.");
             }
-        }
-        else
-        {
-            Debug.LogWarning("Player object not found with tag 'Player'.");
         }
 
         if (dialoguePanel != null)
@@ -671,10 +719,22 @@ public class DialogueManager : MonoBehaviour
             {
                 playerMovement.SetMovementState(true);
             }
-            if (inventoryManager != null)
+            GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+            if (playerObject != null)
             {
-                inventoryManager.enabled = true;
-                inventoryCanvas.gameObject.SetActive(true);
+                if (inventoryManager != null)
+                {
+                    inventoryManager.enabled = true;
+                }
+                Transform inventoryCanvasTransform = playerObject.transform.Find("Inventory Canvas");
+                if (inventoryCanvasTransform != null)
+                {
+                    inventoryCanvas = inventoryCanvasTransform.GetComponent<Canvas>();
+                    if (inventoryCanvas != null)
+                    {
+                        inventoryCanvas.gameObject.SetActive(true);
+                    }
+                }
             }
             if (playerHands != null)
             {

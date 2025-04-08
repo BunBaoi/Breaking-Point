@@ -397,22 +397,48 @@ public class BedManager : MonoBehaviour
         private IEnumerator HandleBedInteraction()
     {
         isInteracting = true;
-        if (playerStats != null)
+        
+        GameObject playerObject = GameObject.FindGameObjectWithTag(playerTag);
+
+        if (playerObject != null)
         {
-            playerStats.FadeOut();
-        }
-        if (inventoryManager != null)
-        {
-            inventoryManager.enabled = false;
-            inventoryCanvas.gameObject.SetActive(false);
-        }
-        if (cameraController != null)
-        {
-            cameraController.SetLookState(false);
-        }
-        if (playerMovement != null)
-        {
-            playerMovement.SetMovementState(false);
+            inventoryManager = playerObject.GetComponent<InventoryManager>();
+            if (inventoryManager != null)
+            {
+                inventoryManager.enabled = false;
+                Debug.Log("InventoryManager disabled.");
+            }
+            Transform inventoryCanvasTransform = playerObject.transform.Find("Inventory Canvas");
+            if (inventoryCanvasTransform != null)
+            {
+                inventoryCanvas = inventoryCanvasTransform.GetComponent<Canvas>();
+                if (inventoryCanvas != null)
+                {
+                    inventoryCanvas.gameObject.SetActive(false);
+                    Debug.Log("Inventory Canvas disabled.");
+                }
+            }
+            GameObject playerCamera = GameObject.FindGameObjectWithTag("PlayerCamera");
+            cameraController = playerCamera.GetComponent<CameraController>();
+
+            if (cameraController != null)
+            {
+                cameraController.SetLookState(false);
+            }
+
+            playerMovement = playerObject.GetComponent<PlayerMovement>();
+
+            if (playerMovement != null)
+            {
+                playerMovement.SetMovementState(false);
+            }
+
+            playerStats = playerObject.GetComponent<PlayerStats>();
+
+            if (playerStats != null)
+            {
+                playerStats.FadeOut();
+            }
         }
 
         // Get the collider of the bed to determine the height for positioning

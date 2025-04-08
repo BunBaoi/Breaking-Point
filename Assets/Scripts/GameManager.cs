@@ -4,46 +4,44 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] private CinematicSequence cinematicSequence;
-    [SerializeField] private InventoryManager inventoryManager;
-    [SerializeField] private Item journalItem;
+    public static GameManager Instance;
+
+    [SerializeField] private CinematicSequence chapter1CinematicSequence;
+    [SerializeField] private CinematicSequence chapter2CinematicSequence;
+    [SerializeField] private CinematicSequence chapter3CinematicSequence;
 
     private void Awake()
     {
-        // Clear all PlayerPrefs
-        // PlayerPrefs.DeleteAll();
+        if (Instance == null)
+        {
+            Instance = this;
+            // Clear all PlayerPrefs
+            // PlayerPrefs.DeleteAll();
+        }
     }
 
     void Start()
     {
-        if (inventoryManager == null)
-        {
-            inventoryManager = FindObjectOfType<InventoryManager>();
-        }
-
-        if (inventoryManager != null && journalItem != null)
-        {
-            bool added = inventoryManager.AddItem(journalItem);
-            if (added)
-            {
-                Debug.Log("Starting item added: " + journalItem.name);
-            }
-            else
-            {
-                Debug.LogWarning("Failed to add item. Inventory might be full.");
-            }
-        }
-        else
-        {
-            Debug.LogError("InventoryManager or Item is not assigned!");
-        }
-
-        cinematicSequence.StartCinematic();
+      
     }
 
-    // Update is called once per frame
     void Update()
     {
         
+    }
+
+    public void LoadLevel1Cinematic()
+    {
+        chapter1CinematicSequence.StartCinematic();
+    }
+
+    public void LoadLevel2Cinematic()
+    {
+        chapter2CinematicSequence.StartCinematic();
+    }
+
+    public void LoadLevel3Cinematic()
+    {
+        chapter3CinematicSequence.StartCinematic();
     }
 }

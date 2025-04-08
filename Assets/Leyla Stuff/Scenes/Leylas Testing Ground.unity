@@ -1939,6 +1939,37 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 770537f91a066487bb81bbbba8eddf92, type: 3}
+--- !u!1 &1232592141
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1232592142}
+  m_Layer: 0
+  m_Name: GameObject (2)
+  m_TagString: Level2Teleport
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1232592142
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1232592141}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.41816917, z: -0, w: 0.9083692}
+  m_LocalPosition: {x: -4, y: 1, z: 7}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -49.438, z: 0}
 --- !u!1001 &1244491463
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3494,6 +3525,63 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 820b5474013ad440e83842618021b16a, type: 3}
+--- !u!1001 &48632151309146632
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4609533624134428165, guid: dd4ae7dd7609c4af5bf4211166d2cd78, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4609533624134428165, guid: dd4ae7dd7609c4af5bf4211166d2cd78, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4609533624134428165, guid: dd4ae7dd7609c4af5bf4211166d2cd78, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 4609533624134428165, guid: dd4ae7dd7609c4af5bf4211166d2cd78, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4609533624134428165, guid: dd4ae7dd7609c4af5bf4211166d2cd78, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4609533624134428165, guid: dd4ae7dd7609c4af5bf4211166d2cd78, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4609533624134428165, guid: dd4ae7dd7609c4af5bf4211166d2cd78, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4609533624134428165, guid: dd4ae7dd7609c4af5bf4211166d2cd78, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4609533624134428165, guid: dd4ae7dd7609c4af5bf4211166d2cd78, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4609533624134428165, guid: dd4ae7dd7609c4af5bf4211166d2cd78, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8479374859620021849, guid: dd4ae7dd7609c4af5bf4211166d2cd78, type: 3}
+      propertyPath: m_Name
+      value: Venture Forth
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: dd4ae7dd7609c4af5bf4211166d2cd78, type: 3}
 --- !u!1001 &2162590266920033140
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3909,3 +3997,5 @@ SceneRoots:
   - {fileID: 520253680}
   - {fileID: 1342746279}
   - {fileID: 1928193774}
+  - {fileID: 48632151309146632}
+  - {fileID: 1232592142}

@@ -83,6 +83,8 @@ public class CinematicSequence : MonoBehaviour
             {
                 Debug.LogWarning("Player object not found with tag 'Player'.");
             }
+            GameObject sun = GameObject.FindGameObjectWithTag("Sun");
+            dayNightCycle = sun.GetComponent<DayNightCycle>();
             if (dayNightCycle != null)
             {
                 dayNightCycle.StopTime();
@@ -527,6 +529,8 @@ public class CinematicSequence : MonoBehaviour
                 cameraController.SetLookState(true);
             }
         }
+        GameObject sun = GameObject.FindGameObjectWithTag("Sun");
+        dayNightCycle = sun.GetComponent<DayNightCycle>();
         if (dayNightCycle != null)
         {
             dayNightCycle.StartTime();
