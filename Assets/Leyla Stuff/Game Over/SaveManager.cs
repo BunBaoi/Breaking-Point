@@ -62,6 +62,17 @@ public class SaveManager : MonoBehaviour
         fadeCanvasGroup.gameObject.SetActive(false);
     }
 
+    public void StartNewGame()
+    {
+        // Check if the save file exists
+        if (File.Exists(savePath))
+        {
+            // Delete the existing save file
+            File.Delete(savePath);
+            Debug.Log("Existing save file deleted.");
+        }
+    }
+
     public void SaveGame()
     {
         StartCoroutine(ShowSavePanelAndStartRotation());
@@ -124,6 +135,11 @@ public class SaveManager : MonoBehaviour
             data.savedMinutes = dayNightCycle.minutes;
         }
 
+        foreach (var page in PageTracker.Instance.Pages)
+        {
+            data.journalPageIDs.Add(page.pageID);
+        }
+
         // Save the dialogue progress
         foreach (string dialogueID in DialogueManager.Instance.GetAllDialogueIDs())
         {
@@ -156,6 +172,11 @@ public class SaveManager : MonoBehaviour
             string encryptedJson = EncryptionUtility.Encrypt(json);
             File.WriteAllText(savePath, encryptedJson);
             Debug.Log("Game saved with encryption.");
+
+            string decryptedJson = EncryptionUtility.Decrypt(encryptedJson);
+            Debug.Log($"Decrypted Data: {decryptedJson}");
+
+            Debug.Log($"Encrypted Data (Base64): {encryptedJson}");
         }
         else
         {
@@ -183,7 +204,7 @@ public class SaveManager : MonoBehaviour
 
         while (true)
         {
-            saveImage.transform.Rotate(Vector3.forward, rotationSpeed * Time.deltaTime);
+            saveImage.transform.Rotate(Vector3.forward, rotationSpeed * Time.unscaledDeltaTime);
             yield return null;
         }
     }
@@ -327,6 +348,22 @@ public class SaveManager : MonoBehaviour
             // Update lighting and UI
             dayNightCycle.UpdateLighting();
             dayNightCycle.UpdateTimeUI();
+        }
+
+        foreach (var pageID in data.journalPageIDs)
+        {
+            // Attempt to find the JournalPage by ID from PageTracker's available pages
+            JournalPage page = PageTracker.Instance.FindJournalPageByID(pageID);
+
+            if (page != null)
+            {
+                // If found, add the page to the PageTracker's list
+                PageTracker.Instance.AddPage(page);
+            }
+            else
+            {
+                Debug.LogWarning("JournalPage with ID " + pageID + " not found.");
+            }
         }
 
         // Load oxygen and energy

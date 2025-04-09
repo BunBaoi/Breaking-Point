@@ -2,23 +2,36 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class VentureForthInteraction : MonoBehaviour
 {
+    [Header("Interact Settings")]
     [SerializeField] private GameObject interactTextPrefab;
     private GameObject interactTextInstance;
     private bool playerInRange = false;
+
+    [Header("Player Inputs")]
     [SerializeField] private string interactActionName = "Interact";
     [SerializeField] private InputActionAsset inputActions;
-    private SpriteRenderer spriteRenderer; 
+
+    [Header("UI Settings")]
+    private SpriteRenderer spriteRenderer;
     private GameObject iconObject;
     [SerializeField] private GameObject ventureForthPanel;
-    [SerializeField] private InventoryManager inventoryManager;
-    [SerializeField] private Canvas inventoryCanvas;
     [SerializeField] private Button ventureForthButton;
 
+    [Header("Other Scripts")]
+    [SerializeField] private InventoryManager inventoryManager;
+    [SerializeField] private Canvas inventoryCanvas;
+
+    [Header("Teleport Settings")]
     [SerializeField] private string sceneName;
     [SerializeField] private string teleportLocationTag = "";
+
+    [Header("Bool Conditions")]
+    [SerializeField] private List<string> requiredBoolKeysTrue = new List<string>();
+    [SerializeField] private List<string> requiredBoolKeysFalse = new List<string>();
 
     private InputAction interactAction;
 
@@ -61,9 +74,30 @@ public class VentureForthInteraction : MonoBehaviour
         PlayerManager.Instance.TeleportToScene(sceneName, teleportLocationTag);
     }
 
+    private bool CanVentureForth()
+    {
+        foreach (string boolKey in requiredBoolKeysTrue)
+        {
+            if (!BoolManager.Instance.GetBool(boolKey))
+            {
+                return false; // If any bool is false when it should be true, return false
+            }
+        }
+
+        foreach (string boolKey in requiredBoolKeysFalse)
+        {
+            if (BoolManager.Instance.GetBool(boolKey))
+            {
+                return false; // If any bool is true when it should be false, return false
+            }
+        }
+
+        return true; // All conditions are met, return true
+    }
+
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && CanVentureForth())
         {
             playerInRange = true;
             ShowInteractText();
@@ -77,7 +111,7 @@ public class VentureForthInteraction : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        if (other.CompareTag("Player") && playerInRange)
+        if (other.CompareTag("Player") && playerInRange && CanVentureForth())
         {
             if (interactTextInstance != null)
             {
@@ -289,7 +323,7 @@ public class VentureForthInteraction : MonoBehaviour
 
     void Update()
     {
-        if (playerInRange && interactAction.triggered)
+        if (playerInRange && interactAction.triggered && CanVentureForth())
         {
             OpenVentureForthPanel();
         }

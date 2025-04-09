@@ -28,6 +28,9 @@ public class SaveData
     public int savedDay;
     public int savedHours;
     public int savedMinutes;
+
+    [Header("Journal Pages")]
+    public List<string> journalPageIDs = new List<string>();
 }
 
     [Serializable]

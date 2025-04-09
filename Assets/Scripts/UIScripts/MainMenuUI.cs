@@ -22,8 +22,9 @@ public class MainMenuUI : MonoBehaviour
     [SerializeField] private float textFadeDuration = 1f;
     [SerializeField] private float waitDuration = 0.5f;
     [SerializeField] private TMP_Text pressAnyKeyText;
+    [SerializeField] private Button newGameButton;
 
-    private void Awake()
+   private void Awake()
     {
         anyKeyPressAction = inputActions.FindAction(anyKeyPressActionName);
 
@@ -48,6 +49,28 @@ public class MainMenuUI : MonoBehaviour
 
         introPanel.SetActive(true);
         mainMenuPanel.SetActive(false);
+
+        newGameButton.onClick.AddListener(SaveManager.Instance.StartNewGame);
+    }
+
+    public void SetBoolVariable(string boolName)
+    {
+        if (BoolManager.Instance != null)
+        {
+            BoolManager.Instance.SetBool(boolName, true);
+        }
+        else
+        {
+            Debug.LogError("BoolManager.Instance is null.");
+        }
+    }
+
+    public void ClearAllBools()
+    {
+        if (BoolManager.Instance != null)
+        {
+            BoolManager.Instance.ClearAllBools();
+        }
     }
 
     void Update()

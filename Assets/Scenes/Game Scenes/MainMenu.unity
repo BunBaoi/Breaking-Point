@@ -792,6 +792,63 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &406796343
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2960932167531318844, guid: 27fd4fbb1a63f4d808125cc407e804c0, type: 3}
+      propertyPath: m_Name
+      value: Bool Manager
+      objectReference: {fileID: 0}
+    - target: {fileID: 7439324674421856776, guid: 27fd4fbb1a63f4d808125cc407e804c0, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7439324674421856776, guid: 27fd4fbb1a63f4d808125cc407e804c0, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7439324674421856776, guid: 27fd4fbb1a63f4d808125cc407e804c0, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7439324674421856776, guid: 27fd4fbb1a63f4d808125cc407e804c0, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7439324674421856776, guid: 27fd4fbb1a63f4d808125cc407e804c0, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7439324674421856776, guid: 27fd4fbb1a63f4d808125cc407e804c0, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7439324674421856776, guid: 27fd4fbb1a63f4d808125cc407e804c0, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7439324674421856776, guid: 27fd4fbb1a63f4d808125cc407e804c0, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7439324674421856776, guid: 27fd4fbb1a63f4d808125cc407e804c0, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7439324674421856776, guid: 27fd4fbb1a63f4d808125cc407e804c0, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 27fd4fbb1a63f4d808125cc407e804c0, type: 3}
 --- !u!1 &492836604
 GameObject:
   m_ObjectHideFlags: 0
@@ -2123,6 +2180,30 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 1997078304}
+        m_TargetAssemblyTypeName: MainMenuUI, Assembly-CSharp
+        m_MethodName: ClearAllBools
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1997078304}
+        m_TargetAssemblyTypeName: MainMenuUI, Assembly-CSharp
+        m_MethodName: SetBoolVariable
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: StartedNewGame
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 189120383}
         m_TargetAssemblyTypeName: SceneTransitionController, Assembly-CSharp
         m_MethodName: StartTransition
@@ -2132,7 +2213,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: GameScene
+          m_StringArgument: Level1
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1467659527
@@ -2860,16 +2941,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22e47d971675b694b80cafcaac395777, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  introPanel: {fileID: 0}
-  mainMenuPanel: {fileID: 0}
-  introCanvasGroup: {fileID: 0}
-  mainMenuCanvasGroup: {fileID: 0}
+  introPanel: {fileID: 126836705}
+  mainMenuPanel: {fileID: 492836604}
+  introCanvasGroup: {fileID: 126836707}
+  mainMenuCanvasGroup: {fileID: 492836606}
   fadeDuration: 1
-  inputActions: {fileID: 0}
+  inputActions: {fileID: -944628639613478452, guid: 5ec57af691e024f5495721c1aec07891, type: 3}
   anyKeyPressActionName: AnyKeyPress
   textFadeDuration: 1
   waitDuration: 0.5
-  pressAnyKeyText: {fileID: 0}
+  pressAnyKeyText: {fileID: 815223910}
+  newGameButton: {fileID: 1467659526}
 --- !u!1 &2087235430
 GameObject:
   m_ObjectHideFlags: 0
@@ -3177,3 +3259,4 @@ SceneRoots:
   - {fileID: 1997078303}
   - {fileID: 397602352}
   - {fileID: 218256854}
+  - {fileID: 406796343}

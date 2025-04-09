@@ -11,7 +11,8 @@ public class BedManager : MonoBehaviour
     [SerializeField] private Transform bed;
     [SerializeField] private string bedTag = "Bed";
     [SerializeField] private string playerTag = "Player";
-    [SerializeField] private CanvasGroup fadeCanvas; // CanvasGroup for fading effect
+    [SerializeField] private string cinematicSequenceTag = "";
+   [SerializeField] private CanvasGroup fadeCanvas; // CanvasGroup for fading effect
     [SerializeField] private float fadeDuration = 0.5f;
     [SerializeField] private float rotationSpeed = 2f;
     [SerializeField] private float zPositionOffset = 1f;
@@ -494,9 +495,7 @@ public class BedManager : MonoBehaviour
         if (BoolManager.Instance.GetBool(boolKey))
         {
             // Start cinematic sequence if the bool is true
-            cinematicSequence.StartCinematic();
-            cinematicSequence.OnCinematicFinished += RotatePlayerUpright;
-            cinematicSequence.OnCinematicStarted += FadeOutBlack;
+            StartCinematicByTag(cinematicSequenceTag);
         }
         else
         {
@@ -521,6 +520,7 @@ public class BedManager : MonoBehaviour
                 playerStats.ReplenishEnergy(100f);
                 playerStats.FadeIn();
             }
+            SaveManager.Instance.SaveGame();
             dayNightCycle.StartTime();
             cameraController.SetLookState(true);
             playerMovement.SetMovementState(true);
@@ -537,6 +537,31 @@ public class BedManager : MonoBehaviour
 
         hasSetTime = false;
         isInteracting = false;
+    }
+
+    void StartCinematicByTag(string tag)
+    {
+        GameObject cinematicObj = GameObject.FindWithTag(tag);
+
+        if (cinematicObj != null)
+        {
+            CinematicSequence cinematicSequence = cinematicObj.GetComponent<CinematicSequence>();
+
+            if (cinematicSequence != null)
+            {
+                cinematicSequence.StartCinematic();
+                cinematicSequence.OnCinematicFinished += RotatePlayerUpright;
+                cinematicSequence.OnCinematicStarted += FadeOutBlack;
+            }
+            else
+            {
+                Debug.LogWarning("No CinematicSequence component found on object with tag: " + tag);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("No GameObject found with tag: " + tag);
+        }
     }
 
     private bool CanStartCinematic()
@@ -588,8 +613,18 @@ public class BedManager : MonoBehaviour
             yield return null;
         }
 
-        // Unsubscribe from the event to avoid duplicate calls
-        cinematicSequence.OnCinematicFinished -= RotatePlayerUpright;
+        GameObject cinematicObj = GameObject.FindWithTag(tag);
+
+        if (cinematicObj != null)
+        {
+            CinematicSequence cinematicSequence = cinematicObj.GetComponent<CinematicSequence>();
+
+            if (cinematicSequence != null)
+            {
+                // Unsubscribe from the event to avoid duplicate calls
+                cinematicSequence.OnCinematicFinished -= RotatePlayerUpright;
+            }
+        }
 
         if (playerStats != null)
         {
@@ -606,6 +641,7 @@ public class BedManager : MonoBehaviour
         {
             characterController.enabled = true; // Disable to avoid collision or unwanted behavior
         }
+        SaveManager.Instance.SaveGame();
         cameraController.SetLookState(true);
         playerMovement.SetMovementState(true);
         dayNightCycle.StartTime();

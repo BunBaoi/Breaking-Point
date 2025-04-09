@@ -53,6 +53,7 @@ public class PlayerStats : MonoBehaviour
 
     [Header("Player Status")]
     public bool IsAlive = true;
+    public bool isInCamp = false;
     public bool QTEState = false;
     public PlayerStatus stateOfPlayer;
 
@@ -414,15 +415,20 @@ public class PlayerStats : MonoBehaviour
             isInOxygenDrainZone = true;
             Debug.Log("Atmosphere Danger");
         }
-        else if (other.CompareTag("Level2QTE.1"))
+        if (other.CompareTag("Level2QTE.1"))
         {
             stateOfPlayer = PlayerStatus.QTE;
             Debug.Log("Level2QTE.1 Enter");
         }
-        else if (other.CompareTag("EnergyDrain"))
+        if (other.CompareTag("EnergyDrain"))
         {
             isInEnergyDrainZone = true;
             Debug.Log("Energy Drain Zone Entered");
+        }
+        if (other.CompareTag("Camp"))
+        {
+            isInCamp = true;
+            Debug.Log("Entered Camp - Safe Zone");
         }
     }
 
@@ -430,22 +436,32 @@ public class PlayerStats : MonoBehaviour
     {
         Debug.Log($"Exited Trigger: {other.gameObject.name}");
 
-        if (other.CompareTag("OxygenDrain") || other.CompareTag("Level2QTE.1"))
+        if (other.CompareTag("OxygenDrain"))
+        {
+            isInOxygenDrainZone = false;
+            stateOfPlayer = PlayerStatus.FreeRoam;
+            Debug.Log("Exited Oxygen Drain Zone");
+        }
+        if (other.CompareTag("Level2QTE.1"))
         {
             stateOfPlayer = PlayerStatus.FreeRoam;
-            isInOxygenDrainZone = false;
-            Debug.Log("Atmosphere Safe");
+            Debug.Log("Exited Level2QTE.1");
         }
-        else if (other.CompareTag("EnergyDrain"))
+        if (other.CompareTag("EnergyDrain"))
         {
             isInEnergyDrainZone = false;
             Debug.Log("Exited Energy Drain Zone");
         }
+        if (other.CompareTag("Camp"))
+        {
+            isInCamp = false;
+            Debug.Log("Exited Camp - Danger Zone");
+        }
     }
-    
+
     public void PlayerDeath()
     {
-        if (!IsAlive) return;
+        if (!IsAlive || isInCamp) return;
 
         IsAlive = false;
 

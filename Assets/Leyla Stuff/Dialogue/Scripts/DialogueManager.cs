@@ -19,7 +19,7 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private Transform buttonParent;
     [SerializeField] private Image nextDialogueIndicatorImage;
     [SerializeField] private CanvasGroup nextDialogueIndicatorCanvasGroup;
-    [SerializeField] private Camera mainCamera;  // Player camera
+    [SerializeField] private Camera mainCamera;
     [SerializeField] private float scrollSpeed = 0.03f;
     public Dictionary<string, bool> dialogueTreeProgress = new Dictionary<string, bool>();
 
@@ -260,6 +260,10 @@ public class DialogueManager : MonoBehaviour
 
     private void Update()
     {
+        foreach (var entry in dialogueTreeProgress)
+        {
+            Debug.Log($"Key: {entry.Key}, Value: {entry.Value}");
+        }
         if (SettingsManager.Instance != null && SettingsManager.Instance.isMenuOpen)
         {
             return; // Prevent dialogue from advancing while the settings menu is open
@@ -865,13 +869,19 @@ public class DialogueManager : MonoBehaviour
     private IEnumerator SmoothLookAtNpc(GameObject npc)
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
+        GameObject cameraObject = GameObject.FindGameObjectWithTag("PlayerCamera");
+
+        if (cameraObject != null)
+        {
+            mainCamera = cameraObject.GetComponent<Camera>();
+        }
         if (npc != null && mainCamera != null && player != null)
         {
-            // Get the position of the NPC
-            Vector3 npcPosition = npc.transform.position;
+            // Calculate the position to look at
+            Vector3 npcHeadPosition = npc.transform.position + Vector3.up * 1.7f; // Can be adjusted based on NPC Mesh to look at head
 
-            // Calculate the direction vector from the camera to the NPC
-            Vector3 targetDirection = npcPosition - mainCamera.transform.position;
+            // Calculate the direction vector from the camera to the NPC's head
+            Vector3 targetDirection = npcHeadPosition - mainCamera.transform.position;
 
             // Calculate the target rotation based on the direction (this will affect both yaw and pitch)
             Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
@@ -883,16 +893,16 @@ public class DialogueManager : MonoBehaviour
             {
                 // Smoothly rotate the camera horizontally (yaw) and vertically (pitch)
                 Quaternion currentRotation = mainCamera.transform.rotation;
-                currentRotation = Quaternion.Slerp(currentRotation, targetRotation, Time.deltaTime * 2f);
 
-                // Smoothly adjust the pitch (xRotation) towards the target pitch
+                // Smoothly interpolate the yaw (horizontal rotation) towards the target yaw
+                float targetYaw = Mathf.LerpAngle(currentRotation.eulerAngles.y, targetRotation.eulerAngles.y, Time.deltaTime * 2f);
                 float targetPitch = Mathf.LerpAngle(cameraController.xRotation, targetRotation.eulerAngles.x, Time.deltaTime * 2f);
 
-                // Apply the smooth pitch (vertical) and yaw (horizontal) to the camera
-                mainCamera.transform.rotation = Quaternion.Euler(targetPitch, currentRotation.eulerAngles.y, 0);
+                // Apply the smooth yaw (horizontal) and pitch (vertical) to the camera
+                mainCamera.transform.rotation = Quaternion.Euler(targetPitch, targetYaw, 0);
 
                 // Also rotate the player (body) to face the NPC (yaw only)
-                player.transform.rotation = Quaternion.Euler(0, currentRotation.eulerAngles.y, 0);
+                player.transform.rotation = Quaternion.Euler(0, targetYaw, 0);
 
                 // Update the camera's xRotation to reflect the smooth pitch (vertical rotation)
                 cameraController.xRotation = targetPitch;
@@ -900,7 +910,7 @@ public class DialogueManager : MonoBehaviour
                 yield return null;
             }
 
-            // Final alignment with the NPC (ensure no overshooting)
+            // Final alignment with the NPC's head (ensure no overshooting)
             mainCamera.transform.rotation = targetRotation;
             player.transform.rotation = Quaternion.Euler(0, targetRotation.eulerAngles.y, 0);
         }

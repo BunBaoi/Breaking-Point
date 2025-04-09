@@ -1,6 +1,9 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 [CreateAssetMenu(fileName = "NewDialogueTree", menuName = "Dialogue/DialogueTree")]
 public class DialogueTree : ScriptableObject
@@ -10,10 +13,13 @@ public class DialogueTree : ScriptableObject
 
     private void OnEnable()
     {
+#if UNITY_EDITOR
         if (string.IsNullOrEmpty(treeID))
         {
-            treeID = Guid.NewGuid().ToString(); // Generate a unique ID
+            treeID = Guid.NewGuid().ToString();
+            EditorUtility.SetDirty(this); // Mark the asset as dirty
+            AssetDatabase.SaveAssets();   // Save the changes
         }
+#endif
     }
 }
-

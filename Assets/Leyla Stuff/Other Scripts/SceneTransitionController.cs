@@ -22,6 +22,7 @@ public class SceneTransitionController : MonoBehaviour
 
     public void StartTransition(string sceneName)
     {
+        GameManager.Instance.ShowLoadingPanel();
         // Start the transition coroutine
         StartCoroutine(Transition(sceneName));
 
@@ -79,6 +80,8 @@ public class SceneTransitionController : MonoBehaviour
             canvasGroup.alpha -= Time.deltaTime / transitionDuration;
             yield return null;
         }
+
+        GameManager.Instance.HideLoadingPanel();
 
         canvasGroup.alpha = 0f;
         StartCoroutine(DestroyObject());

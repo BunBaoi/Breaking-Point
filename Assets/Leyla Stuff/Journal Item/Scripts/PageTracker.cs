@@ -3,7 +3,8 @@ using UnityEngine;
 
 public class PageTracker : MonoBehaviour
 {
-    private List<JournalPage> pages = new List<JournalPage>();
+    [SerializeField] private List<JournalPage> pages = new List<JournalPage>();
+    [SerializeField] private List<JournalPage> allAvailablePages;
     private int currentPageIndex = 0;
 
     public int CurrentPageIndex => currentPageIndex;
@@ -12,10 +13,9 @@ public class PageTracker : MonoBehaviour
     // Singleton pattern
     public static PageTracker Instance { get; private set; }
 
-    // Add serialized fields for TextPage and ObjectivesPage
-    [Header("Journal Pages")]
-    [SerializeField] private TextPage[] textPages;
-    [SerializeField] private ObjectivesPage[] objectivesPages;
+    // [Header("Journal Pages")]
+    // [SerializeField] private TextPage[] textPages;
+    // [SerializeField] private ObjectivesPage[] objectivesPages;
 
     private void Awake()
     {
@@ -28,22 +28,35 @@ public class PageTracker : MonoBehaviour
             Instance = this;
         }
 
-        AddPagesFromInspector();
+        // InitialisePages();
     }
 
-    private void AddPagesFromInspector()
+    /*private void InitialisePages()
     {
-        // Add TextPages to journal
+        // Add TextPages to journal and dictionary
         foreach (var page in textPages)
         {
             AddPage(page);
         }
 
-        // Add ObjectivesPages to journal
+        // Add ObjectivesPages to journal and dictionary
         foreach (var page in objectivesPages)
         {
             AddPage(page);
         }
+    }*/
+
+    public JournalPage FindJournalPageByID(string pageID)
+    {
+        // Search through your list of available pages
+        foreach (var page in allAvailablePages)
+        {
+            if (page.pageID == pageID)
+            {
+                return page;
+            }
+        }
+        return null;
     }
 
     public void AddPage(JournalPage newPage)

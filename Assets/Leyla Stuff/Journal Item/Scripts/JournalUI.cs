@@ -336,12 +336,17 @@ public class JournalUI : MonoBehaviour
 
         var pages = PageTracker.Instance.Pages;
 
-        if (!nextOrPreviousPageCalled)
+        if (useItem.triggered)
         {
-            if (pages.Count == previousPageIndex)
+            Debug.Log("Force UI update due to input action");
+        }
+        else
+        {
+            // Only skip if no new page is added and useItem.triggered wasn't triggered
+            if (!nextOrPreviousPageCalled && pages.Count == previousPageIndex)
             {
-                Debug.Log("No new page added, skipping UI update.");
-                return; // Don't do anything if the page hasn't changed
+                Debug.Log("No new page added, skipping UI update");
+                return;
             }
         }
 

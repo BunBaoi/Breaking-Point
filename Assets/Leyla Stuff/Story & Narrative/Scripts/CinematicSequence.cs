@@ -50,6 +50,11 @@ public class CinematicSequence : MonoBehaviour
     public event System.Action OnCinematicStarted;
     public static bool IsCinematicActive { get; private set; } = false;
 
+    private void Start()
+    {
+        canvas.gameObject.SetActive(false);
+    }
+
     public void StartCinematic()
     {
         if (AreConditionsMet())
@@ -181,7 +186,8 @@ public class CinematicSequence : MonoBehaviour
     private IEnumerator PlayCinematic()
     {
         Debug.Log("Starting cinematic fade-in");
-        yield return StartCoroutine(FadeCanvasGroup(canvasGroup, 1f, 1f));
+        canvas.gameObject.SetActive(true);
+        // yield return StartCoroutine(FadeCanvasGroup(canvasGroup, 1f, 1f));
 
         // Play each dialogue in order
         for (int i = 0; i < cinematicData.dialoguesAndAudio.Length; i++)
@@ -241,6 +247,8 @@ public class CinematicSequence : MonoBehaviour
         int npcNameHash = npcName.GetHashCode();
         int letterIndex = 0;
 
+        FMOD.Studio.EventInstance? currentAudioEvent = null;
+
         foreach (char letter in dialogue)
         {
             dialogueText.text += letter;
@@ -248,12 +256,17 @@ public class CinematicSequence : MonoBehaviour
             char lowerLetter = char.ToLower(letter);
             int audioIndex = lowerLetter - 'a';
 
-            float pitch = Random.Range(dialogueAudio.minPitch, dialogueAudio.maxPitch);
-
+            // Play sound based on frequency
             if (audioIndex >= 0 && audioIndex < dialogueAudio.fmodSoundEvents.Length && letterIndex % dialogueAudio.frequency == 0)
             {
+                if (currentAudioEvent.HasValue)
+                {
+                    currentAudioEvent.Value.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+                }
+
+                // Play the new sound event
                 EventReference soundEvent = dialogueAudio.fmodSoundEvents[audioIndex];
-                PlayDialogueSoundEvent(soundEvent, pitch);
+                currentAudioEvent = PlayDialogueSoundEvent(soundEvent);
             }
 
             letterIndex++;
@@ -267,12 +280,11 @@ public class CinematicSequence : MonoBehaviour
         onDialogueComplete?.Invoke();
     }
 
-    private void PlayDialogueSoundEvent(EventReference soundEvent, float pitch)
+    private FMOD.Studio.EventInstance PlayDialogueSoundEvent(EventReference soundEvent)
     {
         FMOD.Studio.EventInstance eventInstance = RuntimeManager.CreateInstance(soundEvent);
-        eventInstance.setPitch(pitch);
         eventInstance.start();
-        eventInstance.release();
+        return eventInstance;
     }
 
     private IEnumerator ShowChapterText()
@@ -538,6 +550,7 @@ public class CinematicSequence : MonoBehaviour
 
         SettingsManager.Instance.SetCinematicActive(false);
 
+        canvas.gameObject.SetActive(false);
         IsCinematicActive = false;
         OnCinematicFinished?.Invoke();
     }

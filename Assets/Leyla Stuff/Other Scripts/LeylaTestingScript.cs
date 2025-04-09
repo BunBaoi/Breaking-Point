@@ -28,7 +28,8 @@ public class LeylaTestingScript : MonoBehaviour
     {
         if (Input.GetKeyDown(key))
         {
-            cinematicSequence.StartCinematic();
+            BoolManager.Instance.SetBool(boolName, true);
+            // cinematicSequence.StartCinematic();
             // SceneManager.LoadScene("MainMenu");
             // SaveManager.Instance.SaveGame();
             // Debug.Log("save game");
@@ -52,8 +53,8 @@ public class LeylaTestingScript : MonoBehaviour
         }
         if (Input.GetKeyDown(key3))
         {
-
-            gameOverMenu.ShowGameOver();
+            PlayerManager.Instance.TeleportToScene("Leylas Testing Ground", "Tenzing");
+            // gameOverMenu.ShowGameOver();
             // Debug.Log("load game");
         }
     }

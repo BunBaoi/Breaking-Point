@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class ObjectTracker : MonoBehaviour
 {
@@ -18,10 +19,25 @@ public class ObjectTracker : MonoBehaviour
             Instance = this;
         else
             Destroy(gameObject);
+
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
-    private void Start()
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        Debug.Log($"Scene Loaded: {scene.name}");
+
+        // Check if object is a game scene
+        if (scene.name.Contains("Level") || scene.name.Contains("Game") || scene.name.Contains("Test"))
+        {
+            Debug.Log("Scene is a gameplay scene, registering objects.");
+            RegisterObjectsInScene();
+        }
+    }
+
+    private void RegisterObjectsInScene()
+    {
+        // Find all objects in the scene
         GameObject[] allObjects = FindObjectsOfType<GameObject>();
 
         foreach (GameObject obj in allObjects)
@@ -125,5 +141,7 @@ public class ObjectTracker : MonoBehaviour
                 Debug.Log($"Object {objectName} is destroyed.");
             }
         }
+
+        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 }
