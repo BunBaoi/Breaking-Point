@@ -6,27 +6,28 @@ public class ItemPickUp : MonoBehaviour
 {
     [Header("Pickup Settings")]
     public Item item;
-    [SerializeField] private float raycastDistance = 5f; // Distance to check for raycast
+    [SerializeField] private float raycastDistance = 5f;
     [SerializeField] private float pickupRadius = 1f; // Radius around the centre of the screen for pickup detection
     [SerializeField] private string playerCameraTag = "PlayerCamera";
     [SerializeField] private string playerTag = "Player";
     [SerializeField] private LayerMask itemLayer; // Inventory item layer
     [SerializeField] private LayerMask pickUpColliderLayer;
-
     [SerializeField] private bool canPickUp = false;
     [SerializeField] private bool isPickingUp = false;
 
     [Header("Interact Text")]
     [SerializeField] private GameObject interactTextPrefab;
+    [SerializeField] private float yAxis = 0.2f;
+    [SerializeField] private float defaultYAxis = 0.2f;
+
+    [Header("Input Settings")]
+    [SerializeField] private InputActionAsset inputActions;
+    [SerializeField] private string pickupActionName = "PickUp";
 
     private GameObject interactTextInstance;
     private Transform player;
     private GameObject iconObject;
     private SpriteRenderer spriteRenderer;
-
-    [Header("Input Settings")]
-    [SerializeField] private InputActionAsset inputActions;
-    [SerializeField] private string pickupActionName = "PickUp"; 
 
     private InputAction pickupAction;
 
@@ -194,16 +195,16 @@ public class ItemPickUp : MonoBehaviour
 
                     Vector3 pickUpTopLocalPos = interactTextInstance.transform.InverseTransformPoint(pickUpTopWorldPos);
 
-                    interactTextInstance.transform.localPosition = new Vector3(0, pickUpTopLocalPos.y + 0.2f, 0);
+                    interactTextInstance.transform.localPosition = new Vector3(0, pickUpTopLocalPos.y + yAxis, 0);
                 }
                 else
                 {
-                    interactTextInstance.transform.localPosition = new Vector3(0, 0.2f, 0);
+                    interactTextInstance.transform.localPosition = new Vector3(0, defaultYAxis, 0);
                 }
             }
             else
             {
-                interactTextInstance.transform.localPosition = new Vector3(0, 0.2f, 0);
+                interactTextInstance.transform.localPosition = new Vector3(0, defaultYAxis, 0);
             }
 
         string interactText = "Pick Up"; // Default text
@@ -224,11 +225,11 @@ public class ItemPickUp : MonoBehaviour
                     {
                         // Create a object for the sprite and set it next to the text
                         iconObject = new GameObject("KeybindIcon");
-                        iconObject.transform.SetParent(interactTextInstance.transform); // Make it a child of the text
+                        iconObject.transform.SetParent(interactTextInstance.transform);
 
-                        // Position sprite to left of text
                         float horizontalOffset = -textMesh.preferredWidth / 2 - 0.04f; // Increased offset to add more space
                         iconObject.transform.localPosition = new Vector3(horizontalOffset, 0f, 0);
+                        iconObject.transform.rotation = interactTextInstance.transform.rotation;
 
                         // Add a SpriteRenderer to display the icon
                         spriteRenderer = iconObject.AddComponent<SpriteRenderer>();

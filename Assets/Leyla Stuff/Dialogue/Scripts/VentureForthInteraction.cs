@@ -6,18 +6,27 @@ using System.Collections.Generic;
 
 public class VentureForthInteraction : MonoBehaviour
 {
-    [Header("Interact Settings")]
+    [Header("Teleport Settings")]
+    [SerializeField] private string sceneName;
+    [SerializeField] private string teleportLocationTag = "";
+
+    [Header("Interact Text Settings")]
     [SerializeField] private GameObject interactTextPrefab;
+    [SerializeField] private float yAxis = -8f;
+    [SerializeField] private float defaultYAxis = 1f;
     private GameObject interactTextInstance;
     private bool playerInRange = false;
+    private Transform player;
+    private SpriteRenderer spriteRenderer;
+    private GameObject iconObject;
 
     [Header("Player Inputs")]
     [SerializeField] private string interactActionName = "Interact";
     [SerializeField] private InputActionAsset inputActions;
 
+    private InputAction interactAction;
+
     [Header("UI Settings")]
-    private SpriteRenderer spriteRenderer;
-    private GameObject iconObject;
     [SerializeField] private GameObject ventureForthPanel;
     [SerializeField] private Button ventureForthButton;
 
@@ -25,15 +34,9 @@ public class VentureForthInteraction : MonoBehaviour
     [SerializeField] private InventoryManager inventoryManager;
     [SerializeField] private Canvas inventoryCanvas;
 
-    [Header("Teleport Settings")]
-    [SerializeField] private string sceneName;
-    [SerializeField] private string teleportLocationTag = "";
-
     [Header("Bool Conditions")]
     [SerializeField] private List<string> requiredBoolKeysTrue = new List<string>();
     [SerializeField] private List<string> requiredBoolKeysFalse = new List<string>();
-
-    private InputAction interactAction;
 
     void Awake()
     {
@@ -99,6 +102,7 @@ public class VentureForthInteraction : MonoBehaviour
     {
         if (other.CompareTag("Player") && CanVentureForth())
         {
+            player = other.transform;
             playerInRange = true;
             ShowInteractText();
 
@@ -124,6 +128,7 @@ public class VentureForthInteraction : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
+            player = null;
             playerInRange = false;
             HideInteractText();
         }
@@ -151,17 +156,16 @@ public class VentureForthInteraction : MonoBehaviour
                     // Convert the world position to local position relative to the parent
                     Vector3 pickUpTopLocalPos = interactTextInstance.transform.InverseTransformPoint(objectTopWorldPos);
 
-                    interactTextInstance.transform.localPosition = new Vector3(0, pickUpTopLocalPos.y + -5f, 0);
+                    interactTextInstance.transform.localPosition = new Vector3(0, pickUpTopLocalPos.y + yAxis, 0);
                 }
                 else
                 {
-                    // If no collider is attached to "Pick Up Collider", fallback position
-                    interactTextInstance.transform.localPosition = new Vector3(0, 0.2f, 0);
+                    interactTextInstance.transform.localPosition = new Vector3(0, defaultYAxis, 0);
                 }
             }
             else
             {
-                interactTextInstance.transform.localPosition = new Vector3(0, 0.2f, 0);
+                interactTextInstance.transform.localPosition = new Vector3(0, defaultYAxis, 0);
             }
 
             string interactText = "Venture Forth"; // Default text
@@ -187,6 +191,7 @@ public class VentureForthInteraction : MonoBehaviour
 
                         float horizontalOffset = -textMesh.preferredWidth / 2 - 0.04f;
                         iconObject.transform.localPosition = new Vector3(horizontalOffset, 0f, 0);
+                        iconObject.transform.rotation = interactTextInstance.transform.rotation;
 
                         // Add a SpriteRenderer to display the icon
                         spriteRenderer = iconObject.AddComponent<SpriteRenderer>();
@@ -326,6 +331,23 @@ public class VentureForthInteraction : MonoBehaviour
         if (playerInRange && interactAction.triggered && CanVentureForth())
         {
             OpenVentureForthPanel();
+        }
+        GameObject playerCamera = GameObject.FindGameObjectWithTag("PlayerCamera");
+        if (playerInRange && interactTextInstance != null && player != null)
+        {
+            if (playerCamera != null)
+            {
+                Vector3 lookDirection = player.position - interactTextInstance.transform.position;
+                lookDirection.y = 0; // Keep the text rotation horizontal (no vertical tilt)
+
+                interactTextInstance.transform.forward = -lookDirection.normalized;
+
+                Vector3 currentEulerAngles = interactTextInstance.transform.eulerAngles;
+
+                // Set the Y rotation of the interaction text based on the camera's X rotation
+                currentEulerAngles.x = playerCamera.transform.eulerAngles.x;
+                interactTextInstance.transform.eulerAngles = currentEulerAngles;
+            }
         }
     }
 

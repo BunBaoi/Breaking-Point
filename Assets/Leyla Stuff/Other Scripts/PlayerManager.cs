@@ -6,8 +6,12 @@ using System.Collections;
 public class PlayerManager : MonoBehaviour
 {
     public static PlayerManager Instance;
+
+    [Header("Player Settings")]
     public GameObject playerInstance;
     public GameObject playerPrefab;
+
+    [Header("UI Settings")]
     public CanvasGroup fadeCanvasGroup;
     public float fadeDuration = 1f;
 

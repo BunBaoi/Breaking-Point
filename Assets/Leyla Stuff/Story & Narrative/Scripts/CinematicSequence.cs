@@ -40,6 +40,7 @@ public class CinematicSequence : MonoBehaviour
     [SerializeField] private List<string> requiredBoolKeysFalse = new List<string>();
     [SerializeField] private float eventIdsDelay = 0.5f;
 
+    [Header("Other Scripts")]
     private PlayerMovement playerMovement;
     private CameraController cameraController;
     [SerializeField] private InventoryManager inventoryManager;

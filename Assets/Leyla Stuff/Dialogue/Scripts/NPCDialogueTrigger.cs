@@ -3,17 +3,18 @@ using System.Collections.Generic;
 
 public class NPCDialogueTrigger : MonoBehaviour
 {
-    [SerializeField] private DialogueTree npcDialogueTree; // NPC's dialogue tree reference
+    [Header("Dialogue Settings")]
+    [SerializeField] private DialogueTree npcDialogueTree;
     [SerializeField] private CompanionScript companionScript;
     private bool isDialogueTriggered;
 
-    private Transform player; // Reference to the player's transform
     [SerializeField] private string dialogueKey = "DialogueTriggered";
-
 
     [Header("Bool Conditions")]
     [SerializeField] private List<string> requiredBoolKeysTrue = new List<string>(); // List of bool keys that should be true
     [SerializeField] private List<string> requiredBoolKeysFalse = new List<string>(); // List of bool keys that should be false
+
+    private Transform player; // Reference to the player's transform
 
     private void Start()
     {

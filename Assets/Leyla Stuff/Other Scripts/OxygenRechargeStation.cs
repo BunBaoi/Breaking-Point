@@ -7,20 +7,25 @@ using FMOD.Studio;
 
 public class OxygenRechargeStation : MonoBehaviour
 {
-    [Header("General")]
+    [Header("Oxygen Refill Settings")]
     [SerializeField] private float refillRate = 1f; // Default refill rate per second
     [SerializeField] private bool isRefilling = false;
-    [SerializeField] private bool isPlayerInTrigger = false; // Track if player is in trigger
+    [SerializeField] private bool isPlayerInTrigger = false;
     [SerializeField] private PlayerStats playerStats;
+
+    [Header("Interact Text Settings")]
+    [SerializeField] private GameObject interactTextPrefab;
+    [SerializeField] private float yAxis = 0.2f;
+    [SerializeField] private float defaultYAxis = 0.2f;
 
     [Header("Required Item")]
     [SerializeField] private Item requiredItem;
     [SerializeField] private InventoryManager inventoryManager;
 
     [Header("Keybinds")]
-    [SerializeField] private InputActionAsset inputActions; // Reference to the Input Action Asset
+    [SerializeField] private InputActionAsset inputActions;
     [SerializeField] private string interactActionName = "Interact";
-    [SerializeField] private GameObject interactTextPrefab; // Prefab for interaction text
+
     private GameObject interactTextInstance;
     private GameObject iconObject;
     private InputAction interactAction;
@@ -173,37 +178,29 @@ public class OxygenRechargeStation : MonoBehaviour
                 {
                     Vector3 objectTopWorldPos = objectCollider.bounds.max;
 
-                    // Convert the world position to local position relative to the parent
                     Vector3 pickUpTopLocalPos = interactTextInstance.transform.InverseTransformPoint(objectTopWorldPos);
 
-                    // Position the interact text just above the top of the "Pick Up Collider"
-                    interactTextInstance.transform.localPosition = new Vector3(0, pickUpTopLocalPos.y + 0.2f, 0); // Adjust the Y offset as needed
+                    interactTextInstance.transform.localPosition = new Vector3(0, pickUpTopLocalPos.y + yAxis, 0);
                 }
                 else
                 {
-                    // If no collider is attached to "Pick Up Collider", fallback position
-                    interactTextInstance.transform.localPosition = new Vector3(0, 0.2f, 0);
+                    interactTextInstance.transform.localPosition = new Vector3(0, defaultYAxis, 0);
                 }
             }
             else
             {
-                // If no "Pick Up Collider" child is found, fallback position
-                interactTextInstance.transform.localPosition = new Vector3(0, 0.2f, 0);
+                interactTextInstance.transform.localPosition = new Vector3(0, defaultYAxis, 0);
             }
 
-            // Declare the interactText variable
             string interactText = "Refill"; // Default text
 
-            // Get the keybinding data for "Interact"
             KeyBinding keyBinding = KeyBindingManager.Instance.GetKeybinding(interactActionName);
 
-            // Update text dynamically to match the correct keybinding based on input device
             TextMeshPro textMesh = interactTextInstance.GetComponent<TextMeshPro>();
             if (textMesh != null)
             {
                 textMesh.text = "Refill";
 
-                // Now check if we have a keybinding sprite
                 if (keyBinding != null)
                 {
                     Sprite icon = KeyBindingManager.Instance.IsUsingController() ? keyBinding.controllerSprite : keyBinding.keySprite;
@@ -211,14 +208,13 @@ public class OxygenRechargeStation : MonoBehaviour
                     // If the sprite exists, display it next to the text
                     if (icon != null)
                     {
-                        // Create a object for the sprite and set it next to the text
                         iconObject = new GameObject("KeybindIcon");
-                        iconObject.transform.SetParent(interactTextInstance.transform); // Make it a child of the text
+                        iconObject.transform.SetParent(interactTextInstance.transform);
 
                         // Position sprite to left of text
-                        // Increase the horizontal space by adjusting the x-position further
-                        float horizontalOffset = -textMesh.preferredWidth / 2 - 0.04f; // Increased offset to add more space
+                        float horizontalOffset = -textMesh.preferredWidth / 2 - 0.04f;
                         iconObject.transform.localPosition = new Vector3(horizontalOffset, 0f, 0);
+                        iconObject.transform.rotation = interactTextInstance.transform.rotation;
 
                         // Add a SpriteRenderer to display the icon
                         spriteRenderer = iconObject.AddComponent<SpriteRenderer>();
@@ -234,7 +230,6 @@ public class OxygenRechargeStation : MonoBehaviour
                         // Get the first binding for keyboard and second for controller directly from the InputActionAsset
                         string keyText = "";
 
-                        // Get the "Interact" action
                         var interactAction = inputActions.FindAction(interactActionName);
 
                         if (interactAction != null)
@@ -250,9 +245,9 @@ public class OxygenRechargeStation : MonoBehaviour
                             }
 
                             // Remove the word "Press" from the keyText if it exists
-                            keyText = keyText.Replace("Press ", "").Trim(); // Removes "Press" and any extra spaces
+                            keyText = keyText.Replace("Press ", "").Trim();
 
-                            // Set the fallback text to show the keybinding for "Interact"
+                            // Set the fallback text
                             interactText = $"[{keyText}] Refill";
                         }
                         else

@@ -11,45 +11,41 @@ public class InventoryManager : MonoBehaviour
 
     private List<InventorySlot> slots = new List<InventorySlot>();
     private int selectedSlotIndex = 0; // Currently selected inventory slot
-    private GameObject heldLeftHandItemInstance; // Instance of the item in the player's left hand
-    private GameObject heldRightHandItemInstance; // Instance of the item in the player's right hand
+    private GameObject heldLeftHandItemInstance;
+    private GameObject heldRightHandItemInstance;
     private Item currentItem;  // Reference to the currently equipped item
-    private bool isSwitchingDisabled = false; // Flag to disable item switching
-
-    private const float MaxSwitchableWeight = 10.0f; // Maximum weight allowed for switching
-    private const float WeightThreshold1 = 10.0f; // Weight threshold for first action
-    private const float WeightThreshold2 = 15.0f; // Weight threshold for second action
-
-    private GameObject playerController; // CHANGE TO ACTUAL PLAYER MOVEMENT SCRIPT LATER
-    // private PlayerClimbingState playerClimbingState;
 
     [Header("Setup Settings")]
-    public int defaultSlotCount = 4;  // Default number of inventory slots
-    public GameObject inventorySlotPrefab;  // Prefab for the inventory slots
-    public Transform inventoryPanel;  // UI panel for inventory display
-    public Transform leftHandPosition;  // Position for left hand item
-    public Transform rightHandPosition;  // Position for right hand item
+    public int defaultSlotCount = 4;
+    public GameObject inventorySlotPrefab;
+    public Transform inventoryPanel;
+    public Transform leftHandPosition;
+    public Transform rightHandPosition;
     [SerializeField] private TMP_Text updateText;
     private Coroutine currentCoroutine;
-    // public KeyCode dropKey = KeyCode.Q; // Key to drop an item
 
     [Header("Layer Setup")]
     public LayerMask groundLayer;
     [SerializeField] private LayerMask itemLayer;
 
     [Header("Keybinds")]
-    [SerializeField] private InputActionAsset inputActions;  // Input Action Asset
+    [SerializeField] private InputActionAsset inputActions;
     [SerializeField] private TMP_Text equippedItemText;
     [SerializeField] private string scrollActionName = "Inventory Scroll";
     [SerializeField] private string dropActionName = "Drop";
     [SerializeField] private string slotActionsName = "Slot";
-    [SerializeField] private float scrollCooldown = 0f; // Cooldown time (in seconds)
-    private float lastScrollTime = 0f; // Time when the last scroll occurred
+    [SerializeField] private float scrollCooldown = 0f; // Cooldown time
+    private float lastScrollTime = 0f;
     private InputAction scrollAction;
     private InputAction dropAction;
     private List<InputAction> slotActions = new List<InputAction>();
 
 
+    // IF USING WEIGHT
+    private const float WeightThreshold1 = 10.0f; // Weight threshold for first action
+    private const float WeightThreshold2 = 15.0f; // Weight threshold for second action
+    private const float MaxSwitchableWeight = 10.0f; // Maximum weight allowed for switching
+    private bool isSwitchingDisabled = false; // Flag to disable item switching
 
     private ClimbingSystem climbingSystem;
 
