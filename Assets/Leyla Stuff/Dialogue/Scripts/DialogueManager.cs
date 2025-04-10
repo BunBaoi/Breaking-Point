@@ -595,6 +595,14 @@ public class DialogueManager : MonoBehaviour
 
         SetDialogueProgress(dialogueTree.treeID, true);
 
+        PlayerStats.Instance.FadeOut();
+
+        if (CallingCompanionMethods.Instance != null)
+        {
+            CallingCompanionMethods.Instance.CallTeleportToPlayer();
+            CallingCompanionMethods.Instance.CallFacePlayer();
+        }
+
         GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
 
         if (playerObject != null)
@@ -714,6 +722,7 @@ public class DialogueManager : MonoBehaviour
             nextDialogueIndicatorCanvasGroup.alpha = 0f;
             nextDialogueIndicatorImage.gameObject.SetActive(false);
             dialogueCanvas.enabled = false;
+            PlayerStats.Instance.FadeIn();
             // Stop the previous coroutine if it's running
             if (currentLookAtNpcCoroutine != null)
             {

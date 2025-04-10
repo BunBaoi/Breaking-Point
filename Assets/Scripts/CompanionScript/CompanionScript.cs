@@ -13,6 +13,7 @@ public class CompanionScript : MonoBehaviour
     public float companionSpeed = 3.5f;
     public CompanionState stateOfCompanion;
     private bool teleportLeft = true;
+    private Animator animator;
 
     [Header("Companion Visuals")]
     public GameObject companionModel;
@@ -45,6 +46,8 @@ public class CompanionScript : MonoBehaviour
 
     void Start()
     {
+        animator = GetComponentInChildren<Animator>();
+
         if (AI == null)
             AI = GetComponent<NavMeshAgent>();
 
@@ -99,6 +102,9 @@ public class CompanionScript : MonoBehaviour
                 break;
         }
 
+        UpdateAnimation();
+
+
         // Check for key inputs using the customizable keys
         // CheckKeyInputs();
     }
@@ -130,6 +136,16 @@ public class CompanionScript : MonoBehaviour
             ToggleFollowing();
         }
     }*/
+
+    private void UpdateAnimation()
+    {
+        if (animator == null || AI == null)
+            return;
+
+        float speed = AI.velocity.magnitude;
+
+        animator.SetFloat("speed", speed);
+    }
 
     public void FollowPlayer()
     {
@@ -253,6 +269,21 @@ public class CompanionScript : MonoBehaviour
             teleportLeft = !teleportLeft;
 
             TeleportToPosition(targetPosition);
+        }
+    }
+
+    public void FacePlayer()
+    {
+        if (player != null)
+        {
+            Vector3 directionToPlayer = player.position - transform.position;
+            directionToPlayer.y = 0; // Keep rotation flat on the Y axis
+
+            if (directionToPlayer != Vector3.zero)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(directionToPlayer);
+                transform.rotation = targetRotation;
+            }
         }
     }
 

@@ -21,7 +21,7 @@ public class Tip : ScriptableObject
     [Tooltip("Array of colours for the keybinds.")]
     public Color[] actionColors;
 
-    private void OnEnable()
+    private void OnValidate()
     {
         if (string.IsNullOrEmpty(tipID))
         {

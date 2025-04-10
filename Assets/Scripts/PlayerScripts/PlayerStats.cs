@@ -9,6 +9,8 @@ using FMODUnity;
 
 public class PlayerStats : MonoBehaviour
 {
+    public static PlayerStats Instance;
+
     [Header("Oxygen Stats")]
     public float Oxygen = 100f;
     [SerializeField] private float OxygenDeductionRate = 2f;
@@ -44,8 +46,8 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private CanvasGroup energyUIParent;
     [SerializeField] private CanvasGroup connectorImage;
     [SerializeField] private float fadeDuration = 1f;
-    [SerializeField] private Image oxygenRadialFill;  // Reference to the Oxygen radial fill image
-    [SerializeField] private Image energyRadialFill;  // Reference to the Energy radial fill image
+    [SerializeField] private Image oxygenRadialFill;  // Oxygen radial fill image
+    [SerializeField] private Image energyRadialFill;  // Energy radial fill image
     [SerializeField] private TMP_Text oxygenText;
     private Coroutine oxygenFadeCoroutine;
     private Coroutine energyFadeCoroutine;
@@ -73,7 +75,15 @@ public class PlayerStats : MonoBehaviour
 
     CharacterController controller;
 
-    void Start()
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+    }
+
+        void Start()
     {
         previousEnergy = Energy;
 

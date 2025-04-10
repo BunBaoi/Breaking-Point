@@ -49,7 +49,6 @@ public class BedManager : MonoBehaviour
     [Header("Other Scripts")]
     [SerializeField] private PlayerMovement playerMovement;
     [SerializeField] private DayNightCycle dayNightCycle;
-    [SerializeField] private PlayerStats playerStats;
 
     [Header("Inventory Setups")]
     [SerializeField] private InventoryManager inventoryManager;
@@ -432,12 +431,7 @@ public class BedManager : MonoBehaviour
                 playerMovement.SetMovementState(false);
             }
 
-            playerStats = playerObject.GetComponent<PlayerStats>();
-
-            if (playerStats != null)
-            {
-                playerStats.FadeOut();
-            }
+            PlayerStats.Instance.FadeOut();
         }
 
         // Get the collider of the bed to determine the height for positioning
@@ -512,12 +506,8 @@ public class BedManager : MonoBehaviour
                 player.rotation = Quaternion.Slerp(player.rotation, uprightRotation, rotationSpeed * Time.deltaTime);
                 yield return null;
             }
-
-            if (playerStats != null)
-            {
-                playerStats.ReplenishEnergy(100f);
-                playerStats.FadeIn();
-            }
+            PlayerStats.Instance.ReplenishEnergy(100f);
+            PlayerStats.Instance.FadeIn();
             SaveManager.Instance.SaveGame();
             dayNightCycle.StartTime();
             cameraController.SetLookState(true);
@@ -633,12 +623,9 @@ public class BedManager : MonoBehaviour
                 cinematicSequence.OnCinematicFinished -= RotatePlayerUpright;
             }
         }
+        PlayerStats.Instance.ReplenishEnergy(100f);
+        PlayerStats.Instance.FadeIn();
 
-        if (playerStats != null)
-        {
-            playerStats.ReplenishEnergy(100f);
-            playerStats.FadeIn();
-        }
         if (inventoryManager != null)
         {
             inventoryManager.enabled = true;

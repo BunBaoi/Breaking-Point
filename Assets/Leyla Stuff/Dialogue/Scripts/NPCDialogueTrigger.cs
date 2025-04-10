@@ -88,10 +88,6 @@ public class NPCDialogueTrigger : MonoBehaviour
     {
         if (npcDialogueTree != null)
         {
-            if (companionScript != null)
-            {
-                companionScript.TeleportToPlayer();
-            }
             isDialogueTriggered = true;
             PlayerPrefs.SetInt(dialogueKey, 1);
             PlayerPrefs.Save();

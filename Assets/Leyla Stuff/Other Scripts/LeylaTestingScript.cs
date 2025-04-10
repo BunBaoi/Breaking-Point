@@ -16,6 +16,8 @@ public class LeylaTestingScript : MonoBehaviour
     [SerializeField] private ObjectivesPage objectivesPage;
     [SerializeField] private GameOverMenu gameOverMenu;
     [SerializeField] private CinematicSequence cinematicSequence;
+    [SerializeField] private CallingCompanionMethods callingCompanionMethods;
+    [SerializeField] private Vector3 teleportPosition;
 
     // Start is called before the first frame update
     void Start()
@@ -47,8 +49,8 @@ public class LeylaTestingScript : MonoBehaviour
         }
         if (Input.GetKeyDown(key2))
         {
-
-            SaveManager.Instance.LoadGame();
+            callingCompanionMethods.CallTeleportToPosition(teleportPosition);
+            // SaveManager.Instance.LoadGame();
             // Debug.Log("load game");
         }
         if (Input.GetKeyDown(key3))

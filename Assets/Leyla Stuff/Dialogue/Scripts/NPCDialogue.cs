@@ -427,10 +427,6 @@ public class NPCDialogue : MonoBehaviour
         {
             DialogueManager.Instance.StartDialogue(npcDialogueTree);
         }
-        if (companionScript != null)
-        {
-            companionScript.TeleportToPlayer();
-        }
     }
 
     private void ClearPlayerPrefs()
