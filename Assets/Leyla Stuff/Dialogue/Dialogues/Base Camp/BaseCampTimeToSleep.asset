@@ -1,0 +1,150 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49d908a81e1ab4345bdb9ed5793418b1, type: 3}
+  m_Name: BaseCampTimeToSleep
+  m_EditorClassIdentifier: 
+  treeID: a59a192c-8809-4e98-9db5-202e68663707
+  dialogueNodes:
+  - dialogueText: Did everything in your little journal hmm? Checked off every last
+      box?
+    dialogueAudio: {fileID: 0}
+    eventIds: []
+    options: []
+    npcName: Phillip
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+  - dialogueText: You say that being organised is a bad thing.
+    dialogueAudio: {fileID: 0}
+    eventIds: []
+    options: []
+    npcName: Alice
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+  - dialogueText: "No! No. It\u2019s adorable! Like a little adventure checklist.
+      \u2018Survive the wilderness, check. Keep Phillip from wandering off, double
+      check.\u2019"
+    dialogueAudio: {fileID: 0}
+    eventIds: []
+    options: []
+    npcName: Phillip
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+  - dialogueText: "Hey! That one wasn\u2019t in there.. But maybe it should be now
+      that I think about it. "
+    dialogueAudio: {fileID: 0}
+    eventIds: []
+    options: []
+    npcName: Alice
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+  - dialogueText: "Wouldn\u2019t blame you. I do have a habit of getting\u2026 distracted.
+      Speaking of distractions, it's past your bedtime missy! "
+    dialogueAudio: {fileID: 0}
+    eventIds: []
+    options: []
+    npcName: Phillip
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+  - dialogueText: "\u2026 "
+    dialogueAudio: {fileID: 0}
+    eventIds: []
+    options: []
+    npcName: Alice
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+  - dialogueText: Hilarious. But yeah, we need all the energy we can get.
+    dialogueAudio: {fileID: 0}
+    eventIds: []
+    options: []
+    npcName: Alice
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+  - dialogueText: Our tent is the red one right? You know, in case your list needs
+      a reminder.
+    dialogueAudio: {fileID: 0}
+    eventIds: []
+    options: []
+    npcName: Phillip
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+  - dialogueText: Ha. Ha. Very funny. Come on, let's go before you fall asleep out
+      here.
+    dialogueAudio: {fileID: 0}
+    eventIds:
+    - BaseCampGoToSleepDialogue
+    options: []
+    npcName: Alice
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 

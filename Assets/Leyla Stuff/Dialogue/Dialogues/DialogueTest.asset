@@ -1,0 +1,76 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49d908a81e1ab4345bdb9ed5793418b1, type: 3}
+  m_Name: DialogueTest
+  m_EditorClassIdentifier: 
+  treeID: ad90a330-61e9-47f7-a2db-9eb1c2974150
+  dialogueNodes:
+  - dialogueText: you are stooooooooooopid
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
+    eventIds: []
+    options: []
+    npcName: ok
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: -824021375
+        Data2: 1215717741
+        Data3: 1917500314
+        Data4: -1955761802
+      Path: event:/TestingSoundEvent
+  - dialogueText: hahahahah hahahhaha. tehe tehe
+    dialogueAudio: {fileID: 11400000, guid: 98e125fe940c141babd5d8b069a031ad, type: 2}
+    eventIds: []
+    options:
+    - optionText: OPTION 1
+      nextDialogueTree: {fileID: 11400000, guid: cc7cc97ddc8a748a0b30a410b8935ab3, type: 2}
+    - optionText: OPTION 2
+      nextDialogueTree: {fileID: 11400000, guid: 68313fdaa6f704aaaaf9a20b72bf69d1, type: 2}
+    npcName: boo
+    npcTag: Test
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 1765606322
+        Data2: 1118326076
+        Data3: -1774001520
+        Data4: 1115765450
+      Path: event:/TestingSoundEvent2
+  - dialogueText: bleh
+    dialogueAudio: {fileID: 11400000, guid: 7aa603cac70ac442cbe1e5af68e9852b, type: 2}
+    eventIds: []
+    options: []
+    npcName: boo
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: -824021375
+        Data2: 1215717741
+        Data3: 1917500314
+        Data4: -1955761802
+      Path: event:/TestingSoundEvent
+  - dialogueText: bleh
+    dialogueAudio: {fileID: 11400000, guid: 7aa603cac70ac442cbe1e5af68e9852b, type: 2}
+    eventIds: []
+    options: []
+    npcName: ok
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 1765606322
+        Data2: 1118326076
+        Data3: -1774001520
+        Data4: 1115765450
+      Path: event:/TestingSoundEvent2

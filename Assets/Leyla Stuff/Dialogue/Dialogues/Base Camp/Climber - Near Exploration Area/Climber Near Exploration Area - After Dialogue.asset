@@ -1,0 +1,119 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49d908a81e1ab4345bdb9ed5793418b1, type: 3}
+  m_Name: Climber Near Exploration Area - After Dialogue
+  m_EditorClassIdentifier: 
+  treeID: d331bb96-d70c-4750-ac8c-1b8cf1f6676c
+  dialogueNodes:
+  - dialogueText: "One more thing\u2026 while you\u2019re taking it all in, there\u2019s
+      something important you should do first."
+    dialogueAudio: {fileID: 11400000, guid: 98e125fe940c141babd5d8b069a031ad, type: 2}
+    eventIds: []
+    options: []
+    npcName: Wise Climber
+    npcTag: NPC
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+  - dialogueText: "What\u2019s that?"
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
+    eventIds: []
+    options: []
+    npcName: Alice
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+  - dialogueText: There should be an oxygen tank in the big red community tent. The
+      wind may feel calm here, but as you climb higher, the air gets thinner.
+    dialogueAudio: {fileID: 11400000, guid: 98e125fe940c141babd5d8b069a031ad, type: 2}
+    eventIds: []
+    options: []
+    npcName: Wise Climber
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+  - dialogueText: "You\u2019ll want to make sure you have it before you venture too
+      far."
+    dialogueAudio: {fileID: 11400000, guid: 98e125fe940c141babd5d8b069a031ad, type: 2}
+    eventIds: []
+    options: []
+    npcName: Wise Climber
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+  - dialogueText: "Right, I\u2019ll pick it up."
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
+    eventIds: []
+    options: []
+    npcName: Alice
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+  - dialogueText: "Good. Trust me, you don\u2019t want to be caught without it."
+    dialogueAudio: {fileID: 11400000, guid: 98e125fe940c141babd5d8b069a031ad, type: 2}
+    eventIds: []
+    options: []
+    npcName: Wise Climber
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+  - dialogueText: "The mountain may be beautiful, but it won\u2019t wait for you
+      to catch your breath."
+    dialogueAudio: {fileID: 11400000, guid: 98e125fe940c141babd5d8b069a031ad, type: 2}
+    eventIds:
+    - BaseCampAfterClimberNearExplorationAreaDialogueCompleted
+    options: []
+    npcName: Wise Climber
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
