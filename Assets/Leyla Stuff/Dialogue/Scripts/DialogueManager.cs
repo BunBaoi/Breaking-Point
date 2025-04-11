@@ -23,6 +23,10 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private float scrollSpeed = 0.03f;
     public Dictionary<string, bool> dialogueTreeProgress = new Dictionary<string, bool>();
 
+    [Header("NPC Dialogue Settings")]
+    [SerializeField] private GameObject npcDialogueTextPrefab;
+    private GameObject activeNPCBubble;
+
     [Header("Colour Settings")]
     [SerializeField] private string npcNameColorHex = "#D95959"; // Default colour
     [SerializeField] private string dialogueTextColorHex = "#4DB7C0"; // Default colour
@@ -597,12 +601,6 @@ public class DialogueManager : MonoBehaviour
 
         PlayerStats.Instance.FadeOut();
 
-        if (CallingCompanionMethods.Instance != null)
-        {
-            CallingCompanionMethods.Instance.CallTeleportToPlayer();
-            CallingCompanionMethods.Instance.CallFacePlayer();
-        }
-
         GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
 
         if (playerObject != null)
@@ -1140,5 +1138,149 @@ public class DialogueManager : MonoBehaviour
     public void SetAutomaticDialogueState(bool isAutomatic)
     {
         isAutomaticDialogueActive = isAutomatic;
+    }
+
+    // NPC DIALOGUE
+
+    public void StartNPCDialogue(DialogueTree dialogueTree, Transform npcTransform)
+    {
+        if (activeNPCBubble != null)
+            Destroy(activeNPCBubble);
+
+        if (dialogueTree == null || dialogueTree.dialogueNodes == null || dialogueTree.dialogueNodes.Count == 0)
+        {
+            Debug.LogWarning("Dialogue tree is empty or null.");
+            return;
+        }
+
+        if (GetDialogueProgress(dialogueTree.treeID))
+        {
+            Debug.Log("Dialogue with treeID " + dialogueTree.treeID + " has already been completed.");
+            return;
+        }
+
+        SetDialogueProgress(dialogueTree.treeID, true);
+
+        // Start with the first dialogue node and NPC
+        DialogueNode firstNode = dialogueTree.dialogueNodes[0];
+        GameObject npc = GameObject.Find(firstNode.npcName); // Find NPC by name
+        if (npc == null)
+        {
+            Debug.LogWarning("NPC not found: " + firstNode.npcName);
+            return;
+        }
+
+        Collider npcCollider = npc.GetComponent<Collider>();
+        if (npcCollider == null)
+        {
+            Debug.LogWarning("NPC collider not found.");
+            return;
+        }
+
+        Vector3 bubblePosition = npcCollider.bounds.center + Vector3.up * 1.3f; // Adjust bubble height
+
+        activeNPCBubble = Instantiate(npcDialogueTextPrefab, bubblePosition, Quaternion.identity);
+        activeNPCBubble.transform.SetParent(npcTransform);
+
+        TMP_Text bubbleText = activeNPCBubble.GetComponentInChildren<TMP_Text>();
+
+        StartCoroutine(PlayNPCDialogueSequence(dialogueTree, bubbleText));
+    }
+
+    private IEnumerator PlayNPCDialogueSequence(DialogueTree tree, TMP_Text textField)
+    {
+        FMOD.Studio.EventInstance currentSound = default;
+
+        // Process each dialogue node
+        foreach (DialogueNode node in tree.dialogueNodes)
+        {
+            string fullText = node.dialogueText;
+            textField.text = "";
+
+            GameObject npc = GameObject.Find(node.npcName); // Update the NPC based on the current node
+            if (npc == null)
+            {
+                Debug.LogWarning("NPC not found: " + node.npcName);
+                continue; // Skip to the next node
+            }
+
+            Collider npcCollider = npc.GetComponent<Collider>();
+            if (npcCollider == null)
+            {
+                Debug.LogWarning("NPC collider not found.");
+                continue; // Skip to the next node
+            }
+
+            // Reposition the dialogue bubble above the current NPC's head
+            Vector3 bubblePosition = npcCollider.bounds.center + Vector3.up * 1.3f;
+            activeNPCBubble.transform.position = bubblePosition;
+
+            // Handle audio for dialogue
+            DialogueAudio audioSettings = node.dialogueAudio;
+            int validCharCount = 0;
+            int npcHash = node.npcName.GetHashCode();
+            bool hasPlayedFirstSound = false;
+
+            // If not using per-letter dialogue audio, play single sound
+            if (!node.useDialogueAudio)
+            {
+                if (currentSound.isValid())
+                {
+                    currentSound.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+                    currentSound.release();
+                }
+
+                if (!node.fmodSoundEvent.IsNull)
+                {
+                    currentSound = FMODUnity.RuntimeManager.CreateInstance(node.fmodSoundEvent);
+                    currentSound.start();
+                }
+            }
+
+            // Display the text one letter at a time
+            for (int i = 0; i < fullText.Length; i++)
+            {
+                textField.text = fullText.Substring(0, i + 1);
+                char currentChar = fullText[i];
+
+                if (node.useDialogueAudio && char.IsLetter(currentChar))
+                {
+                    validCharCount++;
+
+                    if (audioSettings != null && (!hasPlayedFirstSound || validCharCount % audioSettings.frequency == 0))
+                    {
+                        hasPlayedFirstSound = true;
+
+                        if (currentSound.isValid())
+                        {
+                            currentSound.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+                            currentSound.release();
+                        }
+
+                        int letterIndex = char.ToLower(currentChar) - 'a';
+                        letterIndex = Mathf.Clamp(letterIndex, 0, audioSettings.fmodSoundEvents.Length - 1);
+                        EventReference soundEventReference = audioSettings.fmodSoundEvents[letterIndex];
+
+                        currentSound = FMODUnity.RuntimeManager.CreateInstance(soundEventReference);
+                        float pitch = Mathf.Lerp(audioSettings.minPitch, audioSettings.maxPitch, Mathf.Abs(npcHash % 100) / 100f);
+                        currentSound.setPitch(pitch);
+                        currentSound.start();
+                    }
+                }
+
+                yield return new WaitForSeconds(scrollSpeed);
+            }
+
+            yield return new WaitForSeconds(3f); // Wait for a moment before continuing
+        }
+
+        // Stop the audio and release the resources
+        if (currentSound.isValid())
+        {
+            currentSound.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+            currentSound.release();
+        }
+
+        Destroy(activeNPCBubble);
     }
 }

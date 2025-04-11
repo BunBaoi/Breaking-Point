@@ -415,7 +415,7 @@ if (interactTextInstance != null && !IsHoldingRequiredItem() && !IsLookingAtOxyg
         int layerMask = LayerMask.GetMask("Oxygen Refill Station");
 
         // Perform the raycast with the layer mask to limit the detection to that layer.
-        if (Physics.Raycast(ray, out hit, 3f, layerMask)) // Check within 3 meters
+        if (Physics.Raycast(ray, out hit, 3f, layerMask, QueryTriggerInteraction.Ignore)) // Check within 3 meters
         {
             return hit.collider.CompareTag("Oxygen Refill Station"); // Ensure the looked-at object has the correct tag
         }

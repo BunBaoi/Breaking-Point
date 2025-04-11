@@ -47,7 +47,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -167,6 +167,8 @@ MonoBehaviour:
   canPickUp: 0
   isPickingUp: 0
   interactTextPrefab: {fileID: 95194169440117963, guid: 15891119156aa4ae388994054e96a4c5, type: 3}
+  yAxis: 0.2
+  defaultYAxis: 0.2
   inputActions: {fileID: -944628639613478452, guid: 5ec57af691e024f5495721c1aec07891, type: 3}
   pickupActionName: PickUp
 --- !u!65 &778047884948910781

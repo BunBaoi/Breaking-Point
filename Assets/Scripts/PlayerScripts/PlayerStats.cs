@@ -235,7 +235,7 @@ public class PlayerStats : MonoBehaviour
             Energy -= drainRate * Time.deltaTime;
             Energy = Mathf.Max(Energy, 0);
 
-            if (Energy >= 0)
+            if (Energy <= 0)
             {
                 PlayerDeath();
             }
@@ -442,6 +442,31 @@ public class PlayerStats : MonoBehaviour
         }
     }
 
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.CompareTag("OxygenDrain"))
+        {
+            stateOfPlayer = PlayerStatus.OxygenZone;
+            isInOxygenDrainZone = true;
+            Debug.Log("Atmosphere Danger");
+        }
+        if (other.CompareTag("Level2QTE.1"))
+        {
+            stateOfPlayer = PlayerStatus.QTE;
+            Debug.Log("Level2QTE.1 Enter");
+        }
+        if (other.CompareTag("EnergyDrain"))
+        {
+            isInEnergyDrainZone = true;
+            Debug.Log("Energy Drain Zone Entered");
+        }
+        if (other.CompareTag("Camp"))
+        {
+            isInCamp = true;
+            Debug.Log("Entered Camp - Safe Zone");
+        }
+    }
+
     private void OnTriggerExit(Collider other)
     {
         Debug.Log($"Exited Trigger: {other.gameObject.name}");
@@ -617,7 +642,7 @@ public IEnumerator MoveCube(Vector3 targetPosition) // targetPosition = Player <
         Energy -= amount;
         Energy = Mathf.Max(Energy, 0); // Prevent Energy from going below 0
 
-        if (Energy >= 0)
+        if (Energy <= 0)
         {
             PlayerDeath();
         }

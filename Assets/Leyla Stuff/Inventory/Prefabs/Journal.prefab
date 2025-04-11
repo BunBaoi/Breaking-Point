@@ -435,6 +435,8 @@ MonoBehaviour:
   useItemName: Use
   nextPageName: Next
   previousPageName: Previous
+  previousPageIndex: 0
+  nextOrPreviousPageCalled: 0
   inventoryManager: {fileID: 0}
   inventoryCanvas: {fileID: 0}
   isJournalOpen: 0
@@ -464,6 +466,8 @@ MonoBehaviour:
   canPickUp: 0
   isPickingUp: 0
   interactTextPrefab: {fileID: 95194169440117963, guid: 15891119156aa4ae388994054e96a4c5, type: 3}
+  yAxis: 0.2
+  defaultYAxis: 0.2
   inputActions: {fileID: -944628639613478452, guid: 5ec57af691e024f5495721c1aec07891, type: 3}
   pickupActionName: PickUp
 --- !u!1 &2035373246615655833
@@ -1463,7 +1467,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -1670,7 +1674,7 @@ PrefabInstance:
     - target: {fileID: -1504981713932161579, guid: f77ab1a07531efc49a814b75f78f7e4e, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 47a29f1e548ac43df97f1fecc6a6bfee, type: 2}
+      objectReference: {fileID: 2100000, guid: 507af6cbd35654b32b0fdb9e23e1e9b1, type: 2}
     - target: {fileID: -927199367670048503, guid: f77ab1a07531efc49a814b75f78f7e4e, type: 3}
       propertyPath: m_Name
       value: mf_book_01
