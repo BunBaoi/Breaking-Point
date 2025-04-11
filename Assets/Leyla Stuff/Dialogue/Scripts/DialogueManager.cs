@@ -19,10 +19,11 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private Transform buttonParent;
     [SerializeField] private Image nextDialogueIndicatorImage;
     [SerializeField] private CanvasGroup nextDialogueIndicatorCanvasGroup;
-    [SerializeField] private Camera mainCamera;  // Player camera
+    [SerializeField] private Camera mainCamera;
     [SerializeField] private float scrollSpeed = 0.03f;
+    public Dictionary<string, bool> dialogueTreeProgress = new Dictionary<string, bool>();
 
-   [Header("Colour Settings")]
+    [Header("Colour Settings")]
     [SerializeField] private string npcNameColorHex = "#D95959"; // Default colour
     [SerializeField] private string dialogueTextColorHex = "#4DB7C0"; // Default colour
 
@@ -195,25 +196,74 @@ public class DialogueManager : MonoBehaviour
 
     public void SetInventoryActive(bool isActive)
     {
-        // Activate or deactivate the InventoryManager script itself
-        if (inventoryManager != null)
+
+        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+
+        if (playerObject != null)
         {
-            inventoryManager.enabled = isActive;
+            inventoryManager = playerObject.GetComponent<InventoryManager>();
+            if (inventoryManager != null)
+            {
+                inventoryManager.enabled = isActive;
+            }
+            Transform inventoryCanvasTransform = playerObject.transform.Find("Inventory Canvas");
+            if (inventoryCanvasTransform != null)
+            {
+                inventoryCanvas = inventoryCanvasTransform.GetComponent<Canvas>();
+                if (inventoryCanvas != null)
+                {
+                    inventoryCanvas.gameObject.SetActive(isActive);
+                }
+            }
         }
 
-        // Also manage the other objects
-        if (inventoryCanvas != null)
-            inventoryCanvas.gameObject.SetActive(isActive); 
+        GameObject leftHand = GameObject.Find("Left Hand");
+        if (leftHand != null)
+        {
+            playerHands[0] = leftHand;
+        }
+
+        GameObject rightHand = GameObject.Find("Right Hand");
+        if (rightHand != null)
+        {
+            playerHands[1] = rightHand;
+        }
 
         foreach (var hand in playerHands)
         {
             if (hand != null)
+            {
                 hand.SetActive(isActive);
+            }
         }
+    }
+
+    // current state of the dialogue tree (completed or not)
+    public void SetDialogueProgress(string treeID, bool isCompleted)
+    {
+        dialogueTreeProgress[treeID] = isCompleted;
+    }
+
+    // progress of a dialogue tree (true = completed, false = not completed)
+    public bool GetDialogueProgress(string treeID)
+    {
+        if (dialogueTreeProgress.ContainsKey(treeID))
+            return dialogueTreeProgress[treeID];
+
+        return false;
+    }
+
+    public List<string> GetAllDialogueIDs()
+    {
+        return new List<string>(dialogueTreeProgress.Keys);
     }
 
     private void Update()
     {
+        foreach (var entry in dialogueTreeProgress)
+        {
+            Debug.Log($"Key: {entry.Key}, Value: {entry.Value}");
+        }
         if (SettingsManager.Instance != null && SettingsManager.Instance.isMenuOpen)
         {
             return; // Prevent dialogue from advancing while the settings menu is open
@@ -537,10 +587,54 @@ public class DialogueManager : MonoBehaviour
             return; // Prevent dialogue from advancing while the settings menu is open
         }
 
-        if (inventoryManager != null)
+        if (GetDialogueProgress(dialogueTree.treeID))
         {
-            inventoryManager.enabled = false;
-            inventoryCanvas.gameObject.SetActive(false);
+            Debug.Log("Dialogue with treeID " + dialogueTree.treeID + " has already been completed.");
+            return; // Exit without showing the dialogue
+        }
+
+        SetDialogueProgress(dialogueTree.treeID, true);
+
+        PlayerStats.Instance.FadeOut();
+
+        if (CallingCompanionMethods.Instance != null)
+        {
+            CallingCompanionMethods.Instance.CallTeleportToPlayer();
+            CallingCompanionMethods.Instance.CallFacePlayer();
+        }
+
+        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+
+        if (playerObject != null)
+        {
+            inventoryManager = playerObject.GetComponent<InventoryManager>();
+            if (inventoryManager != null)
+            {
+                inventoryManager.enabled = false;
+                Debug.Log("InventoryManager disabled.");
+            }
+            Transform inventoryCanvasTransform = playerObject.transform.Find("Inventory Canvas");
+            if (inventoryCanvasTransform != null)
+            {
+                inventoryCanvas = inventoryCanvasTransform.GetComponent<Canvas>();
+                if (inventoryCanvas != null)
+                {
+                    inventoryCanvas.gameObject.SetActive(false);
+                    Debug.Log("Inventory Canvas disabled.");
+                }
+            }
+        }
+
+        GameObject leftHand = GameObject.Find("Left Hand");
+        if (leftHand != null)
+        {
+            playerHands[0] = leftHand;
+        }
+
+        GameObject rightHand = GameObject.Find("Right Hand");
+        if (rightHand != null)
+        {
+            playerHands[1] = rightHand;
         }
 
         if (playerHands != null)
@@ -551,7 +645,6 @@ public class DialogueManager : MonoBehaviour
             }
         }
 
-        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
         if (playerObject != null)
         {
             playerMovement = playerObject.GetComponent<PlayerMovement>();
@@ -565,10 +658,6 @@ public class DialogueManager : MonoBehaviour
             {
                 Debug.LogWarning("PlayerMovement component not found on Player.");
             }
-        }
-        else
-        {
-            Debug.LogWarning("Player object not found with tag 'Player'.");
         }
 
         if (dialoguePanel != null)
@@ -633,6 +722,7 @@ public class DialogueManager : MonoBehaviour
             nextDialogueIndicatorCanvasGroup.alpha = 0f;
             nextDialogueIndicatorImage.gameObject.SetActive(false);
             dialogueCanvas.enabled = false;
+            PlayerStats.Instance.FadeIn();
             // Stop the previous coroutine if it's running
             if (currentLookAtNpcCoroutine != null)
             {
@@ -642,10 +732,22 @@ public class DialogueManager : MonoBehaviour
             {
                 playerMovement.SetMovementState(true);
             }
-            if (inventoryManager != null)
+            GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+            if (playerObject != null)
             {
-                inventoryManager.enabled = true;
-                inventoryCanvas.gameObject.SetActive(true);
+                if (inventoryManager != null)
+                {
+                    inventoryManager.enabled = true;
+                }
+                Transform inventoryCanvasTransform = playerObject.transform.Find("Inventory Canvas");
+                if (inventoryCanvasTransform != null)
+                {
+                    inventoryCanvas = inventoryCanvasTransform.GetComponent<Canvas>();
+                    if (inventoryCanvas != null)
+                    {
+                        inventoryCanvas.gameObject.SetActive(true);
+                    }
+                }
             }
             if (playerHands != null)
             {
@@ -776,13 +878,19 @@ public class DialogueManager : MonoBehaviour
     private IEnumerator SmoothLookAtNpc(GameObject npc)
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
+        GameObject cameraObject = GameObject.FindGameObjectWithTag("PlayerCamera");
+
+        if (cameraObject != null)
+        {
+            mainCamera = cameraObject.GetComponent<Camera>();
+        }
         if (npc != null && mainCamera != null && player != null)
         {
-            // Get the position of the NPC
-            Vector3 npcPosition = npc.transform.position;
+            // Calculate the position to look at
+            Vector3 npcHeadPosition = npc.transform.position + Vector3.up * 1.7f; // Can be adjusted based on NPC Mesh to look at head
 
-            // Calculate the direction vector from the camera to the NPC
-            Vector3 targetDirection = npcPosition - mainCamera.transform.position;
+            // Calculate the direction vector from the camera to the NPC's head
+            Vector3 targetDirection = npcHeadPosition - mainCamera.transform.position;
 
             // Calculate the target rotation based on the direction (this will affect both yaw and pitch)
             Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
@@ -794,16 +902,16 @@ public class DialogueManager : MonoBehaviour
             {
                 // Smoothly rotate the camera horizontally (yaw) and vertically (pitch)
                 Quaternion currentRotation = mainCamera.transform.rotation;
-                currentRotation = Quaternion.Slerp(currentRotation, targetRotation, Time.deltaTime * 2f);
 
-                // Smoothly adjust the pitch (xRotation) towards the target pitch
+                // Smoothly interpolate the yaw (horizontal rotation) towards the target yaw
+                float targetYaw = Mathf.LerpAngle(currentRotation.eulerAngles.y, targetRotation.eulerAngles.y, Time.deltaTime * 2f);
                 float targetPitch = Mathf.LerpAngle(cameraController.xRotation, targetRotation.eulerAngles.x, Time.deltaTime * 2f);
 
-                // Apply the smooth pitch (vertical) and yaw (horizontal) to the camera
-                mainCamera.transform.rotation = Quaternion.Euler(targetPitch, currentRotation.eulerAngles.y, 0);
+                // Apply the smooth yaw (horizontal) and pitch (vertical) to the camera
+                mainCamera.transform.rotation = Quaternion.Euler(targetPitch, targetYaw, 0);
 
                 // Also rotate the player (body) to face the NPC (yaw only)
-                player.transform.rotation = Quaternion.Euler(0, currentRotation.eulerAngles.y, 0);
+                player.transform.rotation = Quaternion.Euler(0, targetYaw, 0);
 
                 // Update the camera's xRotation to reflect the smooth pitch (vertical rotation)
                 cameraController.xRotation = targetPitch;
@@ -811,7 +919,7 @@ public class DialogueManager : MonoBehaviour
                 yield return null;
             }
 
-            // Final alignment with the NPC (ensure no overshooting)
+            // Final alignment with the NPC's head (ensure no overshooting)
             mainCamera.transform.rotation = targetRotation;
             player.transform.rotation = Quaternion.Euler(0, targetRotation.eulerAngles.y, 0);
         }

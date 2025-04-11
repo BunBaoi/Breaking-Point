@@ -40,7 +40,7 @@ public class AutomaticDialogueTrigger : MonoBehaviour
         }
 
         // Load dialogue played state
-        dialoguePlayed = PlayerPrefs.GetInt(dialogueKey, 0) == 1;
+        // dialoguePlayed = PlayerPrefs.GetInt(dialogueKey, 0) == 1;
     }
 
     private void Start()
@@ -136,8 +136,8 @@ public class AutomaticDialogueTrigger : MonoBehaviour
 
         if (triggerOnce)
         {
-            PlayerPrefs.SetInt(dialogueKey, 1);
-            PlayerPrefs.Save();
+            // PlayerPrefs.SetInt(dialogueKey, 1);
+            // PlayerPrefs.Save();
         }
 
         // Set the automatic dialogue flag in DialogueManager
@@ -153,12 +153,12 @@ public class AutomaticDialogueTrigger : MonoBehaviour
     }
 
     // Public method to reset the dialogue (can be called from other scripts)
-    public void ResetDialogue()
+    /*public void ResetDialogue()
     {
         dialoguePlayed = false;
         PlayerPrefs.SetInt(dialogueKey, 0);
         PlayerPrefs.Save();
-    }
+    }*/
 
     private IEnumerator RunAutomaticDialogue()
     {

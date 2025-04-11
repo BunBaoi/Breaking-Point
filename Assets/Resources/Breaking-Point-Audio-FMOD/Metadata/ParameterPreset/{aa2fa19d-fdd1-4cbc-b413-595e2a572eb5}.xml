@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects serializationModel="Studio.02.02.00">
+	<object class="ParameterPreset" id="{aa2fa19d-fdd1-4cbc-b413-595e2a572eb5}">
+		<property name="name">
+			<value>OxygenBreathing</value>
+		</property>
+		<relationship name="folder">
+			<destination>{c0db4ffe-3572-4cc2-be31-2d3b00cef618}</destination>
+		</relationship>
+		<relationship name="parameter">
+			<destination>{ba36147e-b843-4392-898d-ab63cc69937b}</destination>
+		</relationship>
+	</object>
+	<object class="GameParameter" id="{ba36147e-b843-4392-898d-ab63cc69937b}">
+		<property name="parameterType">
+			<value>1</value>
+		</property>
+		<property name="maximum">
+			<value>6</value>
+		</property>
+		<property name="initialValue">
+			<value>0</value>
+		</property>
+	</object>
+</objects>

@@ -11,6 +11,11 @@ public class NPCDialogue : MonoBehaviour
     [SerializeField] private CompanionScript companionScript;
     [SerializeField] private string dialogueKey = "DialogueTriggered";
 
+    [Header("Interact Text")]
+    [SerializeField] private GameObject interactTextPrefab;
+    [SerializeField] private float yAxis = 0.9f;
+    [SerializeField] private float defaultYAxis = 0.9f;
+
     [Header("Testing Purposes")]
     [SerializeField] private bool playerInRange = false; // Is player in range?
     [SerializeField] private bool isDialoguePressed;
@@ -19,18 +24,17 @@ public class NPCDialogue : MonoBehaviour
     [SerializeField] private InputActionAsset inputActions;
     [SerializeField] private string interactActionName = "Interact";
     [SerializeField] private KeyCode clearPlayerPrefs = KeyCode.C;
-    [SerializeField] private GameObject interactTextPrefab;
+
+    [Header("Bool Conditions")]
+    [SerializeField] private List<string> requiredBoolKeysTrue = new List<string>();
+    [SerializeField] private List<string> requiredBoolKeysFalse = new List<string>();
 
     private GameObject interactTextInstance;
     private Transform player;
     private GameObject iconObject;
     private SpriteRenderer spriteRenderer;
 
-    [Header("Bool Conditions")]
-    [SerializeField] private List<string> requiredBoolKeysTrue = new List<string>(); 
-    [SerializeField] private List<string> requiredBoolKeysFalse = new List<string>();
-
-    private InputAction interactAction; // Reference to the "Interact" InputAction
+    private InputAction interactAction;
 
     void Awake()
     {
@@ -49,7 +53,7 @@ public class NPCDialogue : MonoBehaviour
 
     private void Start()
     {
-        isDialoguePressed = PlayerPrefs.GetInt(dialogueKey, 0) == 1;
+        // isDialoguePressed = PlayerPrefs.GetInt(dialogueKey, 0) == 1;
 
         // Find the action dynamically using the interactActionName string
         interactAction = inputActions.FindAction(interactActionName);
@@ -66,6 +70,12 @@ public class NPCDialogue : MonoBehaviour
 
     void ShowInteractText()
     {
+        if (DialogueManager.Instance.GetDialogueProgress(npcDialogueTree.treeID))
+        {
+            Debug.Log("Dialogue with treeID " + npcDialogueTree.treeID + " has already been completed.");
+            return;
+        }
+
         if (!isDialoguePressed && interactTextPrefab != null && interactTextInstance == null && CanStartDialogue())
         {
             interactTextInstance = Instantiate(interactTextPrefab);
@@ -85,17 +95,38 @@ public class NPCDialogue : MonoBehaviour
                     // Convert the world position to local position relative to the parent
                     Vector3 pickUpTopLocalPos = interactTextInstance.transform.InverseTransformPoint(objectTopWorldPos);
 
-                    interactTextInstance.transform.localPosition = new Vector3(0, pickUpTopLocalPos.y + 0.2f, 0); // Adjust the Y offset as needed
+                    Transform playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
+
+                    if (playerTransform != null)
+                    {
+                        // Direction from NPC to player
+                        Vector3 toPlayer = (playerTransform.position - transform.position).normalized;
+
+                        // Set position slightly in front of NPC, facing the player
+                        Vector3 frontOfNPC = transform.position + toPlayer * 1.0f;
+
+                        frontOfNPC.y += yAxis;
+
+                        // Set world position
+                        interactTextInstance.transform.position = frontOfNPC;
+
+                        // Rotate text to face player
+                        Vector3 lookDirection = (playerTransform.position - frontOfNPC);
+                        lookDirection.y = 0;
+                        if (lookDirection != Vector3.zero)
+                        {
+                            interactTextInstance.transform.rotation = Quaternion.LookRotation(lookDirection);
+                        }
+                    }
                 }
                 else
                 {
-                    // If no collider is attached to "Pick Up Collider", fallback position
-                    interactTextInstance.transform.localPosition = new Vector3(0, 0.2f, 0);
+                    interactTextInstance.transform.localPosition = new Vector3(0, defaultYAxis, 0);
                 }
             }
             else
             {
-                interactTextInstance.transform.localPosition = new Vector3(0, 0.2f, 0);
+                interactTextInstance.transform.localPosition = new Vector3(0, defaultYAxis, 0);
             }
 
             string interactText = "Talk"; // Default text
@@ -121,6 +152,7 @@ public class NPCDialogue : MonoBehaviour
 
                         float horizontalOffset = -textMesh.preferredWidth / 2 - 0.04f;
                         iconObject.transform.localPosition = new Vector3(horizontalOffset, 0f, 0);
+                        iconObject.transform.rotation = interactTextInstance.transform.rotation;
 
                         // Add a SpriteRenderer to display the icon
                         spriteRenderer = iconObject.AddComponent<SpriteRenderer>();
@@ -271,6 +303,24 @@ public class NPCDialogue : MonoBehaviour
             if (interactTextInstance != null)
             {
                 UpdateSprite(iconObject.gameObject, interactActionName);
+
+                Transform playerTransform = other.transform;
+
+                // Get direction from NPC to player
+                Vector3 toPlayer = (playerTransform.position - transform.position).normalized;
+
+                // Position the interact text in front of NPC toward the player
+                Vector3 frontOfNPC = transform.position + toPlayer * 1.0f;
+                frontOfNPC.y += yAxis;
+                interactTextInstance.transform.position = Vector3.Lerp(interactTextInstance.transform.position, frontOfNPC, Time.deltaTime * 15f);
+
+                // Make it face the player
+                Vector3 lookDirection = (playerTransform.position - frontOfNPC);
+                lookDirection.y = 0;
+                if (lookDirection != Vector3.zero)
+                {
+                    interactTextInstance.transform.rotation = Quaternion.LookRotation(lookDirection);
+                }
             }
         }
     }
@@ -319,9 +369,9 @@ public class NPCDialogue : MonoBehaviour
                 // Check if the interact key is pressed
                 if (playerInRange && interactAction.triggered && !isDialoguePressed && CanStartDialogue())
                 {
-                    isDialoguePressed = true;
+                    /*isDialoguePressed = true;
                     PlayerPrefs.SetInt(dialogueKey, 1);
-                    PlayerPrefs.Save();
+                    PlayerPrefs.Save();*/
                     StartDialogue();
 
                     HideInteractText();
@@ -343,10 +393,10 @@ public class NPCDialogue : MonoBehaviour
             UpdateSpriteScale();
         }
 
-        if (Input.GetKeyDown(clearPlayerPrefs))
+        /*if (Input.GetKeyDown(clearPlayerPrefs))
         {
             ClearPlayerPrefs();
-        }
+        }*/
     }
 
     private bool CanStartDialogue()
@@ -376,10 +426,6 @@ public class NPCDialogue : MonoBehaviour
         if (npcDialogueTree != null)
         {
             DialogueManager.Instance.StartDialogue(npcDialogueTree);
-        }
-        if (companionScript != null)
-        {
-            companionScript.TeleportToPlayer();
         }
     }
 

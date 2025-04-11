@@ -6,23 +6,28 @@ using UnityEngine.InputSystem;
 
 public class BedManager : MonoBehaviour
 {
-    [Header("References")]
+    [Header("Bed Settings")]
     [SerializeField] private Transform player;
     [SerializeField] private Transform bed;
     [SerializeField] private string bedTag = "Bed";
     [SerializeField] private string playerTag = "Player";
-    [SerializeField] private CanvasGroup fadeCanvas; // CanvasGroup for fading effect
-    [SerializeField] private float fadeDuration = 0.5f;
     [SerializeField] private float rotationSpeed = 2f;
     [SerializeField] private float zPositionOffset = 1f;
     [SerializeField] private float xPositionOffset = 1f;
     [SerializeField] private float yPositionOffset = 0.1f;
-    [SerializeField] private string boolKey = "SleptInBed";
+
+    [Header("UI Settings")]
+    [SerializeField] private CanvasGroup fadeCanvas; // CanvasGroup for fading effect
+    [SerializeField] private float fadeDuration = 0.5f;
+
+    [Header("Interact Text Settings")]
+    [SerializeField] private float yAxis = 0.2f;
+    [SerializeField] private float defaultYAxis = 0.2f;
+
+    [Header("Cinematic Sequence")]
+    [SerializeField] private string cinematicSequenceTag = "";
     [SerializeField] private CinematicSequence cinematicSequence;
     [SerializeField] private CameraController cameraController;
-    [SerializeField] private PlayerMovement playerMovement;
-    [SerializeField] private DayNightCycle dayNightCycle;
-    [SerializeField] private PlayerStats playerStats;
 
     [Header("Keybinds")]
     [SerializeField] private InputActionAsset inputActions;
@@ -36,9 +41,14 @@ public class BedManager : MonoBehaviour
     [Header("Bool Conditions")]
     [SerializeField] private List<string> requiredBoolKeysTrue = new List<string>();
     [SerializeField] private List<string> requiredBoolKeysFalse = new List<string>();
+    [SerializeField] private string boolKey = "SleptInBed";
     [SerializeField] private bool hasSetTime = false;
     [SerializeField] private bool isInteracting = false;
     [SerializeField] private bool inTrigger = false;
+
+    [Header("Other Scripts")]
+    [SerializeField] private PlayerMovement playerMovement;
+    [SerializeField] private DayNightCycle dayNightCycle;
 
     [Header("Inventory Setups")]
     [SerializeField] private InventoryManager inventoryManager;
@@ -119,25 +129,20 @@ public class BedManager : MonoBehaviour
                     // Convert the world position to local position relative to the parent
                     Vector3 pickUpTopLocalPos = interactTextInstance.transform.InverseTransformPoint(objectTopWorldPos);
 
-                    // Position the interact text just above the top of the "Pick Up Collider"
-                    interactTextInstance.transform.localPosition = new Vector3(0, pickUpTopLocalPos.y + 0.2f, 0); // Adjust the Y offset as needed
+                    interactTextInstance.transform.localPosition = new Vector3(0, pickUpTopLocalPos.y + yAxis, 0);
                 }
                 else
                 {
-                    // If no collider is attached to "Pick Up Collider", fallback position
-                    interactTextInstance.transform.localPosition = new Vector3(0, 0.2f, 0);
+                    interactTextInstance.transform.localPosition = new Vector3(0, defaultYAxis, 0);
                 }
             }
             else
             {
-                // If no "Pick Up Collider" child is found, fallback position
-                interactTextInstance.transform.localPosition = new Vector3(0, 0.2f, 0);
+                interactTextInstance.transform.localPosition = new Vector3(0, defaultYAxis, 0);
             }
 
-            // Declare the interactText variable
             string interactText = "Sleep"; // Default text
 
-            // Get the keybinding data for "Interact"
             KeyBinding keyBinding = KeyBindingManager.Instance.GetKeybinding(interactActionName);
 
             // Update text dynamically to match the correct keybinding based on input device
@@ -146,7 +151,6 @@ public class BedManager : MonoBehaviour
             {
                 textMesh.text = "Sleep";
 
-                // Now check if we have a keybinding sprite
                 if (keyBinding != null)
                 {
                     Sprite icon = KeyBindingManager.Instance.IsUsingController() ? keyBinding.controllerSprite : keyBinding.keySprite;
@@ -154,16 +158,13 @@ public class BedManager : MonoBehaviour
                     // If the sprite exists, display it next to the text
                     if (icon != null)
                     {
-                        // Create a object for the sprite and set it next to the text
                         iconObject = new GameObject("KeybindIcon");
-                        iconObject.transform.SetParent(interactTextInstance.transform); // Make it a child of the text
+                        iconObject.transform.SetParent(interactTextInstance.transform);
 
-                        // Position sprite to left of text
-                        // Increase the horizontal space by adjusting the x-position further
                         float horizontalOffset = -textMesh.preferredWidth / 2 - 0.04f; // Increased offset to add more space
                         iconObject.transform.localPosition = new Vector3(horizontalOffset, 0f, 0);
+                        iconObject.transform.rotation = interactTextInstance.transform.rotation;
 
-                        // Add a SpriteRenderer to display the icon
                         spriteRenderer = iconObject.AddComponent<SpriteRenderer>();
                         spriteRenderer.sprite = icon;
                         spriteRenderer.sortingOrder = 1;
@@ -174,10 +175,8 @@ public class BedManager : MonoBehaviour
                     }
                     else
                     {
-                        // Get the first binding for keyboard and second for controller directly from the InputActionAsset
                         string keyText = "";
 
-                        // Get the "Interact" action
                         var interactAction = inputActions.FindAction(interactActionName);
 
                         if (interactAction != null)
@@ -192,10 +191,9 @@ public class BedManager : MonoBehaviour
                                 keyText = interactAction.bindings[0].ToDisplayString();  // First binding (keyboard)
                             }
 
-                            // Remove the word "Press" from the keyText if it exists
                             keyText = keyText.Replace("Press ", "").Trim(); // Removes "Press" and any extra spaces
 
-                            // Set the fallback text to show the keybinding for "Interact"
+                            // Set the fallback text
                             interactText = $"[{keyText}] Sleep";
                         }
                         else
@@ -397,22 +395,43 @@ public class BedManager : MonoBehaviour
         private IEnumerator HandleBedInteraction()
     {
         isInteracting = true;
-        if (playerStats != null)
+        
+        GameObject playerObject = GameObject.FindGameObjectWithTag(playerTag);
+
+        if (playerObject != null)
         {
-            playerStats.FadeOut();
-        }
-        if (inventoryManager != null)
-        {
-            inventoryManager.enabled = false;
-            inventoryCanvas.gameObject.SetActive(false);
-        }
-        if (cameraController != null)
-        {
-            cameraController.SetLookState(false);
-        }
-        if (playerMovement != null)
-        {
-            playerMovement.SetMovementState(false);
+            inventoryManager = playerObject.GetComponent<InventoryManager>();
+            if (inventoryManager != null)
+            {
+                inventoryManager.enabled = false;
+                Debug.Log("InventoryManager disabled.");
+            }
+            Transform inventoryCanvasTransform = playerObject.transform.Find("Inventory Canvas");
+            if (inventoryCanvasTransform != null)
+            {
+                inventoryCanvas = inventoryCanvasTransform.GetComponent<Canvas>();
+                if (inventoryCanvas != null)
+                {
+                    inventoryCanvas.gameObject.SetActive(false);
+                    Debug.Log("Inventory Canvas disabled.");
+                }
+            }
+            GameObject playerCamera = GameObject.FindGameObjectWithTag("PlayerCamera");
+            cameraController = playerCamera.GetComponent<CameraController>();
+
+            if (cameraController != null)
+            {
+                cameraController.SetLookState(false);
+            }
+
+            playerMovement = playerObject.GetComponent<PlayerMovement>();
+
+            if (playerMovement != null)
+            {
+                playerMovement.SetMovementState(false);
+            }
+
+            PlayerStats.Instance.FadeOut();
         }
 
         // Get the collider of the bed to determine the height for positioning
@@ -468,9 +487,7 @@ public class BedManager : MonoBehaviour
         if (BoolManager.Instance.GetBool(boolKey))
         {
             // Start cinematic sequence if the bool is true
-            cinematicSequence.StartCinematic();
-            cinematicSequence.OnCinematicFinished += RotatePlayerUpright;
-            cinematicSequence.OnCinematicStarted += FadeOutBlack;
+            StartCinematicByTag(cinematicSequenceTag);
         }
         else
         {
@@ -489,12 +506,9 @@ public class BedManager : MonoBehaviour
                 player.rotation = Quaternion.Slerp(player.rotation, uprightRotation, rotationSpeed * Time.deltaTime);
                 yield return null;
             }
-
-            if (playerStats != null)
-            {
-                playerStats.ReplenishEnergy(100f);
-                playerStats.FadeIn();
-            }
+            PlayerStats.Instance.ReplenishEnergy(100f);
+            PlayerStats.Instance.FadeIn();
+            SaveManager.Instance.SaveGame();
             dayNightCycle.StartTime();
             cameraController.SetLookState(true);
             playerMovement.SetMovementState(true);
@@ -511,6 +525,31 @@ public class BedManager : MonoBehaviour
 
         hasSetTime = false;
         isInteracting = false;
+    }
+
+    void StartCinematicByTag(string tag)
+    {
+        GameObject cinematicObj = GameObject.FindWithTag(tag);
+
+        if (cinematicObj != null)
+        {
+            CinematicSequence cinematicSequence = cinematicObj.GetComponent<CinematicSequence>();
+
+            if (cinematicSequence != null)
+            {
+                cinematicSequence.StartCinematic();
+                cinematicSequence.OnCinematicFinished += RotatePlayerUpright;
+                cinematicSequence.OnCinematicStarted += FadeOutBlack;
+            }
+            else
+            {
+                Debug.LogWarning("No CinematicSequence component found on object with tag: " + tag);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("No GameObject found with tag: " + tag);
+        }
     }
 
     private bool CanStartCinematic()
@@ -543,7 +582,17 @@ public class BedManager : MonoBehaviour
     private IEnumerator FadeOutBlackCoroutine()
     {
         yield return StartCoroutine(FadeScreen(false));
-        cinematicSequence.OnCinematicStarted -= FadeOutBlack;
+        GameObject cinematicObj = GameObject.FindWithTag(tag);
+
+        if (cinematicObj != null)
+        {
+            CinematicSequence cinematicSequence = cinematicObj.GetComponent<CinematicSequence>();
+
+            if (cinematicSequence != null)
+            {
+                cinematicSequence.OnCinematicStarted -= FadeOutBlack;
+            }
+        }
     }
 
     private void RotatePlayerUpright()
@@ -562,14 +611,21 @@ public class BedManager : MonoBehaviour
             yield return null;
         }
 
-        // Unsubscribe from the event to avoid duplicate calls
-        cinematicSequence.OnCinematicFinished -= RotatePlayerUpright;
+        GameObject cinematicObj = GameObject.FindWithTag(tag);
 
-        if (playerStats != null)
+        if (cinematicObj != null)
         {
-            playerStats.ReplenishEnergy(100f);
-            playerStats.FadeIn();
+            CinematicSequence cinematicSequence = cinematicObj.GetComponent<CinematicSequence>();
+
+            if (cinematicSequence != null)
+            {
+                // Unsubscribe from the event to avoid duplicate calls
+                cinematicSequence.OnCinematicFinished -= RotatePlayerUpright;
+            }
         }
+        PlayerStats.Instance.ReplenishEnergy(100f);
+        PlayerStats.Instance.FadeIn();
+
         if (inventoryManager != null)
         {
             inventoryManager.enabled = true;
@@ -580,6 +636,7 @@ public class BedManager : MonoBehaviour
         {
             characterController.enabled = true; // Disable to avoid collision or unwanted behavior
         }
+        SaveManager.Instance.SaveGame();
         cameraController.SetLookState(true);
         playerMovement.SetMovementState(true);
         dayNightCycle.StartTime();

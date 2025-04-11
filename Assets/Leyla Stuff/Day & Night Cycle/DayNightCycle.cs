@@ -11,9 +11,9 @@ public class SunriseSunsetTimes
 public class DayNightCycle : MonoBehaviour
 {
     [Header("Time Settings")]
-    [SerializeField] private int day = 1; // Track in-game days
-    [SerializeField] private int hours = 6;
-    [SerializeField] private int minutes = 0;
+    public int day = 1; // Track in-game days
+    public int hours = 6;
+    public int minutes = 0;
     [SerializeField] private float realSecondsPerGameMinute = 1f; // Every second increases time by 1 in-game minute
 
     [Header("Light Settings")]
@@ -32,6 +32,22 @@ public class DayNightCycle : MonoBehaviour
     [SerializeField] private float sunriseRotation = -30f;
     [SerializeField] private float sunsetRotation = 210f;
     [SerializeField] private float nightRotation = 290f;
+
+    [Header("Skybox Settings")]
+    [SerializeField] private Material daySkybox;
+    [SerializeField] private Material sunsetSkybox;
+   [SerializeField] private Material nightSkybox;
+    [SerializeField] private float transitionDuration = 3f;
+    [SerializeField] private float rotationSpeed = 1f;
+    private float skyboxRotation = 0f;
+
+    [Header("Fog Settings")]
+    [SerializeField] private Color fogColorAtSunset = Color.gray;
+    [SerializeField] private float fogDensityAtSunset = 0.5f;
+    [SerializeField] private float fogDensityAtSunrise = 0f;
+    [SerializeField] private float fogFadeDuration = 5f;
+    private float currentFogDensity = 0f; // Current fog density
+    private Color currentFogColor = Color.clear; // Current fog colour
 
     [Header("UI")]
     [SerializeField] private TMP_Text timeText;
@@ -81,11 +97,12 @@ public class DayNightCycle : MonoBehaviour
         }
     }
 
-    private void UpdateLighting()
+    public void UpdateLighting()
     {
         int currentTotalMinutes = hours * 60 + minutes;
         int sunriseTotalMinutes = sunriseTime.hour * 60 + sunriseTime.minute;
         int sunsetTotalMinutes = sunsetTime.hour * 60 + sunsetTime.minute;
+        int sunsetEndTotalMinutes = sunsetTotalMinutes + 30;
 
         if (directionalLight != null)
         {
@@ -112,9 +129,67 @@ public class DayNightCycle : MonoBehaviour
         }
 
         RenderSettings.ambientLight = ambientColourGradient.Evaluate(currentTotalMinutes / 1440f);
+
+        // === SKYBOX SWITCHING ===
+        if (currentTotalMinutes < sunriseTotalMinutes || currentTotalMinutes >= sunsetEndTotalMinutes)
+        {
+            // Night (before sunrise or after sunset and after the sunset period)
+            RenderSettings.skybox = nightSkybox;
+        }
+        else if (currentTotalMinutes >= sunriseTotalMinutes && currentTotalMinutes < sunsetTotalMinutes)
+        {
+            // Day (between sunrise and sunset)
+            RenderSettings.skybox = daySkybox;
+        }
+        else if (currentTotalMinutes >= sunsetTotalMinutes && currentTotalMinutes < sunsetEndTotalMinutes)
+        {
+            // Sunset (for the 30 minutes after sunset)
+            RenderSettings.skybox = sunsetSkybox;
+        }
+
+        DynamicGI.UpdateEnvironment();
+
+        // Update skybox rotation based on the in-game time
+        skyboxRotation += rotationSpeed * (Time.deltaTime / realSecondsPerGameMinute);
+
+        // Clamp the skybox rotation to stay within 0 to 360 degrees
+        if (skyboxRotation >= 360f)
+        {
+            skyboxRotation -= 360f;
+        }
+
+        // Apply the rotation to the skybox
+        RenderSettings.skybox.SetFloat("_Rotation", skyboxRotation);
+
+        // === FOG CONTROL ===
+        float fadeDuration = fogFadeDuration; // Duration for the fade effect (in seconds)
+        float fadeDurationInMinutes = fadeDuration / 60f; // Convert fade duration to minutes
+
+        // Daytime: From Sunrise to Sunset, fog density stays at the sunrise value.
+        if (currentTotalMinutes >= sunriseTotalMinutes && currentTotalMinutes < sunsetTotalMinutes)
+        {
+            // Gradually transition to sunrise fog density
+            float fadeFactor = Mathf.InverseLerp(sunriseTotalMinutes, sunriseTotalMinutes + fadeDurationInMinutes, currentTotalMinutes);
+            currentFogDensity = Mathf.Lerp(fogDensityAtSunrise, fogDensityAtSunrise, fadeFactor); // Always stays at sunrise density
+            currentFogColor = Color.Lerp(Color.clear, Color.clear, fadeFactor); // Always stays clear
+        }
+        // Sunset: From Sunset to Sunrise, fog density stays at the sunset value.
+        else if (currentTotalMinutes >= sunsetTotalMinutes || currentTotalMinutes < sunriseTotalMinutes)
+        {
+            // Gradually transition to sunset fog density
+            float fadeFactor = Mathf.InverseLerp(sunsetTotalMinutes, sunsetTotalMinutes + fadeDurationInMinutes, currentTotalMinutes);
+            currentFogDensity = Mathf.Lerp(fogDensityAtSunset, fogDensityAtSunset, fadeFactor); // Always stays at sunset density
+            currentFogColor = Color.Lerp(fogColorAtSunset, fogColorAtSunset, fadeFactor); // Always stays at sunset color
+        }
+
+        // Apply the calculated fog density and color
+        RenderSettings.fogDensity = currentFogDensity;
+        RenderSettings.fogColor = currentFogColor;
+
+        DynamicGI.UpdateEnvironment();
     }
 
-    private void UpdateTimeUI()
+        public void UpdateTimeUI()
     {
         timeText.text = $"Day {day}\n{hours:00}:{minutes:00}";
     }

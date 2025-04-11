@@ -12,6 +12,8 @@ public class CompanionScript : MonoBehaviour
     public float maxDistanceToPlayer = 5f;
     public float companionSpeed = 3.5f;
     public CompanionState stateOfCompanion;
+    private bool teleportLeft = true;
+    private Animator animator;
 
     [Header("Companion Visuals")]
     public GameObject companionModel;
@@ -44,6 +46,8 @@ public class CompanionScript : MonoBehaviour
 
     void Start()
     {
+        animator = GetComponentInChildren<Animator>();
+
         if (AI == null)
             AI = GetComponent<NavMeshAgent>();
 
@@ -55,6 +59,12 @@ public class CompanionScript : MonoBehaviour
 
         stateOfCompanion = CompanionState.Follow;
         lastPosition = transform.position;
+
+        GameObject playerObject = GameObject.FindWithTag("Player");
+        if (playerObject != null)
+        {
+            player = playerObject.transform;
+        }
 
         // Make sure the companion is visible at start
         isVisible = true;
@@ -92,6 +102,9 @@ public class CompanionScript : MonoBehaviour
                 break;
         }
 
+        UpdateAnimation();
+
+
         // Check for key inputs using the customizable keys
         // CheckKeyInputs();
     }
@@ -123,6 +136,16 @@ public class CompanionScript : MonoBehaviour
             ToggleFollowing();
         }
     }*/
+
+    private void UpdateAnimation()
+    {
+        if (animator == null || AI == null)
+            return;
+
+        float speed = AI.velocity.magnitude;
+
+        animator.SetFloat("speed", speed);
+    }
 
     public void FollowPlayer()
     {
@@ -221,7 +244,8 @@ public class CompanionScript : MonoBehaviour
         Debug.Log("Companion teleported to: " + position);
     }
 
-    public void TeleportToPlayer()
+    // OLD METHOD, KEEPING IN CASE
+    /*public void TeleportToPlayer()
     {
         if (player != null)
         {
@@ -230,6 +254,36 @@ public class CompanionScript : MonoBehaviour
             Vector3 positionBehindPlayer = player.position - (playerForward * minDistanceToPlayer);
 
             TeleportToPosition(positionBehindPlayer);
+        }
+    }*/
+
+    public void TeleportToPlayer()
+    {
+        if (player != null)
+        {
+            Vector3 playerRight = player.right;
+            Vector3 playerLeft = -playerRight;
+
+            Vector3 targetPosition = teleportLeft ? player.position + playerLeft * minDistanceToPlayer : player.position + playerRight * minDistanceToPlayer;
+
+            teleportLeft = !teleportLeft;
+
+            TeleportToPosition(targetPosition);
+        }
+    }
+
+    public void FacePlayer()
+    {
+        if (player != null)
+        {
+            Vector3 directionToPlayer = player.position - transform.position;
+            directionToPlayer.y = 0; // Keep rotation flat on the Y axis
+
+            if (directionToPlayer != Vector3.zero)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(directionToPlayer);
+                transform.rotation = targetRotation;
+            }
         }
     }
 

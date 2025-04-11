@@ -4,10 +4,12 @@ using UnityEngine;
 using UnityEngine.Video;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using System;
 
 [CreateAssetMenu(fileName = "NewTip", menuName = "Game Tips/Tip")]
 public class Tip : ScriptableObject
 {
+    public string tipID;
     [TextArea(3, 5)]
     public string tipText;  // The text that will be displayed
     public VideoClip tipVideo;  // The video associated with the tip
@@ -19,15 +21,21 @@ public class Tip : ScriptableObject
     [Tooltip("Array of colours for the keybinds.")]
     public Color[] actionColors;
 
+    private void OnValidate()
+    {
+        if (string.IsNullOrEmpty(tipID))
+        {
+            tipID = Guid.NewGuid().ToString(); // Generate a unique ID
+        }
+    }
+
     public void UpdateSprite(GameObject iconObject, string actionName)
     {
         if (KeyBindingManager.Instance == null || iconObject == null || inputActions == null) return;
 
-        // Get the InputAction for the selected action
         InputAction action = inputActions.FindAction(actionName);
         if (action == null) return;
 
-        // Check the correct binding (controller or keyboard)
         int bindingIndex = KeyBindingManager.Instance.IsUsingController() ? 1 : 0;
         if (action.bindings.Count <= bindingIndex) return;
 
@@ -49,13 +57,12 @@ public class Tip : ScriptableObject
         Image imageComponent = iconObject.GetComponent<Image>();
         if (imageComponent == null)
         {
-            imageComponent = iconObject.AddComponent<Image>();  // Add Image component if not already present
+            imageComponent = iconObject.AddComponent<Image>();
         }
 
-        // Set the sprite based on whether we are using a controller or keyboard
+        // Set the sprite based on whether using a controller or keyboard
         imageComponent.sprite = isUsingController ? keyBinding.controllerSprite : keyBinding.keySprite;
 
-        // Add or get the Animator component
         Animator animator = iconObject.GetComponent<Animator>();
         if (animator == null)
         {

@@ -7,47 +7,45 @@ using System.Linq;
 
 public class InventoryManager : MonoBehaviour
 {
+    public static InventoryManager Instance;
+
     private List<InventorySlot> slots = new List<InventorySlot>();
     private int selectedSlotIndex = 0; // Currently selected inventory slot
-    private GameObject heldLeftHandItemInstance; // Instance of the item in the player's left hand
-    private GameObject heldRightHandItemInstance; // Instance of the item in the player's right hand
+    private GameObject heldLeftHandItemInstance;
+    private GameObject heldRightHandItemInstance;
     private Item currentItem;  // Reference to the currently equipped item
-    private bool isSwitchingDisabled = false; // Flag to disable item switching
-
-    private const float MaxSwitchableWeight = 10.0f; // Maximum weight allowed for switching
-    private const float WeightThreshold1 = 10.0f; // Weight threshold for first action
-    private const float WeightThreshold2 = 15.0f; // Weight threshold for second action
-
-    private GameObject playerController; // CHANGE TO ACTUAL PLAYER MOVEMENT SCRIPT LATER
-    // private PlayerClimbingState playerClimbingState;
 
     [Header("Setup Settings")]
-    public int defaultSlotCount = 4;  // Default number of inventory slots
-    public GameObject inventorySlotPrefab;  // Prefab for the inventory slots
-    public Transform inventoryPanel;  // UI panel for inventory display
-    public Transform leftHandPosition;  // Position for left hand item
-    public Transform rightHandPosition;  // Position for right hand item
+    public int defaultSlotCount = 4;
+    public GameObject inventorySlotPrefab;
+    public Transform inventoryPanel;
+    public Transform leftHandPosition;
+    public Transform rightHandPosition;
     [SerializeField] private TMP_Text updateText;
     private Coroutine currentCoroutine;
-    // public KeyCode dropKey = KeyCode.Q; // Key to drop an item
 
     [Header("Layer Setup")]
     public LayerMask groundLayer;
     [SerializeField] private LayerMask itemLayer;
 
     [Header("Keybinds")]
-    [SerializeField] private InputActionAsset inputActions;  // Input Action Asset
+    [SerializeField] private InputActionAsset inputActions;
     [SerializeField] private TMP_Text equippedItemText;
     [SerializeField] private string scrollActionName = "Inventory Scroll";
     [SerializeField] private string dropActionName = "Drop";
     [SerializeField] private string slotActionsName = "Slot";
-    [SerializeField] private float scrollCooldown = 0f; // Cooldown time (in seconds)
-    private float lastScrollTime = 0f; // Time when the last scroll occurred
+    [SerializeField] private float scrollCooldown = 0f; // Cooldown time
+    private float lastScrollTime = 0f;
     private InputAction scrollAction;
     private InputAction dropAction;
     private List<InputAction> slotActions = new List<InputAction>();
 
 
+    // IF USING WEIGHT
+    private const float WeightThreshold1 = 10.0f; // Weight threshold for first action
+    private const float WeightThreshold2 = 15.0f; // Weight threshold for second action
+    private const float MaxSwitchableWeight = 10.0f; // Maximum weight allowed for switching
+    private bool isSwitchingDisabled = false; // Flag to disable item switching
 
     private ClimbingSystem climbingSystem;
 
@@ -90,36 +88,79 @@ public class InventoryManager : MonoBehaviour
                 slotAction.Enable();
             }
         }
+
+        if (Instance == null)
+        {
+            Instance = this;
+        }
     }
 
     private void Start()
     {
-        /*DisableScriptsOnInventoryItems();
-        CreateSlots(defaultSlotCount);
+        SelectSlot(0, -1);
 
-        scrollAction = inputActions.FindAction(scrollActionName);
-        dropAction = inputActions.FindAction(dropActionName);
+        UpdateSlotImageForAllSlots(selectedSlotIndex);
+    }
 
-        if (scrollAction != null)
+    public void SaveInventory()
+    {
+        for (int i = 0; i < slots.Count; i++)
         {
-            scrollAction.Enable();
-        }
-
-        if (dropAction != null)
-        {
-            dropAction.Enable();
-        }
-
-        for (int i = 0; i < defaultSlotCount; i++)
-        {
-            string actionName = slotActionsName + (i + 1); 
-            InputAction slotAction = inputActions.FindAction(actionName);
-            if (slotAction != null)
+            // Save item in the current slot
+            Item item = slots[i].GetItem();
+            if (item != null)
             {
-                slotActions.Add(slotAction);
-                slotAction.Enable();
+                PlayerPrefs.SetString("Inventory_Slot_" + i, item.name);
             }
-        }*/
+            else
+            {
+                PlayerPrefs.SetString("Inventory_Slot_" + i, "");
+            }
+        }
+        PlayerPrefs.SetInt("SelectedSlotIndex", selectedSlotIndex);
+        PlayerPrefs.Save();
+    }
+
+    public void LoadInventory(List<string> inventoryItems)
+    {
+        for (int i = 0; i < inventoryItems.Count; i++)
+        {
+            string itemName = inventoryItems[i];
+            Item item = FindItemByName(itemName); // Find the item by name
+            if (item != null && i < slots.Count)
+            {
+                slots[i].AddItem(item); // Add item to the corresponding slot
+            }
+            else
+            {
+                Debug.LogWarning($"Item {itemName} not found or slot index out of range.");
+            }
+        }
+
+        // Load selected slot index if available
+        selectedSlotIndex = PlayerPrefs.GetInt("SelectedSlotIndex", 0);
+        UpdateSlotImageForAllSlots(selectedSlotIndex); // Update the UI
+    }
+
+    public List<string> GetInventoryIDs()
+    {
+        List<string> itemIDs = new List<string>();
+
+        foreach (InventorySlot slot in slots)
+        {
+            Item item = slot.GetItem();
+            if (item != null)
+            {
+                itemIDs.Add(item.itemName);
+            }
+        }
+
+        return itemIDs;
+    }
+
+    private Item FindItemByName(string itemName)
+    {
+        return ItemDatabase.Instance.GetItemByName(itemName);
     }
 
     private void Update()
