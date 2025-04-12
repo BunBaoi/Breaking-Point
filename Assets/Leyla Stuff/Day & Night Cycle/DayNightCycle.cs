@@ -10,6 +10,8 @@ public class SunriseSunsetTimes
 
 public class DayNightCycle : MonoBehaviour
 {
+    public static DayNightCycle Instance;
+
     [Header("Time Settings")]
     public int day = 1; // Track in-game days
     public int hours = 6;
@@ -65,6 +67,14 @@ public class DayNightCycle : MonoBehaviour
 
     private float timer = 0f;
     [SerializeField] private bool isTimeRunning = true;
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+    }
 
     private void Start()
     {

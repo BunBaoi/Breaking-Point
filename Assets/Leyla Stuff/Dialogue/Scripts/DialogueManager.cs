@@ -993,6 +993,26 @@ public class DialogueManager : MonoBehaviour
 
                     // Set the pitch and start the sound
                     currentSound.setPitch(pitch);
+
+                    // Try to find the NPC GameObject
+                    GameObject targetObject = null;
+
+                    if (!string.IsNullOrEmpty(node.npcName))
+                    {
+                        targetObject = GameObject.Find(node.npcName);
+                    }
+
+                    // Fallback to player if NPC is not found or name is null
+                    if (targetObject == null)
+                    {
+                        targetObject = GameObject.FindWithTag("Player");
+                    }
+
+                    if (targetObject != null)
+                    {
+                        currentSound.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(targetObject.transform));
+                    }
+
                     currentSound.start();
                 }
             }
@@ -1264,6 +1284,26 @@ public class DialogueManager : MonoBehaviour
                         currentSound = FMODUnity.RuntimeManager.CreateInstance(soundEventReference);
                         float pitch = Mathf.Lerp(audioSettings.minPitch, audioSettings.maxPitch, Mathf.Abs(npcHash % 100) / 100f);
                         currentSound.setPitch(pitch);
+
+                        // Try to find the NPC GameObject
+                        GameObject targetObject = null;
+
+                        if (!string.IsNullOrEmpty(node.npcName))
+                        {
+                            targetObject = GameObject.Find(node.npcName);
+                        }
+
+                        // Fallback to player if NPC is not found or name is null
+                        if (targetObject == null)
+                        {
+                            targetObject = GameObject.FindWithTag("Player");
+                        }
+
+                        if (targetObject != null)
+                        {
+                            currentSound.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(targetObject.transform));
+                        }
+
                         currentSound.start();
                     }
                 }

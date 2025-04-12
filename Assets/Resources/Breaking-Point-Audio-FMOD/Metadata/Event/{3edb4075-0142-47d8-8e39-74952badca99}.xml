@@ -5,7 +5,7 @@
 			<value>LowPitch 26</value>
 		</property>
 		<property name="outputFormat">
-			<value>0</value>
+			<value>2</value>
 		</property>
 		<relationship name="folder">
 			<destination>{fac671b2-f5e8-4db0-9b8d-3e84869527bd}</destination>
@@ -97,9 +97,11 @@
 	<object class="MixerBusEffectChain" id="{2b546ebf-a544-4108-bcec-e55764584570}">
 		<relationship name="effects">
 			<destination>{6afe861e-bfa1-4108-9e8a-0b737ae9d058}</destination>
+			<destination>{a1382231-a3a4-4b3b-841a-50a647e76a06}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{2ed77be2-7c17-430d-bd91-cc135548286f}" />
 	<object class="MixerBusFader" id="{73e4c06d-9e28-419d-9a4a-5260d61470fc}" />
 	<object class="MixerBusFader" id="{6afe861e-bfa1-4108-9e8a-0b737ae9d058}" />
+	<object class="SpatialiserEffect" id="{a1382231-a3a4-4b3b-841a-50a647e76a06}" />
 </objects>

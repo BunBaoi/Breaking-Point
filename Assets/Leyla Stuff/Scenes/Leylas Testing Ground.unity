@@ -1138,6 +1138,7 @@ Transform:
   m_Children:
   - {fileID: 887406135}
   - {fileID: 1914232655}
+  - {fileID: 1121246637}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &665777190
@@ -1355,17 +1356,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &738882447 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4879959143357860729, guid: d0ae1c84917b04d1daf215d126cf78c3, type: 3}
-  m_PrefabInstance: {fileID: 1072337087}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &739537688
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1992,7 +1982,7 @@ GameObject:
   - component: {fileID: 1121246634}
   - component: {fileID: 1121246633}
   m_Layer: 0
-  m_Name: Test NPC Dialogue
+  m_Name: Wise Climber
   m_TagString: NPC
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2102,14 +2092,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1121246632}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 7.34, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2021137446}
   - {fileID: 1852636541}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 586281057}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!223 &1150922513 stripped
 Canvas:
@@ -4027,7 +4017,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2909218889413746572, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
       propertyPath: m_Name
-      value: Player
+      value: Alice
       objectReference: {fileID: 0}
     - target: {fileID: 5640561513350414487, guid: d0d07e41557754c75b65aa31b3c22fea, type: 3}
       propertyPath: m_LocalPosition.x
@@ -4295,7 +4285,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7807269928673555792, guid: e30d62d1874f04b2ea0a8dc47469bc01, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 5.77
+      value: 5.55
       objectReference: {fileID: 0}
     - target: {fileID: 7807269928673555792, guid: e30d62d1874f04b2ea0a8dc47469bc01, type: 3}
       propertyPath: m_LocalRotation.w
@@ -4612,7 +4602,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2769650652238981293, guid: 24d8c550d574ebd419bafc8398b274d8, type: 3}
       propertyPath: m_Name
-      value: Companion
+      value: Phillip
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4688,10 +4678,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Sun - Directional Light
       objectReference: {fileID: 0}
-    - target: {fileID: 1090838556781361173, guid: 04a0c889f20c849e49b28859a5803b02, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 4232604424144538969, guid: 04a0c889f20c849e49b28859a5803b02, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -4732,10 +4718,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7625807044283915388, guid: 04a0c889f20c849e49b28859a5803b02, type: 3}
-      propertyPath: timeText
-      value: 
-      objectReference: {fileID: 738882447}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4750,7 +4732,6 @@ SceneRoots:
   - {fileID: 8555520815988759550}
   - {fileID: 171742233}
   - {fileID: 1928149231}
-  - {fileID: 1121246637}
   - {fileID: 226607983}
   - {fileID: 1447703856}
   - {fileID: 198756513}

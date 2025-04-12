@@ -520,7 +520,7 @@ public class BedManager : MonoBehaviour
             PlayerStats.Instance.ReplenishEnergy(100f);
             PlayerStats.Instance.FadeIn();
             SaveManager.Instance.SaveGame();
-            dayNightCycle.StartTime();
+            DayNightCycle.Instance.StartTime();
             cameraController.SetLookState(true);
             playerMovement.SetMovementState(true);
             if (characterController != null)
@@ -650,7 +650,7 @@ public class BedManager : MonoBehaviour
         SaveManager.Instance.SaveGame();
         cameraController.SetLookState(true);
         playerMovement.SetMovementState(true);
-        dayNightCycle.StartTime();
+        DayNightCycle.Instance.StartTime();
         hasSetTime = false;
 
         isInteracting = false; // Allow new interactions
@@ -671,8 +671,8 @@ public class BedManager : MonoBehaviour
 
         if (!hasSetTime)
         {
-            dayNightCycle.SetTime(6, 00, true); // Set time
-            dayNightCycle.StopTime();
+            DayNightCycle.Instance.SetTime(6, 00, true); // Set time
+            DayNightCycle.Instance.StopTime();
             hasSetTime = true;
         }
     }
