@@ -351,7 +351,8 @@ public class BedManager : MonoBehaviour
         Debug.DrawRay(ray.origin, ray.direction * 3f, Color.red, 1f); // Visualize the ray
 
         // Only perform the raycast once
-        if (Physics.Raycast(ray, out hit, 3f, ~0, QueryTriggerInteraction.Ignore))
+        int layerMask = ~LayerMask.GetMask("Ignore Raycast");
+        if (Physics.Raycast(ray, out hit, 3f, layerMask, QueryTriggerInteraction.Ignore))
         {
             // Check for the Bed Mesh and inTrigger condition
             if (hit.collider.CompareTag(bedTag) && inTrigger)

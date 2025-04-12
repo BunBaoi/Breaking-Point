@@ -11,7 +11,6 @@ public class OxygenRechargeStation : MonoBehaviour
     [SerializeField] private float refillRate = 1f; // Default refill rate per second
     [SerializeField] private bool isRefilling = false;
     [SerializeField] private bool isPlayerInTrigger = false;
-    [SerializeField] private PlayerStats playerStats;
 
     [Header("Interact Text Settings")]
     [SerializeField] private GameObject interactTextPrefab;
@@ -130,12 +129,12 @@ public class OxygenRechargeStation : MonoBehaviour
 
         private void StartRefilling()
     {
-        if (playerStats != null && IsLookingAtOxygenStation())
+        if (PlayerStats.Instance != null && IsLookingAtOxygenStation())
         {
             Debug.Log("Refilling oxygen...");
             isRefilling = true;
 
-            if (!isRefillSoundPlaying && playerStats.Oxygen < 100)
+            if (!isRefillSoundPlaying && PlayerStats.Instance.Oxygen < 100)
             {
                 refillSoundInstance.start();
                 isRefillSoundPlaying = true;
@@ -285,7 +284,6 @@ public class OxygenRechargeStation : MonoBehaviour
     {
         if (other.CompareTag("Player") && IsHoldingRequiredItem())
         {
-            playerStats = other.GetComponent<PlayerStats>();
             player = other.transform;
             isPlayerInTrigger = true;
             Debug.Log("player entered oxygen refill trigger");
@@ -433,13 +431,13 @@ if (interactTextInstance != null && !IsHoldingRequiredItem() && !IsLookingAtOxyg
 
     private IEnumerator RefillOxygen()
     {
-        while (isRefilling && playerStats != null && playerStats.Oxygen < 100)
+        while (isRefilling && PlayerStats.Instance != null && PlayerStats.Instance.Oxygen < 100)
         {
-            playerStats.Oxygen += refillRate * Time.deltaTime;
+            PlayerStats.Instance.Oxygen += refillRate * Time.deltaTime;
 
-            playerStats.Oxygen = Mathf.Min(playerStats.Oxygen, 100f);
+            PlayerStats.Instance.Oxygen = Mathf.Min(PlayerStats.Instance.Oxygen, 100f);
 
-            if (playerStats.Oxygen >= 100f && isRefillSoundPlaying)
+            if (PlayerStats.Instance.Oxygen >= 100f && isRefillSoundPlaying)
             {
                 refillSoundInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
                 isRefillSoundPlaying = false;
