@@ -284,6 +284,20 @@ public class CinematicSequence : MonoBehaviour
     private FMOD.Studio.EventInstance PlayDialogueSoundEvent(EventReference soundEvent)
     {
         FMOD.Studio.EventInstance eventInstance = RuntimeManager.CreateInstance(soundEvent);
+
+        // Get the FMOD listener
+        GameObject listener = GameObject.FindGameObjectWithTag("PlayerCamera");
+
+        if (listener != null)
+        {
+            // Set the 3D attributes to the listener's position
+            eventInstance.set3DAttributes(RuntimeUtils.To3DAttributes(listener.transform));
+        }
+        else
+        {
+            Debug.LogWarning("Listener not found! Sound will not be positioned.");
+        }
+
         eventInstance.start();
         return eventInstance;
     }

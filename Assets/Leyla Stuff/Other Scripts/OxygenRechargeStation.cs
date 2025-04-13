@@ -39,14 +39,14 @@ public class OxygenRechargeStation : MonoBehaviour
 
     private void Start()
     {
-        GameObject player = GameObject.Find("Player");
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
             inventoryManager = player.GetComponent<InventoryManager>();
         }
 
         refillSoundInstance = RuntimeManager.CreateInstance(refillSoundEvent);
-        RuntimeManager.AttachInstanceToGameObject(refillSoundInstance, transform, GetComponent<Rigidbody>());
+        RuntimeManager.AttachInstanceToGameObject(refillSoundInstance, transform);
     }
 
     private void OnEnable()

@@ -83,6 +83,7 @@ public class DialogueManager : MonoBehaviour
     private Coroutine currentLookAtNpcCoroutine;
     private Coroutine scrollingCoroutine;
     private Coroutine indicatorCoroutine;
+    private string currentNpcTag = null;
 
     private List<GameObject> instantiatedButtons = new List<GameObject>();
 
@@ -833,20 +834,20 @@ public class DialogueManager : MonoBehaviour
     {
         if (!string.IsNullOrEmpty(node.npcTag))
         {
-            // Find all NPCs with the given tag
+            currentNpcTag = node.npcTag; // Update the current tag
+
             GameObject[] npcs = GameObject.FindGameObjectsWithTag(node.npcTag);
             if (npcs.Length > 0)
             {
                 GameObject closestNpc = null;
-                float closestDistance = Mathf.Infinity; // Start with a very large distance
+                float closestDistance = Mathf.Infinity;
 
-                // Find the closest NPC
                 GameObject player = GameObject.FindGameObjectWithTag("Player");
+
                 foreach (GameObject npc in npcs)
                 {
                     if (npc != null && player != null)
                     {
-                        // Calculate the distance from the player to the center of the NPC
                         Vector3 npcCenter = npc.transform.position;
                         float distance = Vector3.Distance(player.transform.position, npcCenter);
 
@@ -858,22 +859,29 @@ public class DialogueManager : MonoBehaviour
                     }
                 }
 
-                // If closest NPC found, start the look at NPC process
                 if (closestNpc != null)
                 {
                     if (currentLookAtNpcCoroutine != null)
-                    {
                         StopCoroutine(currentLookAtNpcCoroutine);
-                    }
 
-                    // Start a new coroutine to look at the closest NPC
-                    currentLookAtNpcCoroutine = StartCoroutine(SmoothLookAtNpc(closestNpc));
+                    currentLookAtNpcCoroutine = StartCoroutine(SmoothLookAtNpc(closestNpc, currentNpcTag));
                 }
+            }
+        }
+        else
+        {
+            // Stop if NPC tag is null/empty
+            currentNpcTag = null;
+
+            if (currentLookAtNpcCoroutine != null)
+            {
+                StopCoroutine(currentLookAtNpcCoroutine);
+                currentLookAtNpcCoroutine = null;
             }
         }
     }
 
-    private IEnumerator SmoothLookAtNpc(GameObject npc)
+    private IEnumerator SmoothLookAtNpc(GameObject npc, string tagAtStart)
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         GameObject cameraObject = GameObject.FindGameObjectWithTag("PlayerCamera");
@@ -882,44 +890,30 @@ public class DialogueManager : MonoBehaviour
         {
             mainCamera = cameraObject.GetComponent<Camera>();
         }
+
         if (npc != null && mainCamera != null && player != null)
         {
-            // Calculate the position to look at
-            Vector3 npcHeadPosition = npc.transform.position + Vector3.up * 1.7f; // Can be adjusted based on NPC Mesh to look at head
-
-            // Calculate the direction vector from the camera to the NPC's head
-            Vector3 targetDirection = npcHeadPosition - mainCamera.transform.position;
-
-            // Calculate the target rotation based on the direction (this will affect both yaw and pitch)
-            Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
-
             CameraController cameraController = mainCamera.GetComponent<CameraController>();
+            float smoothSpeed = 2f;
 
-            // Smoothly rotate the camera to the target rotation
-            while (Quaternion.Angle(mainCamera.transform.rotation, targetRotation) > 0.1f)
+            while (currentNpcTag == tagAtStart && !string.IsNullOrEmpty(currentNpcTag))
             {
-                // Smoothly rotate the camera horizontally (yaw) and vertically (pitch)
+                Transform head = npc.transform.Find("Head");
+                Vector3 npcHeadPosition = head != null ? head.position : npc.transform.position + Vector3.up * 1.0f;
+
+                Vector3 targetDirection = npcHeadPosition - mainCamera.transform.position;
+                Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
+
                 Quaternion currentRotation = mainCamera.transform.rotation;
+                float targetYaw = Mathf.LerpAngle(currentRotation.eulerAngles.y, targetRotation.eulerAngles.y, Time.deltaTime * smoothSpeed);
+                float targetPitch = Mathf.LerpAngle(cameraController.xRotation, targetRotation.eulerAngles.x, Time.deltaTime * smoothSpeed);
 
-                // Smoothly interpolate the yaw (horizontal rotation) towards the target yaw
-                float targetYaw = Mathf.LerpAngle(currentRotation.eulerAngles.y, targetRotation.eulerAngles.y, Time.deltaTime * 2f);
-                float targetPitch = Mathf.LerpAngle(cameraController.xRotation, targetRotation.eulerAngles.x, Time.deltaTime * 2f);
-
-                // Apply the smooth yaw (horizontal) and pitch (vertical) to the camera
                 mainCamera.transform.rotation = Quaternion.Euler(targetPitch, targetYaw, 0);
-
-                // Also rotate the player (body) to face the NPC (yaw only)
                 player.transform.rotation = Quaternion.Euler(0, targetYaw, 0);
-
-                // Update the camera's xRotation to reflect the smooth pitch (vertical rotation)
                 cameraController.xRotation = targetPitch;
 
                 yield return null;
             }
-
-            // Final alignment with the NPC's head (ensure no overshooting)
-            mainCamera.transform.rotation = targetRotation;
-            player.transform.rotation = Quaternion.Euler(0, targetRotation.eulerAngles.y, 0);
         }
     }
 
