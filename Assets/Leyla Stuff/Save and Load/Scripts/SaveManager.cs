@@ -17,6 +17,7 @@ public class SaveManager : MonoBehaviour
     [SerializeField] private Image saveImage;
     [SerializeField] private float rotationSpeed = 100f;
 
+
     private void Awake()
     {
         if (Instance == null)
@@ -145,6 +146,12 @@ public class SaveManager : MonoBehaviour
         {
             bool dialogueProgress = DialogueManager.Instance.GetDialogueProgress(dialogueID);
             data.dialogueStates.Add(new DialogueState(dialogueID, dialogueProgress));
+        }
+
+        // Save completed cutscenes
+        foreach (string cutsceneID in CutsceneTracker.Instance.GetCompletedCutsceneIDs())
+        {
+            data.completedCutsceneIDs.Add(cutsceneID);
         }
 
         // Save oxygen and energy stats
@@ -386,6 +393,12 @@ public class SaveManager : MonoBehaviour
             {
                 Debug.LogWarning($"DialogueManager not found. Failed to restore dialogue progress for {dialogueState.dialogueID}.");
             }
+        }
+
+        // Restore completed cutscenes
+        foreach (string cutsceneID in data.completedCutsceneIDs)
+        {
+            CutsceneTracker.Instance.MarkCutsceneAsCompleted(cutsceneID);
         }
 
         // Restore shown tip IDs

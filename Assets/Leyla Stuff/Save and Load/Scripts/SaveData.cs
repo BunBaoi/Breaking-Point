@@ -31,9 +31,12 @@ public class SaveData
 
     [Header("Journal Pages")]
     public List<string> journalPageIDs = new List<string>();
+
+    [Header("Cutscenes")]
+    public List<string> completedCutsceneIDs = new List<string>(); // List of completed cutscenes
 }
 
-    [Serializable]
+[Serializable]
     public struct SerializableVector3
     {
         public float x, y, z;

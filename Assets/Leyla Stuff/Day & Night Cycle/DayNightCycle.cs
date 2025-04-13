@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 [System.Serializable]
 public class SunriseSunsetTimes
@@ -79,8 +80,69 @@ public class DayNightCycle : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (directionalLight != null)
+        {
+            RenderSettings.sun = directionalLight;
+        }
+
+        UpdateLighting();
+
+        SetInitialSkyboxState();
+    }
+
+    private void SetInitialSkyboxState()
+    {
+        int currentTotalMinutes = hours * 60 + minutes;
+        int sunriseTotalMinutes = sunriseTime.hour * 60 + sunriseTime.minute;
+        int sunsetTotalMinutes = sunsetTime.hour * 60 + sunsetTime.minute;
+        int sunsetEndTotalMinutes = sunsetTotalMinutes + 30;
+        int sunriseEndTotalMinutes = sunriseTotalMinutes + 30;
+
+        if (currentTotalMinutes < sunriseTotalMinutes || currentTotalMinutes >= sunsetEndTotalMinutes)
+        {
+            currentSkyState = SkyState.Night;
+            RenderSettings.skybox = nightSkybox;
+        }
+        else if (currentTotalMinutes >= sunriseTotalMinutes && currentTotalMinutes < sunriseEndTotalMinutes)
+        {
+            currentSkyState = SkyState.Sunrise;
+            RenderSettings.skybox = sunriseSkybox;
+        }
+        else if (currentTotalMinutes >= sunriseEndTotalMinutes && currentTotalMinutes < sunsetTotalMinutes)
+        {
+            currentSkyState = SkyState.Day;
+            RenderSettings.skybox = daySkybox;
+        }
+        else
+        {
+            currentSkyState = SkyState.Sunset;
+            RenderSettings.skybox = sunsetSkybox;
+        }
+
+        // Optional: set default exposure and rotation
+        RenderSettings.skybox.SetFloat("_Exposure", exposureValue);
+        RenderSettings.skybox.SetFloat("_Rotation", skyboxRotation);
+    }
+
     private void Start()
     {
+        if (directionalLight != null)
+        {
+            RenderSettings.sun = directionalLight;
+        }
+
         UpdateTimeUI();
         UpdateLighting();
 
@@ -218,7 +280,7 @@ public class DayNightCycle : MonoBehaviour
             targetSkyState = SkyState.Sunset;
         }
 
-        Debug.Log($"Current Time: {currentTotalMinutes}, Target: {targetSkyState}, Current: {currentSkyState}");
+        // Debug.Log($"Current Time: {currentTotalMinutes}, Target: {targetSkyState}, Current: {currentSkyState}");
 
         if (targetSkyState != currentSkyState && !isTransitioningSkybox)
         {

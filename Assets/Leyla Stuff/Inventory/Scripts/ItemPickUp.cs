@@ -17,7 +17,7 @@ public class ItemPickUp : MonoBehaviour
 
     [Header("Interact Text")]
     [SerializeField] private GameObject interactTextPrefab;
-    [SerializeField] private float yAxis = 0.2f;
+    [SerializeField] private float yAxis = 0.4f;
     [SerializeField] private float defaultYAxis = 0.2f;
 
     [Header("Input Settings")]
