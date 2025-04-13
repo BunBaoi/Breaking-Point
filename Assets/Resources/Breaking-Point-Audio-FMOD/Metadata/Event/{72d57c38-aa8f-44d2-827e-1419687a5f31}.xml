@@ -5,7 +5,7 @@
 			<value>Oxygen Tank Gas Refill SFX</value>
 		</property>
 		<property name="outputFormat">
-			<value>1</value>
+			<value>2</value>
 		</property>
 		<relationship name="folder">
 			<destination>{fac671b2-f5e8-4db0-9b8d-3e84869527bd}</destination>
@@ -91,9 +91,11 @@
 	<object class="MixerBusEffectChain" id="{7c9bd0c2-a945-46d0-b30c-70d8853a9a88}">
 		<relationship name="effects">
 			<destination>{0964c94e-3b14-40c7-97e6-1e029a07948b}</destination>
+			<destination>{f9a0b9ed-469b-46ec-bebc-e6e1621d0692}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{bd89f861-90a7-4695-bc78-e31c4c988f9d}" />
 	<object class="MixerBusFader" id="{074cec74-d503-4869-b236-1056a93d5f53}" />
 	<object class="MixerBusFader" id="{0964c94e-3b14-40c7-97e6-1e029a07948b}" />
+	<object class="SpatialiserEffect" id="{f9a0b9ed-469b-46ec-bebc-e6e1621d0692}" />
 </objects>

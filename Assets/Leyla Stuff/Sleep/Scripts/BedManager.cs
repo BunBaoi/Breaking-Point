@@ -351,7 +351,8 @@ public class BedManager : MonoBehaviour
         Debug.DrawRay(ray.origin, ray.direction * 3f, Color.red, 1f); // Visualize the ray
 
         // Only perform the raycast once
-        if (Physics.Raycast(ray, out hit, 3f))
+        int layerMask = ~LayerMask.GetMask("Ignore Raycast");
+        if (Physics.Raycast(ray, out hit, 3f, layerMask, QueryTriggerInteraction.Ignore))
         {
             // Check for the Bed Mesh and inTrigger condition
             if (hit.collider.CompareTag(bedTag) && inTrigger)
@@ -442,9 +443,20 @@ public class BedManager : MonoBehaviour
             yield break;
         }
 
-        // Teleport player to the center of the bed's collider but slightly above it (use the collider's center)
-        Vector3 colliderCenter = bedCollider.bounds.center; // Center of the collider
-        Vector3 targetPosition = new Vector3(colliderCenter.x + xPositionOffset, colliderCenter.y + bedCollider.bounds.extents.y + yPositionOffset, colliderCenter.z + zPositionOffset); // Adjusted height above the bed
+        // Get the world-space center of the bed collider
+        Vector3 colliderCenter = bedCollider.bounds.center; // This gives the center in world space, considering rotation
+
+        // Adjust the position to be at the collider's center, accounting for rotation
+        Vector3 targetPosition = colliderCenter + bed.transform.up * (bedCollider.bounds.extents.y + yPositionOffset) +
+                                 bed.transform.right * xPositionOffset + bed.transform.forward * zPositionOffset;
+
+        // Position the player at the calculated target position
+        player.transform.position = targetPosition;
+
+        // Optionally, you can rotate the player to align with the bed's rotation if necessary
+        player.transform.rotation = bed.transform.rotation; // Align the player's rotation with the bed
+
+        Debug.Log($"Teleporting player to: {targetPosition}");
 
         // Disable the CharacterController while teleporting the player
         CharacterController characterController = player.GetComponent<CharacterController>();
@@ -509,7 +521,7 @@ public class BedManager : MonoBehaviour
             PlayerStats.Instance.ReplenishEnergy(100f);
             PlayerStats.Instance.FadeIn();
             SaveManager.Instance.SaveGame();
-            dayNightCycle.StartTime();
+            DayNightCycle.Instance.StartTime();
             cameraController.SetLookState(true);
             playerMovement.SetMovementState(true);
             if (characterController != null)
@@ -639,7 +651,7 @@ public class BedManager : MonoBehaviour
         SaveManager.Instance.SaveGame();
         cameraController.SetLookState(true);
         playerMovement.SetMovementState(true);
-        dayNightCycle.StartTime();
+        DayNightCycle.Instance.StartTime();
         hasSetTime = false;
 
         isInteracting = false; // Allow new interactions
@@ -660,8 +672,8 @@ public class BedManager : MonoBehaviour
 
         if (!hasSetTime)
         {
-            dayNightCycle.SetTime(6, 00, true); // Set time
-            dayNightCycle.StopTime();
+            DayNightCycle.Instance.SetTime(6, 00, true); // Set time
+            DayNightCycle.Instance.StopTime();
             hasSetTime = true;
         }
     }

@@ -317,7 +317,7 @@ public class ItemPickUp : MonoBehaviour
             LayerMask combinedMask = pickUpColliderLayer & ~itemLayer;
 
             // Perform a raycast to find the item in the center of the view
-            if (Physics.Raycast(ray, out hit, raycastDistance, combinedMask))
+            if (Physics.Raycast(ray, out hit, raycastDistance, combinedMask, QueryTriggerInteraction.Ignore))
             {
                 // Check if the hit collider matches the 'Pick Up Collider' child
                 if (IsHitOnPickUpCollider(hit.collider))

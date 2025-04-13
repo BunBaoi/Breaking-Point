@@ -159,14 +159,21 @@ public class PlayerMovement : MonoBehaviour
         canMove = state;
     }
 
-    // Animation event for Left Footstep
+    // Left Footstep
     public void PlayLeftFootstepSound()
     {
         if (leftFootstepEvents.Length == 0) return;
 
+        Transform footTransform = transform;
+
         EventReference soundEventReference = leftFootstepEvents[leftFootstepIndex];
 
         EventInstance footstepInstance = RuntimeManager.CreateInstance(soundEventReference);
+
+        // Set the 3D attributes for the footstep sound based on the foot's position
+        Vector3 footPosition = footTransform.position + new Vector3(0, 0, 0.3f);
+        footstepInstance.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(footPosition));
+
         footstepInstance.start();
         footstepInstance.release();
 
@@ -174,14 +181,21 @@ public class PlayerMovement : MonoBehaviour
         leftFootstepIndex = (leftFootstepIndex + 1) % leftFootstepEvents.Length;
     }
 
-    // Animation event for Right Footstep
+    // Right Footstep
     public void PlayRightFootstepSound()
     {
         if (rightFootstepEvents.Length == 0) return;
 
+        Transform footTransform = transform;
+
         EventReference soundEventReference = rightFootstepEvents[rightFootstepIndex];
 
         EventInstance footstepInstance = RuntimeManager.CreateInstance(soundEventReference);
+
+        // Set the 3D attributes for the footstep sound based on the foot's position
+        Vector3 footPosition = footTransform.position + new Vector3(0, 0, 0.3f);
+        footstepInstance.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(footPosition));
+
         footstepInstance.start();
         footstepInstance.release();
 
@@ -189,7 +203,6 @@ public class PlayerMovement : MonoBehaviour
         rightFootstepIndex = (rightFootstepIndex + 1) % rightFootstepEvents.Length;
     }
 
-    
     public void binocularZoom()
     {
         if (Input.GetKey(KeyCode.Z))

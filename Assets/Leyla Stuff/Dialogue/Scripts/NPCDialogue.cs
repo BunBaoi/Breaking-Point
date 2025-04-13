@@ -360,7 +360,7 @@ public class NPCDialogue : MonoBehaviour
         RaycastHit hit;
         Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
 
-        if (Physics.Raycast(ray, out hit, 3f))
+        if (Physics.Raycast(ray, out hit, 3f, ~0, QueryTriggerInteraction.Ignore))
         {
             Debug.Log("Raycast hit: " + hit.collider.name);
             if (hit.collider != null && hit.collider.gameObject.name == "NPC Mesh" && hit.collider.transform.IsChildOf(transform) && playerInRange)
@@ -426,6 +426,12 @@ public class NPCDialogue : MonoBehaviour
         if (npcDialogueTree != null)
         {
             DialogueManager.Instance.StartDialogue(npcDialogueTree);
+
+            if (CallingCompanionMethods.Instance != null)
+            {
+                CallingCompanionMethods.Instance.CallTeleportToPlayer();
+                CallingCompanionMethods.Instance.CallFacePlayer();
+            }
         }
     }
 

@@ -92,6 +92,12 @@ public class NPCDialogueTrigger : MonoBehaviour
             PlayerPrefs.SetInt(dialogueKey, 1);
             PlayerPrefs.Save();
             DialogueManager.Instance.StartDialogue(npcDialogueTree);
+
+            if (CallingCompanionMethods.Instance != null)
+            {
+                CallingCompanionMethods.Instance.CallTeleportToPlayer();
+                CallingCompanionMethods.Instance.CallFacePlayer();
+            }
         }
     }
 }

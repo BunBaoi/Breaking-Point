@@ -19,6 +19,13 @@ public class ActivateCutScene : MonoBehaviour
 
     private void Start()
     {
+        GameObject playerVirtualCameraObject = GameObject.FindGameObjectWithTag("PlayerVirtualCamera");
+
+        if (playerVirtualCameraObject != null)
+        {
+            playerCamera = playerVirtualCameraObject.GetComponent<CinemachineVirtualCamera>();
+        }
+
         // Store the original player camera priority
         originalPlayerPriority = playerCamera.Priority;
 
@@ -72,6 +79,8 @@ public class ActivateCutScene : MonoBehaviour
 
             // Disable the trigger collider
             GetComponent<BoxCollider>().enabled = false;
+
+            Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
         }
     }
 
