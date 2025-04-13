@@ -393,14 +393,15 @@ public class BedManager : MonoBehaviour
         }
     }
 
-        private IEnumerator HandleBedInteraction()
+    private IEnumerator HandleBedInteraction()
     {
         isInteracting = true;
-        
+
         GameObject playerObject = GameObject.FindGameObjectWithTag(playerTag);
 
         if (playerObject != null)
         {
+            // Disable inventory components
             inventoryManager = playerObject.GetComponent<InventoryManager>();
             if (inventoryManager != null)
             {
@@ -417,19 +418,35 @@ public class BedManager : MonoBehaviour
                     Debug.Log("Inventory Canvas disabled.");
                 }
             }
+
+            // Disable camera look controls
             GameObject playerCamera = GameObject.FindGameObjectWithTag("PlayerCamera");
             cameraController = playerCamera.GetComponent<CameraController>();
-
             if (cameraController != null)
             {
                 cameraController.SetLookState(false);
             }
 
+            // Disable player movement
             playerMovement = playerObject.GetComponent<PlayerMovement>();
-
             if (playerMovement != null)
             {
                 playerMovement.SetMovementState(false);
+            }
+
+            // NEW: Check for ClimbingSystem and disable it
+            ClimbingSystem climbingSystem = playerObject.GetComponent<ClimbingSystem>();
+            if (climbingSystem != null)
+            {
+                climbingSystem.enabled = false;
+            }
+
+            // NEW: Handle Rigidbody if it exists
+            Rigidbody playerRigidbody = playerObject.GetComponent<Rigidbody>();
+            if (playerRigidbody != null)
+            {
+                playerRigidbody.isKinematic = true; // Make rigidbody kinematic to prevent physics
+                playerRigidbody.velocity = Vector3.zero; // Zero out velocity
             }
 
             PlayerStats.Instance.FadeOut();
@@ -518,16 +535,40 @@ public class BedManager : MonoBehaviour
                 player.rotation = Quaternion.Slerp(player.rotation, uprightRotation, rotationSpeed * Time.deltaTime);
                 yield return null;
             }
+
+            // NEW: Reset player position slightly above the bed to prevent falling through
+            player.position = new Vector3(player.position.x, player.position.y + 0.1f, player.position.z);
+
             PlayerStats.Instance.ReplenishEnergy(100f);
             PlayerStats.Instance.FadeIn();
             SaveManager.Instance.SaveGame();
             DayNightCycle.Instance.StartTime();
+
+            // Re-enable character control components
             cameraController.SetLookState(true);
             playerMovement.SetMovementState(true);
+
             if (characterController != null)
             {
-                characterController.enabled = true; // Disable to avoid collision or unwanted behavior
+                characterController.enabled = true;
             }
+
+            // NEW: Reset rigidbody state
+            Rigidbody playerRigidbody = player.GetComponent<Rigidbody>();
+            if (playerRigidbody != null)
+            {
+                playerRigidbody.isKinematic = false;
+                playerRigidbody.velocity = Vector3.zero;
+                playerRigidbody.useGravity = true;
+            }
+
+            // Re-enable climbing system
+            ClimbingSystem climbingSystem = player.GetComponent<ClimbingSystem>();
+            if (climbingSystem != null)
+            {
+                climbingSystem.enabled = true;
+            }
+
             if (inventoryManager != null)
             {
                 inventoryManager.enabled = true;
@@ -635,6 +676,10 @@ public class BedManager : MonoBehaviour
                 cinematicSequence.OnCinematicFinished -= RotatePlayerUpright;
             }
         }
+
+        // NEW: Reset player position slightly above the bed to prevent falling through
+        player.position = new Vector3(player.position.x, player.position.y + 0.1f, player.position.z);
+
         PlayerStats.Instance.ReplenishEnergy(100f);
         PlayerStats.Instance.FadeIn();
 
@@ -643,11 +688,29 @@ public class BedManager : MonoBehaviour
             inventoryManager.enabled = true;
             inventoryCanvas.gameObject.SetActive(true);
         }
+
         CharacterController characterController = player.GetComponent<CharacterController>();
         if (characterController != null)
         {
-            characterController.enabled = true; // Disable to avoid collision or unwanted behavior
+            characterController.enabled = true;
         }
+
+        // NEW: Reset rigidbody state
+        Rigidbody playerRigidbody = player.GetComponent<Rigidbody>();
+        if (playerRigidbody != null)
+        {
+            playerRigidbody.isKinematic = false;
+            playerRigidbody.velocity = Vector3.zero;
+            playerRigidbody.useGravity = true;
+        }
+
+        // Re-enable climbing system
+        ClimbingSystem climbingSystem = player.GetComponent<ClimbingSystem>();
+        if (climbingSystem != null)
+        {
+            climbingSystem.enabled = true;
+        }
+
         SaveManager.Instance.SaveGame();
         cameraController.SetLookState(true);
         playerMovement.SetMovementState(true);
