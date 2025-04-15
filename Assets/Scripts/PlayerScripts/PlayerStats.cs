@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using TMPro;
 using FMOD.Studio;
 using FMODUnity;
+using Unity.VisualScripting;
 
 public class PlayerStats : MonoBehaviour
 {
@@ -409,7 +410,7 @@ public class PlayerStats : MonoBehaviour
                 Debug.Log("Status: OxygenZone");
                 break;
             case PlayerStatus.QTE:
-                Debug.Log("Status: QTE");
+                //Debug.Log("Status: QTE");
                 break;
 
         }
@@ -428,7 +429,7 @@ public class PlayerStats : MonoBehaviour
         if (other.CompareTag("Level2QTE.1"))
         {
             stateOfPlayer = PlayerStatus.QTE;
-            Debug.Log("Level2QTE.1 Enter");
+            //Debug.Log("Level2QTE.1 Enter");
         }
         if (other.CompareTag("EnergyDrain"))
         {
@@ -453,7 +454,7 @@ public class PlayerStats : MonoBehaviour
         if (other.CompareTag("Level2QTE.1"))
         {
             stateOfPlayer = PlayerStatus.QTE;
-            Debug.Log("Level2QTE.1 Enter");
+            //Debug.Log("Level2QTE.1 Enter");
         }
         if (other.CompareTag("EnergyDrain"))
         {
@@ -475,12 +476,12 @@ public class PlayerStats : MonoBehaviour
         {
             isInOxygenDrainZone = false;
             stateOfPlayer = PlayerStatus.FreeRoam;
-            Debug.Log("Exited Oxygen Drain Zone");
+            //Debug.Log("Exited Oxygen Drain Zone");
         }
         if (other.CompareTag("Level2QTE.1"))
         {
             stateOfPlayer = PlayerStatus.FreeRoam;
-            Debug.Log("Exited Level2QTE.1");
+            //Debug.Log("Exited Level2QTE.1");
         }
         if (other.CompareTag("EnergyDrain"))
         {
@@ -609,8 +610,8 @@ public IEnumerator MoveCube(Vector3 targetPosition) // targetPosition = Player <
     {
         Vector3 startPosition = qTEMechanicScript.objectPlayer.position;
         float timeElapsed = 0;
-        Debug.Log(startPosition); // The start position is where the game object starts and leave off from. From testing the qte object moves starts and moves from the player to "targeted position"
-        Debug.Log("Checkpoint Pos" + targetPosition); // "target" = "targetPosition"
+        //Debug.Log(startPosition); // The start position is where the game object starts and leave off from. From testing the qte object moves starts and moves from the player to "targeted position"
+        //Debug.Log("Checkpoint Pos" + targetPosition); // "target" = "targetPosition"
 
         while (timeElapsed < qTEMechanicScript.MoTSpeed)
         {
@@ -618,20 +619,27 @@ public IEnumerator MoveCube(Vector3 targetPosition) // targetPosition = Player <
             timeElapsed += Time.deltaTime;
             yield return null;
         }
-
-        if (qTEMechanicScript.PositionOfPlayer != QTEMechanicScript.PlayerPos.PlayerPos4)
+        if (qTEMechanicScript.Pos_STOP.tag == "QTEStop" && qTEMechanicScript.PositionOfPlayer == QTEMechanicScript.PlayerPos.PlayerPos3) //THIS STOPS QTE BY CHANGING THE ENUM 
         {
-            qTEvent.OpenreloadUI(); // PLAYING TWICE UPON QTE COMPLETION AND MOVE COMPLETION // UPDATE may not need to be fixed
-            qTEMechanicScript.QTEMechanicScriptActive = true; // KEY TO ACTIVATINE TIMER 
-        }
-        else
-        {
+            Debug.Log("Stop game here");
             qTEMechanicScript.QTEMechanicScriptActive = false;
             QTEState = false;
-            qTEMechanicScript.CHKPos4 = true;
             qTEMechanicScript.playerMovement.canMove = true;
-            Debug.Log("Player Movement Unlocked");
+
         }
+        if (qTEMechanicScript.QTEMechanicScriptActive == true) // CHANGE HEARRRRRRRRRR
+        {
+            qTEvent.OpenreloadUI(); // PLAYING TWICE UPON QTE COMPLETION AND MOVE COMPLETION // UPDATE may not need to be fixed
+            //qTEMechanicScript.QTEMechanicScriptActive = true; // KEY TO ACTIVATINE TIMER 
+        }
+        //else
+        //{
+        //    qTEMechanicScript.QTEMechanicScriptActive = false;
+        //    QTEState = false;
+        //    qTEMechanicScript.CHKPos4 = true;
+        //    qTEMechanicScript.playerMovement.canMove = true;
+        //    Debug.Log("Player Movement Unlocked");
+        //}
 
     }
 
