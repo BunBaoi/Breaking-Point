@@ -98,8 +98,8 @@ public class ClimbingSystem : MonoBehaviour
     private float rightDigInProgress = 0f;
 
     // Debug and state management
-    private bool isActivelyClimbing = false;
-    private bool isFirstClimbFrame = false; // Added to track first climb frame
+    public bool isActivelyClimbing = false;
+    public bool isFirstClimbFrame = false; // Added to track first climb frame
 
     private bool leftSoundPlayed = false;
     private bool rightSoundPlayed = false;

@@ -1,0 +1,121 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49d908a81e1ab4345bdb9ed5793418b1, type: 3}
+  m_Name: Going to Level 2
+  m_EditorClassIdentifier: 
+  treeID: 3459dc30-7935-4dcc-8388-5f0fa829f6db
+  dialogueNodes:
+  - dialogueText: Wakey wakey sleepy head!
+    dialogueAudio: {fileID: 11400000, guid: 7aa603cac70ac442cbe1e5af68e9852b, type: 2}
+    eventIds: []
+    options: []
+    npcName: Phillip
+    npcTag: Phillip
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+  - dialogueText: Ugh... What time is it...?
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
+    eventIds: []
+    options: []
+    npcName: Alice
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+  - dialogueText: "It's time to climb, Al! The summit\u2019s calling-  and\u2026
+      it says we\u2019re late."
+    dialogueAudio: {fileID: 11400000, guid: 7aa603cac70ac442cbe1e5af68e9852b, type: 2}
+    eventIds: []
+    options:
+    - optionText: I feel.. Nervous but excited
+      nextDialogueTree: {fileID: 11400000, guid: d1ffa3fdab2af4bc18f8fa25743e1f90, type: 2}
+    - optionText: 'I feel.. Nothing significant '
+      nextDialogueTree: {fileID: 11400000, guid: 731f80a67d0ae43beb602295e20b0ab3, type: 2}
+    npcName: Phillip
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+  - dialogueText: "There should be a sign just ahead- past all the tents. \u201CWay
+      to Summit\u201D Very subtle."
+    dialogueAudio: {fileID: 11400000, guid: 7aa603cac70ac442cbe1e5af68e9852b, type: 2}
+    eventIds: []
+    options: []
+    npcName: Phillip
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+  - dialogueText: "Then I guess\u2026 it\u2019s really starting."
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
+    eventIds: []
+    options: []
+    npcName: Alice
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+  - dialogueText: "Yep. You\u2019ve got this Al."
+    dialogueAudio: {fileID: 11400000, guid: 7aa603cac70ac442cbe1e5af68e9852b, type: 2}
+    eventIds: []
+    options: []
+    npcName: Phillip
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+  - dialogueText: "<b>We\u2019ve</b> got this."
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
+    eventIds:
+    - GoToLevel2
+    options: []
+    npcName: Alice
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 

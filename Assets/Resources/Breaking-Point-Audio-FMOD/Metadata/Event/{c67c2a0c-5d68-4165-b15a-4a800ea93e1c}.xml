@@ -5,7 +5,7 @@
 			<value>MediumPitch 9</value>
 		</property>
 		<property name="outputFormat">
-			<value>0</value>
+			<value>2</value>
 		</property>
 		<relationship name="folder">
 			<destination>{fac671b2-f5e8-4db0-9b8d-3e84869527bd}</destination>
@@ -94,9 +94,11 @@
 	<object class="MixerBusEffectChain" id="{44addeaa-a8a3-4e93-9b6d-a2ca1a36f4bf}">
 		<relationship name="effects">
 			<destination>{7511a6f7-fb84-455a-944f-ee6fdb6a3463}</destination>
+			<destination>{47d2e78a-35bf-4373-8aa7-e3405585e9ca}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{c64a4273-da6e-4b22-9e3a-088e8f12c674}" />
 	<object class="MixerBusFader" id="{206984ce-4f11-47f1-95c7-81d26eb25ffa}" />
 	<object class="MixerBusFader" id="{7511a6f7-fb84-455a-944f-ee6fdb6a3463}" />
+	<object class="SpatialiserEffect" id="{47d2e78a-35bf-4373-8aa7-e3405585e9ca}" />
 </objects>

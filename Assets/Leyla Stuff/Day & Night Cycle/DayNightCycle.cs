@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 [System.Serializable]
 public class SunriseSunsetTimes
@@ -10,16 +11,23 @@ public class SunriseSunsetTimes
 
 public class DayNightCycle : MonoBehaviour
 {
+    public static DayNightCycle Instance;
+
     [Header("Time Settings")]
     public int day = 1; // Track in-game days
     public int hours = 6;
     public int minutes = 0;
     [SerializeField] private float realSecondsPerGameMinute = 1f; // Every second increases time by 1 in-game minute
+    private float currentLightRotation;
 
     [Header("Light Settings")]
     [SerializeField] private Light directionalLight;
     [SerializeField] private Gradient lightColourGradient;
     [SerializeField] private AnimationCurve lightIntensityCurve;
+
+    [Header("Lantern Light Settings")]
+    [SerializeField] private LayerMask lanternLayerMask;
+    private Light[] lanternLights;
 
     [Header("Ambient Light Settings")]
     [SerializeField] private Gradient ambientColourGradient;
@@ -34,12 +42,21 @@ public class DayNightCycle : MonoBehaviour
     [SerializeField] private float nightRotation = 290f;
 
     [Header("Skybox Settings")]
+    [SerializeField] private Material sunriseSkybox;
     [SerializeField] private Material daySkybox;
     [SerializeField] private Material sunsetSkybox;
    [SerializeField] private Material nightSkybox;
-    [SerializeField] private float transitionDuration = 3f;
+    [SerializeField] private float transitionDuration = 1f;
     [SerializeField] private float rotationSpeed = 1f;
     private float skyboxRotation = 0f;
+    private enum SkyState { Sunrise, Day, Sunset, Night }
+    private SkyState currentSkyState;
+    private SkyState targetSkyState;
+    [SerializeField] private bool isTransitioningSkybox = false;
+    [SerializeField] private float transitionTimer = 0f;
+    private float exposureValue = 1f;
+    [SerializeField] private float transitionExposure = 0f; // The value exposure goes to during skybox change
+    [SerializeField] private float endingExposure = 1f;
 
     [Header("Fog Settings")]
     [SerializeField] private Color fogColorAtSunset = Color.gray;
@@ -55,10 +72,82 @@ public class DayNightCycle : MonoBehaviour
     private float timer = 0f;
     [SerializeField] private bool isTimeRunning = true;
 
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+    }
+
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (directionalLight != null)
+        {
+            RenderSettings.sun = directionalLight;
+        }
+
+        UpdateLighting();
+
+        SetInitialSkyboxState();
+    }
+
+    private void SetInitialSkyboxState()
+    {
+        int currentTotalMinutes = hours * 60 + minutes;
+        int sunriseTotalMinutes = sunriseTime.hour * 60 + sunriseTime.minute;
+        int sunsetTotalMinutes = sunsetTime.hour * 60 + sunsetTime.minute;
+        int sunsetEndTotalMinutes = sunsetTotalMinutes + 30;
+        int sunriseEndTotalMinutes = sunriseTotalMinutes + 30;
+
+        if (currentTotalMinutes < sunriseTotalMinutes || currentTotalMinutes >= sunsetEndTotalMinutes)
+        {
+            currentSkyState = SkyState.Night;
+            RenderSettings.skybox = nightSkybox;
+        }
+        else if (currentTotalMinutes >= sunriseTotalMinutes && currentTotalMinutes < sunriseEndTotalMinutes)
+        {
+            currentSkyState = SkyState.Sunrise;
+            RenderSettings.skybox = sunriseSkybox;
+        }
+        else if (currentTotalMinutes >= sunriseEndTotalMinutes && currentTotalMinutes < sunsetTotalMinutes)
+        {
+            currentSkyState = SkyState.Day;
+            RenderSettings.skybox = daySkybox;
+        }
+        else
+        {
+            currentSkyState = SkyState.Sunset;
+            RenderSettings.skybox = sunsetSkybox;
+        }
+
+        // Optional: set default exposure and rotation
+        RenderSettings.skybox.SetFloat("_Exposure", exposureValue);
+        RenderSettings.skybox.SetFloat("_Rotation", skyboxRotation);
+    }
+
     private void Start()
     {
+        if (directionalLight != null)
+        {
+            RenderSettings.sun = directionalLight;
+        }
+
         UpdateTimeUI();
         UpdateLighting();
+
+        targetSkyState = SkyState.Sunrise;
+        RenderSettings.skybox = sunriseSkybox;
     }
 
     private void Update()
@@ -70,13 +159,52 @@ public class DayNightCycle : MonoBehaviour
             {
                 timer = 0f;
                 ProgressTime();
-                UpdateLighting();
 
                 // Only update UI if the minutes are divisible by 10
                 if (minutes % 10 == 0)
                 {
                     UpdateTimeUI();
                 }
+            }
+        }
+        UpdateLighting();
+        HandleLanternLights();
+    }
+
+    private void HandleLanternLights()
+    {
+        int currentTotalMinutes = hours * 60 + minutes;
+        int lightOffTimeMinutes = 7 * 60 + 30; // 7:30 AM
+        int lightOnTimeMinutes = 16 * 60;      // 4:00 PM
+
+        // Enable lights from 16:00 (4:00 PM) until 7:30 AM next day
+        if (currentTotalMinutes >= lightOnTimeMinutes || currentTotalMinutes < lightOffTimeMinutes)
+        {
+            ToggleLanternLights(true);
+        }
+        else
+        {
+            ToggleLanternLights(false);
+        }
+    }
+
+    private void ToggleLanternLights(bool enable)
+    {
+        if (lanternLights == null || lanternLights.Length == 0)
+        {
+            lanternLights = FindObjectsOfType<Light>();
+
+            // Ensure lights in the lantern layer are found
+            lanternLights = System.Array.FindAll(lanternLights, light => ((1 << light.gameObject.layer) & lanternLayerMask) != 0);
+        }
+
+        if (lanternLights.Length == 0) return;
+
+        foreach (var lanternLight in lanternLights)
+        {
+            if (((1 << lanternLight.gameObject.layer) & lanternLayerMask) != 0)
+            {
+                lanternLight.enabled = enable;
             }
         }
     }
@@ -103,51 +231,108 @@ public class DayNightCycle : MonoBehaviour
         int sunriseTotalMinutes = sunriseTime.hour * 60 + sunriseTime.minute;
         int sunsetTotalMinutes = sunsetTime.hour * 60 + sunsetTime.minute;
         int sunsetEndTotalMinutes = sunsetTotalMinutes + 30;
+        int sunriseEndTotalMinutes = sunriseTotalMinutes + 30;
 
         if (directionalLight != null)
         {
             directionalLight.color = lightColourGradient.Evaluate(currentTotalMinutes / 1440f);
             directionalLight.intensity = lightIntensityCurve.Evaluate(currentTotalMinutes / 1440f);
 
-            float lightRotation;
+            float targetRotation;
+
             if (currentTotalMinutes < sunriseTotalMinutes)
             {
-                lightRotation = sunriseRotation;
+                targetRotation = sunriseRotation;
             }
             else if (currentTotalMinutes < sunsetTotalMinutes)
             {
                 float t = Mathf.InverseLerp(sunriseTotalMinutes, sunsetTotalMinutes, currentTotalMinutes);
-                lightRotation = Mathf.Lerp(sunriseRotation, sunsetRotation, t);
+                targetRotation = Mathf.Lerp(sunriseRotation, sunsetRotation, t);
             }
             else
             {
                 float t = Mathf.InverseLerp(sunsetTotalMinutes, 1440, currentTotalMinutes);
-                lightRotation = Mathf.Lerp(sunsetRotation, nightRotation, t);
+                targetRotation = Mathf.Lerp(sunsetRotation, nightRotation, t);
             }
 
-            directionalLight.transform.rotation = Quaternion.Euler(new Vector3(lightRotation, 170f, 0));
+            // Smoothly rotate the directional light
+            currentLightRotation = Mathf.LerpAngle(currentLightRotation, targetRotation, Time.deltaTime * rotationSpeed);
+            directionalLight.transform.rotation = Quaternion.Euler(new Vector3(currentLightRotation, 170f, 0));
         }
 
-        RenderSettings.ambientLight = ambientColourGradient.Evaluate(currentTotalMinutes / 1440f);
+    RenderSettings.ambientLight = ambientColourGradient.Evaluate(currentTotalMinutes / 1440f);
 
         // === SKYBOX SWITCHING ===
         if (currentTotalMinutes < sunriseTotalMinutes || currentTotalMinutes >= sunsetEndTotalMinutes)
         {
-            // Night (before sunrise or after sunset and after the sunset period)
-            RenderSettings.skybox = nightSkybox;
+            targetSkyState = SkyState.Night;
         }
-        else if (currentTotalMinutes >= sunriseTotalMinutes && currentTotalMinutes < sunsetTotalMinutes)
+        else if (currentTotalMinutes >= sunriseTotalMinutes && currentTotalMinutes < sunriseEndTotalMinutes)
         {
-            // Day (between sunrise and sunset)
-            RenderSettings.skybox = daySkybox;
+            targetSkyState = SkyState.Sunrise;
         }
-        else if (currentTotalMinutes >= sunsetTotalMinutes && currentTotalMinutes < sunsetEndTotalMinutes)
+        else if (currentTotalMinutes >= sunriseEndTotalMinutes && currentTotalMinutes < sunsetTotalMinutes)
         {
-            // Sunset (for the 30 minutes after sunset)
-            RenderSettings.skybox = sunsetSkybox;
+            targetSkyState = SkyState.Day;
+        }
+        else
+        {
+            targetSkyState = SkyState.Sunset;
         }
 
-        DynamicGI.UpdateEnvironment();
+        // Debug.Log($"Current Time: {currentTotalMinutes}, Target: {targetSkyState}, Current: {currentSkyState}");
+
+        if (targetSkyState != currentSkyState && !isTransitioningSkybox)
+        {
+            Debug.Log("Starting skybox transition...");
+            isTransitioningSkybox = true;
+            transitionTimer = 0f;
+        }
+
+        // Run transition
+        if (isTransitioningSkybox)
+        {
+            transitionTimer += Time.deltaTime;
+
+            if (transitionTimer < transitionDuration / 2f)
+            {
+                exposureValue = Mathf.Lerp(endingExposure, transitionExposure, transitionTimer / (transitionDuration / 2f));
+            }
+            else if (transitionTimer >= transitionDuration / 2f && transitionTimer < transitionDuration)
+            {
+                // Change skybox at halfway point
+                if (currentSkyState != targetSkyState)
+                {
+                    Debug.Log($"Switching skybox to: {targetSkyState}");
+
+                    switch (targetSkyState)
+                    {
+                        case SkyState.Sunrise: RenderSettings.skybox = sunriseSkybox; break;
+                        case SkyState.Day: RenderSettings.skybox = daySkybox; break;
+                        case SkyState.Sunset: RenderSettings.skybox = sunsetSkybox; break;
+                        case SkyState.Night: RenderSettings.skybox = nightSkybox; break;
+                    }
+
+                    currentSkyState = targetSkyState;
+                }
+
+                float t = (transitionTimer - transitionDuration / 2f) / (transitionDuration / 2f);
+                exposureValue = Mathf.Lerp(transitionExposure, endingExposure, t);
+            }
+            else
+            {
+                isTransitioningSkybox = false;
+                transitionTimer = 0f;
+                exposureValue = endingExposure;
+                Debug.Log("Skybox transition complete.");
+            }
+
+            RenderSettings.skybox.SetFloat("_Exposure", exposureValue);
+        }
+        else
+        {
+            RenderSettings.skybox.SetFloat("_Exposure", exposureValue);
+        }
 
         // Update skybox rotation based on the in-game time
         skyboxRotation += rotationSpeed * (Time.deltaTime / realSecondsPerGameMinute);

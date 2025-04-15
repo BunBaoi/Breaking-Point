@@ -23,8 +23,16 @@ public class MainMenuUI : MonoBehaviour
     [SerializeField] private float waitDuration = 0.5f;
     [SerializeField] private TMP_Text pressAnyKeyText;
     [SerializeField] private Button newGameButton;
+    [SerializeField] private Button loadGameButton;
+    [SerializeField] private bool triggeredAnyKeyPress = false;
 
-   private void Awake()
+    [SerializeField] private SceneTransitionController transitionController;
+    [SerializeField] private string newGameSceneName = "Level1";
+
+    private bool newGameClicked = false;
+    private bool loadGameClicked = false;
+
+    private void Awake()
     {
         anyKeyPressAction = inputActions.FindAction(anyKeyPressActionName);
 
@@ -51,6 +59,8 @@ public class MainMenuUI : MonoBehaviour
         mainMenuPanel.SetActive(false);
 
         newGameButton.onClick.AddListener(SaveManager.Instance.StartNewGame);
+        newGameButton.onClick.AddListener(NewGame);
+        loadGameButton.onClick.AddListener(LoadGame);
     }
 
     public void SetBoolVariable(string boolName)
@@ -122,8 +132,9 @@ public class MainMenuUI : MonoBehaviour
 
     public void OnAnyKeyPress(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if (context.performed && !triggeredAnyKeyPress)
         {
+            triggeredAnyKeyPress = true;
             mainMenuPanel.SetActive(true);
             StartCoroutine(FadeOutIntroAndFadeInMainMenu());
         }
@@ -148,8 +159,24 @@ public class MainMenuUI : MonoBehaviour
         introPanel.SetActive(false);
     }
 
+    public void NewGame()
+    {
+        if (newGameClicked) return;
+
+        newGameClicked = true;
+        newGameButton.interactable = false;
+
+        // Start scene transition
+        transitionController.StartTransition(newGameSceneName);
+    }
+
     public void LoadGame()
     {
+        if (loadGameClicked) return;
+
+        loadGameClicked = true;
+        loadGameButton.interactable = false;
+
         SaveManager.Instance.LoadGame();
     }
 

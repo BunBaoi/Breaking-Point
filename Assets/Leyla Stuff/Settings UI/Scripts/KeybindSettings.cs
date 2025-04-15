@@ -156,6 +156,12 @@ public class KeybindSettings: MonoBehaviour
                 Debug.Log($"Skipping action '{action.name}' due to Mouse movement or scrolling binding.");
                 return;
             }
+
+            if (binding.path.Contains("anyKey"))
+            {
+                Debug.Log($"Skipping action '{action.name}' due to Any Key Press binding.");
+                return;
+            }
         }
 
         if (action.bindings.Count > 1 && action.bindings[0].isComposite)
