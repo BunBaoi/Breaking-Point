@@ -619,7 +619,7 @@ public IEnumerator MoveCube(Vector3 targetPosition) // targetPosition = Player <
             timeElapsed += Time.deltaTime;
             yield return null;
         }
-        if (qTEMechanicScript.Pos_STOP.tag == "QTEStop" && qTEMechanicScript.PositionOfPlayer == QTEMechanicScript.PlayerPos.PlayerPos3) //THIS STOPS QTE BY CHANGING THE ENUM 
+        if (qTEMechanicScript.Pos_STOP.tag == "QTEStop" && qTEMechanicScript.PositionOfPlayer == QTEMechanicScript.PlayerPos.PlayerPos4 || qTEMechanicScript.PositionOfPlayer == QTEMechanicScript.PlayerPos.PlayerPos13) //THIS STOPS QTE BY CHANGING THE ENUM 
         {
             Debug.Log("Stop game here");
             qTEMechanicScript.QTEMechanicScriptActive = false;
