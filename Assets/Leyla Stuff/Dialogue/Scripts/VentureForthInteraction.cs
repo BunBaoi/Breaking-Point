@@ -10,6 +10,9 @@ public class VentureForthInteraction : MonoBehaviour
     [SerializeField] private string sceneName;
     [SerializeField] private string teleportLocationTag = "";
 
+    [Header("Set Bool")]
+    [SerializeField] private string boolName;
+
     [Header("Interact Text Settings")]
     [SerializeField] private GameObject interactTextPrefab;
     [SerializeField] private float yAxis = -8f;
@@ -75,6 +78,11 @@ public class VentureForthInteraction : MonoBehaviour
     void OnVentureForthButtonClicked()
     {
         PlayerManager.Instance.TeleportToScene(sceneName, teleportLocationTag);
+
+        if (BoolManager.Instance != null && boolName != null)
+        {
+            BoolManager.Instance.SetBool(boolName, true);
+        }
     }
 
     private bool CanVentureForth()

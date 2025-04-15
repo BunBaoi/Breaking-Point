@@ -5,7 +5,7 @@
 			<value>Hard Snow Left Footstep 1 SFX</value>
 		</property>
 		<property name="outputFormat">
-			<value>1</value>
+			<value>2</value>
 		</property>
 		<relationship name="folder">
 			<destination>{fac671b2-f5e8-4db0-9b8d-3e84869527bd}</destination>
@@ -91,9 +91,11 @@
 	<object class="MixerBusEffectChain" id="{0c1334b7-ce9a-4859-a396-5caa3f9d0b4c}">
 		<relationship name="effects">
 			<destination>{4fe173c4-1ace-4305-bb20-098b47b0d75a}</destination>
+			<destination>{af93c113-b1f9-4f27-8b61-a6e725fb620d}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{21d9108d-b202-4da6-85f5-bcd7c0ffa02d}" />
 	<object class="MixerBusFader" id="{f817a703-1d31-4add-bb86-5341e0bf4bab}" />
 	<object class="MixerBusFader" id="{4fe173c4-1ace-4305-bb20-098b47b0d75a}" />
+	<object class="SpatialiserEffect" id="{af93c113-b1f9-4f27-8b61-a6e725fb620d}" />
 </objects>

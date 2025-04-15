@@ -14,11 +14,21 @@ public class ActivateCutScene : MonoBehaviour
     [SerializeField] private List<string> requiredBoolKeysTrue = new List<string>(); // List of bool keys that should be true
     [SerializeField] private List<string> requiredBoolKeysFalse = new List<string>(); // List of bool keys that should be false
 
+    [Header("Cutscene Data")]
+    [SerializeField] private CutsceneData cutsceneData;
+
     // Store the original priority to restore it later
     private int originalPlayerPriority;
 
     private void Start()
     {
+        GameObject playerVirtualCameraObject = GameObject.FindGameObjectWithTag("PlayerVirtualCamera");
+
+        if (playerVirtualCameraObject != null)
+        {
+            playerCamera = playerVirtualCameraObject.GetComponent<CinemachineVirtualCamera>();
+        }
+
         // Store the original player camera priority
         originalPlayerPriority = playerCamera.Priority;
 
@@ -28,6 +38,11 @@ public class ActivateCutScene : MonoBehaviour
 
     private bool CanStartCutscene()
     {
+        if (CutsceneTracker.Instance.IsCutsceneCompleted(cutsceneData.cutsceneID))
+        {
+            return false; // Already completed, don't run again
+        }
+
         if (!DialogueManager.Instance.canStartDialogue)
         {
             return false;
@@ -56,6 +71,8 @@ public class ActivateCutScene : MonoBehaviour
     {
         if (collision.CompareTag("Player") && CanStartCutscene())
         {
+            CutsceneTracker.Instance.MarkCutsceneAsCompleted(cutsceneData.cutsceneID);
+
             // Disable player camera by setting its priority to 0
             playerCamera.Priority = 0;
 
@@ -72,11 +89,14 @@ public class ActivateCutScene : MonoBehaviour
 
             // Disable the trigger collider
             GetComponent<BoxCollider>().enabled = false;
+
+            Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
         }
     }
 
     private void OnCutsceneFinished(PlayableDirector director)
     {
+
         // Restore player camera's original priority
         playerCamera.Priority = originalPlayerPriority;
 

@@ -17,7 +17,7 @@ public class ItemPickUp : MonoBehaviour
 
     [Header("Interact Text")]
     [SerializeField] private GameObject interactTextPrefab;
-    [SerializeField] private float yAxis = 0.2f;
+    [SerializeField] private float yAxis = 0.4f;
     [SerializeField] private float defaultYAxis = 0.2f;
 
     [Header("Input Settings")]
@@ -317,7 +317,7 @@ public class ItemPickUp : MonoBehaviour
             LayerMask combinedMask = pickUpColliderLayer & ~itemLayer;
 
             // Perform a raycast to find the item in the center of the view
-            if (Physics.Raycast(ray, out hit, raycastDistance, combinedMask))
+            if (Physics.Raycast(ray, out hit, raycastDistance, combinedMask, QueryTriggerInteraction.Ignore))
             {
                 // Check if the hit collider matches the 'Pick Up Collider' child
                 if (IsHitOnPickUpCollider(hit.collider))

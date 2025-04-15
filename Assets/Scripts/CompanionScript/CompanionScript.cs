@@ -229,11 +229,65 @@ public class CompanionScript : MonoBehaviour
         CompanionState previousState = stateOfCompanion;
         stateOfCompanion = CompanionState.Teleporting;
 
+        // Validate the position on the NavMesh before teleporting
+        NavMeshHit hit;
+        Vector3 validPosition = position;
+
+        // First, check if the requested position is on the NavMesh
+        if (!NavMesh.SamplePosition(position, out hit, 5f, NavMesh.AllAreas))
+        {
+            // If not on NavMesh, find the closest valid position
+            Debug.LogWarning("Companion teleport position is not on NavMesh. Finding closest valid position.");
+
+            // Try positions around the player at different heights
+            Vector3[] testPositions = new Vector3[]
+            {
+                position + Vector3.up * 0.5f,       // Try slightly above
+                player.position + player.right * 2f, // Try to the right of player
+                player.position - player.right * 2f, // Try to the left of player
+                player.position + player.forward * 2f, // Try in front of player
+                player.position - player.forward * 2f  // Try behind player
+            };
+
+            // Check each test position
+            foreach (Vector3 testPos in testPositions)
+            {
+                if (NavMesh.SamplePosition(testPos, out hit, 5f, NavMesh.AllAreas))
+                {
+                    validPosition = hit.position;
+                    Debug.Log("Found valid NavMesh position for companion: " + validPosition);
+                    break;
+                }
+            }
+
+            // If we still don't have a valid position, use a fallback
+            if (validPosition == position)
+            {
+                // Fallback to a position near the player that's definitely on the navmesh
+                if (NavMesh.SamplePosition(player.position, out hit, 10f, NavMesh.AllAreas))
+                {
+                    validPosition = hit.position;
+                    Debug.Log("Using fallback NavMesh position for companion: " + validPosition);
+                }
+                else
+                {
+                    Debug.LogError("Cannot find any valid NavMesh position for companion teleport!");
+                    stateOfCompanion = previousState;
+                    return;
+                }
+            }
+        }
+        else
+        {
+            // The position is valid, use the exact NavMesh position
+            validPosition = hit.position;
+        }
+
         // Disable NavMeshAgent temporarily to avoid conflicts
         AI.enabled = false;
 
-        // Teleport
-        transform.position = position;
+        // Teleport to validated position
+        transform.position = validPosition;
 
         // Re-enable NavMeshAgent
         AI.enabled = true;
@@ -241,7 +295,7 @@ public class CompanionScript : MonoBehaviour
         // Return to previous state
         stateOfCompanion = previousState;
 
-        Debug.Log("Companion teleported to: " + position);
+        Debug.Log("Companion teleported to: " + validPosition);
     }
 
     // OLD METHOD, KEEPING IN CASE
@@ -264,11 +318,17 @@ public class CompanionScript : MonoBehaviour
             Vector3 playerRight = player.right;
             Vector3 playerLeft = -playerRight;
 
-            Vector3 targetPosition = teleportLeft ? player.position + playerLeft * minDistanceToPlayer : player.position + playerRight * minDistanceToPlayer;
+            // Calculate the desired position
+            Vector3 desiredPosition = teleportLeft ?
+                player.position + playerLeft * minDistanceToPlayer :
+                player.position + playerRight * minDistanceToPlayer;
+
+            // Add a small Y offset to avoid ground clipping issues
+            desiredPosition.y += 0.1f;
 
             teleportLeft = !teleportLeft;
 
-            TeleportToPosition(targetPosition);
+            TeleportToPosition(desiredPosition);
         }
     }
 
