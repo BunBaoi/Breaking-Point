@@ -999,7 +999,7 @@ public class DialogueManager : MonoBehaviour
                     // Fallback to player if NPC is not found or name is null
                     if (targetObject == null)
                     {
-                        targetObject = GameObject.FindWithTag("Player");
+                        targetObject = GameObject.FindWithTag("PlayerCamera");
                     }
 
                     if (targetObject != null)
@@ -1290,7 +1290,7 @@ public class DialogueManager : MonoBehaviour
                         // Fallback to player if NPC is not found or name is null
                         if (targetObject == null)
                         {
-                            targetObject = GameObject.FindWithTag("Player");
+                            targetObject = GameObject.FindWithTag("PlayerCamera");
                         }
 
                         if (targetObject != null)

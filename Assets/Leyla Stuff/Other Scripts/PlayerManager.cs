@@ -52,6 +52,13 @@ public class PlayerManager : MonoBehaviour
         shouldTeleport = true;
         StartCoroutine(FadeAndLoadScene(sceneName));
 
+
+        PlayerMovement playerMovement = playerInstance.GetComponent<PlayerMovement>();
+            if (playerMovement != null)
+        {
+            playerMovement.SetApplyGravity(false);
+        }
+
         CharacterController characterController = playerInstance.GetComponent<CharacterController>();
         if (characterController != null)
         {
@@ -198,6 +205,12 @@ public class PlayerManager : MonoBehaviour
         {
             characterController.enabled = true;
             Debug.Log("CharacterController re-enabled.");
+        }
+
+        PlayerMovement playerMovement = playerInstance.GetComponent<PlayerMovement>();
+        if (playerMovement != null)
+        {
+            playerMovement.SetApplyGravity(true);
         }
     }
 

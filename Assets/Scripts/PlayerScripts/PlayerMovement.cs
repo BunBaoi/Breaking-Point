@@ -52,6 +52,7 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 moveInput;
 
     private bool applyGravity = true;
+    private bool wasGravityApplied = false;
 
     void Awake()
     {
@@ -118,10 +119,16 @@ public class PlayerMovement : MonoBehaviour
         {
             velocity.y += gravity * Time.deltaTime;
             controller.Move(velocity * Time.deltaTime);
+
+            // Debug log for gravity application
+            // Debug.Log($"Applying Gravity: {velocity.y} (gravity: {gravity})");
         }
         else
         {
             velocity.y = 0;
+
+            // Debug log when gravity is not applied
+            // Debug.Log("Gravity disabled: velocity.y set to 0");
         }
     }
 
