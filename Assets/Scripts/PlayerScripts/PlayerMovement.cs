@@ -110,7 +110,7 @@ public class PlayerMovement : MonoBehaviour
             currentSpeed = 0f;
         }
 
-        animator.SetFloat("speed", currentSpeed);
+        //animator.SetFloat("speed", currentSpeed);
     }
 
     void ApplyGravity()
@@ -158,6 +158,7 @@ public class PlayerMovement : MonoBehaviour
             qTEMechanicScript.QTEMove();
             canMove = false;
             playerStats.QTEState = true;
+            qTEMechanicScript.QTEMechanicScriptActive = true;
         }
     }
 
@@ -214,7 +215,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.Z))
         {
-            Debug.Log("Z button pressed");
+            //Debug.Log("Z button pressed");
             playerCamera.fieldOfView = zoomFOV;
             binocularsUI.enabled = true;
         }

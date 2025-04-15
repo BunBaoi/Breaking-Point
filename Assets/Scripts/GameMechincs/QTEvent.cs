@@ -77,6 +77,7 @@ public class QTEvent : MonoBehaviour
             qTEMechanicScript.QTEMove(); // Moves Player to Pos
             //qTEMechanic.QTEMechanicScriptActive = false; // Can't remember why this was needed might delete it
 
+
         }
         else if(CountDownTimer <= 0 && WaitingKeyLoad != CorrectKeyCounter)
         {
