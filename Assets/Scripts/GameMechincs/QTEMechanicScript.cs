@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
 
 public class QTEMechanicScript : MonoBehaviour
 {
@@ -18,9 +19,19 @@ public class QTEMechanicScript : MonoBehaviour
     public GameObject Pos11;
     public GameObject Pos12;
     public GameObject Pos13;
+    public GameObject Pos14;
+    public GameObject Pos15;
+    public GameObject Pos16;
+    public GameObject Pos17;
+    public GameObject Pos18;
+    public GameObject Pos19;
+    public GameObject Pos20;
+    public GameObject Pos21;
 
     [Header("QTE Active/InActive")]
-    public GameObject Pos_STOP;
+    public GameObject Pos_STOP_1;
+    public GameObject Pos_STOP_2;
+    public GameObject Pos_STOP_3;
 
 
     public float MoTSpeed = 2f; // Player Move Speed
@@ -55,7 +66,15 @@ public class QTEMechanicScript : MonoBehaviour
         PlayerPos10,
         PlayerPos11,
         PlayerPos12,
-        PlayerPos13
+        PlayerPos13,
+        PlayerPos14,
+        PlayerPos15,
+        PlayerPos16,
+        PlayerPos17,
+        PlayerPos18,
+        PlayerPos19,
+        PlayerPos20,
+        PlayerPos21
     }
 
     [Header("Position Cleared")]
@@ -72,6 +91,14 @@ public class QTEMechanicScript : MonoBehaviour
     public bool CHKPos11;
     public bool CHKPos12;
     public bool CHKPos13;
+    public bool CHKPos14;
+    public bool CHKPos15;
+    public bool CHKPos16;
+    public bool CHKPos17;
+    public bool CHKPos18;
+    public bool CHKPos19;
+    public bool CHKPos20;
+    public bool CHKPos21;
 
     public void QTEMove()
     {
@@ -244,16 +271,129 @@ public class QTEMechanicScript : MonoBehaviour
                 if (CHKPos13 == false)
                 {
                     // Player move to Target position
-                    /*
                     Vector3 target = Pos14.transform.position; // Update target position to Pos 4
                     PositionOfPlayer = PlayerPos.PlayerPos14; // Update Switch
                     CHKCounter++;
                     StartCoroutine(playerStats.MoveCube(target));
-                    */
                     CHKPos13 = true;
                     
                 }
                 break;
+
+            case PlayerPos.PlayerPos14:
+                //Debug.Log("Player Position 3");
+                if (CHKPos14 == false)
+                {
+                    // Player move to Target position
+                    Vector3 target = Pos15.transform.position; // Update target position to Pos 4
+                    PositionOfPlayer = PlayerPos.PlayerPos15; // Update Switch
+                    CHKCounter++;
+                    StartCoroutine(playerStats.MoveCube(target));
+                    CHKPos14 = true;
+
+                }
+                break;
+
+            case PlayerPos.PlayerPos15:
+                //Debug.Log("Player Position 3");
+                if (CHKPos15 == false)
+                {
+                    // Player move to Target position
+                    Vector3 target = Pos16.transform.position; // Update target position to Pos 4
+                    PositionOfPlayer = PlayerPos.PlayerPos16; // Update Switch
+                    CHKCounter++;
+                    StartCoroutine(playerStats.MoveCube(target));
+                    CHKPos15 = true;
+
+                }
+                break;
+
+            case PlayerPos.PlayerPos16:
+                //Debug.Log("Player Position 3");
+                if (CHKPos16 == false)
+                {
+                    // Player move to Target position
+                    Vector3 target = Pos17.transform.position; // Update target position to Pos 4
+                    PositionOfPlayer = PlayerPos.PlayerPos17; // Update Switch
+                    CHKCounter++;
+                    StartCoroutine(playerStats.MoveCube(target));
+                    CHKPos16 = true;
+
+                }
+                break;
+
+            case PlayerPos.PlayerPos17:
+                //Debug.Log("Player Position 3");
+                if (CHKPos17 == false)
+                {
+                    // Player move to Target position
+                    Vector3 target = Pos18.transform.position; // Update target position to Pos 4
+                    PositionOfPlayer = PlayerPos.PlayerPos18; // Update Switch
+                    CHKCounter++;
+                    StartCoroutine(playerStats.MoveCube(target));
+                    CHKPos17 = true;
+
+                }
+                break;
+
+            case PlayerPos.PlayerPos18:
+                //Debug.Log("Player Position 3");
+                if (CHKPos18 == false)
+                {
+                    // Player move to Target position
+                    Vector3 target = Pos19.transform.position; // Update target position to Pos 4
+                    PositionOfPlayer = PlayerPos.PlayerPos19; // Update Switch
+                    CHKCounter++;
+                    StartCoroutine(playerStats.MoveCube(target));
+                    CHKPos18 = true;
+
+                }
+                break;
+
+            case PlayerPos.PlayerPos19:
+                //Debug.Log("Player Position 3");
+                if (CHKPos19 == false)
+                {
+                    // Player move to Target position
+                    Vector3 target = Pos20.transform.position; // Update target position to Pos 4
+                    PositionOfPlayer = PlayerPos.PlayerPos20; // Update Switch
+                    CHKCounter++;
+                    StartCoroutine(playerStats.MoveCube(target));
+                    CHKPos19 = true;
+
+                }
+                break;
+
+            case PlayerPos.PlayerPos20:
+                //Debug.Log("Player Position 3");
+                if (CHKPos20 == false)
+                {
+                    // Player move to Target position
+                    Vector3 target = Pos21.transform.position; // Update target position to Pos 4
+                    PositionOfPlayer = PlayerPos.PlayerPos21; // Update Switch
+                    CHKCounter++;
+                    StartCoroutine(playerStats.MoveCube(target));
+                    CHKPos20 = true;
+
+                }
+                break;
+
+            case PlayerPos.PlayerPos21:
+                //Debug.Log("Player Position 3");
+                if (CHKPos21 == false)
+                {
+                    // Player move to Target position
+                    /*
+                    Vector3 target = Pos22.transform.position; // Update target position to Pos 4
+                    PositionOfPlayer = PlayerPos.PlayerPos22; // Update Switch
+                    CHKCounter++;
+                    StartCoroutine(playerStats.MoveCube(target));
+                    */
+                    CHKPos21 = true;
+
+                }
+                break;
+
         }
     }
 
