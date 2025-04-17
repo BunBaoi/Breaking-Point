@@ -48,6 +48,7 @@ public class PlayerManager : MonoBehaviour
     // Teleport function that takes a tag to find an empty GameObject to teleport to
     public void TeleportToScene(string sceneName, string targetTag)
     {
+        Time.timeScale = 1f;
         targetTagToFind = targetTag;
         shouldTeleport = true;
         StartCoroutine(FadeAndLoadScene(sceneName));
@@ -80,7 +81,7 @@ public class PlayerManager : MonoBehaviour
         {
             if (asyncOperation.progress >= 0.9f)
             {
-                yield return new WaitForSeconds(0.5f);
+                yield return new WaitForSecondsRealtime(0.5f);
                 asyncOperation.allowSceneActivation = true;
             }
 
