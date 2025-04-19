@@ -31,7 +31,7 @@ public class QTEMechanicScript : MonoBehaviour
     [Header("QTE Active/InActive")]
     public GameObject Pos_STOP_1;
     public GameObject Pos_STOP_2;
-    public GameObject Pos_STOP_3;
+    //public GameObject Pos_STOP_3;
 
 
     public float MoTSpeed = 2f; // Player Move Speed
@@ -49,14 +49,14 @@ public class QTEMechanicScript : MonoBehaviour
     {
         PositionOfPlayer = PlayerPos.PlayerPosIdle;
 
-        //objectPlayer = GameObject.FindWithTag("Player").transform;
-        //playerStats = GameObject.FindWithTag("Player").GetComponent<PlayerStats>();
-        //playerMovement = GameObject.FindWithTag("Player").GetComponent<PlayerMovement>();
+        objectPlayer = GameObject.FindWithTag("Player").transform;
+        playerStats = GameObject.FindWithTag("Player").GetComponent<PlayerStats>();
+        playerMovement = GameObject.FindWithTag("Player").GetComponent<PlayerMovement>();
     }
 
     void Update()
     {
-        transform.LookAt(objectPlayer);
+        //transform.LookAt(objectPlayer); ??????
     }
 
     public enum PlayerPos

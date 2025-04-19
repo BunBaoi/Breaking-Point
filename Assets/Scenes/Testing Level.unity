@@ -2333,7 +2333,7 @@ GameObject:
   - component: {fileID: 877724999}
   m_Layer: 0
   m_Name: UI
-  m_TagString: Untagged
+  m_TagString: QTEUI
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -3571,6 +3571,11 @@ Mesh:
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7750844505360647637, guid: 29d8f992ea3309b4f97720c9b3822a99, type: 3}
   m_PrefabInstance: {fileID: 1553070691}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1163889008 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 802129320542748707, guid: 940f9400d4f974944b5e28cd825ce422, type: 3}
+  m_PrefabInstance: {fileID: 7831867613788389699}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1202608530
 GameObject:
@@ -5294,7 +5299,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1665698384}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3f2da04fd11fe2643b75789b0a7059fc, type: 3}
   m_Name: 
@@ -7339,6 +7344,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlayerPosition_4
       objectReference: {fileID: 0}
+    - target: {fileID: 968078516498805096, guid: 940f9400d4f974944b5e28cd825ce422, type: 3}
+      propertyPath: m_TagString
+      value: QTEStop
+      objectReference: {fileID: 0}
     - target: {fileID: 1069813295937483647, guid: 940f9400d4f974944b5e28cd825ce422, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -7369,7 +7378,7 @@ PrefabInstance:
       objectReference: {fileID: 852676369}
     - target: {fileID: 6549741904616277057, guid: 940f9400d4f974944b5e28cd825ce422, type: 3}
       propertyPath: m_VersionIndex
-      value: 28382
+      value: 28385
       objectReference: {fileID: 0}
     - target: {fileID: 6554847979031752303, guid: 940f9400d4f974944b5e28cd825ce422, type: 3}
       propertyPath: m_Name
@@ -7448,13 +7457,21 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1954203231}
     - target: {fileID: 7215727069220563532, guid: 940f9400d4f974944b5e28cd825ce422, type: 3}
+      propertyPath: Pos_STOP_1
+      value: 
+      objectReference: {fileID: 814331982}
+    - target: {fileID: 7215727069220563532, guid: 940f9400d4f974944b5e28cd825ce422, type: 3}
+      propertyPath: Pos_STOP_2
+      value: 
+      objectReference: {fileID: 1163419413}
+    - target: {fileID: 7215727069220563532, guid: 940f9400d4f974944b5e28cd825ce422, type: 3}
       propertyPath: playerStats
       value: 
       objectReference: {fileID: 1665698393}
     - target: {fileID: 7215727069220563532, guid: 940f9400d4f974944b5e28cd825ce422, type: 3}
       propertyPath: objectPlayer
       value: 
-      objectReference: {fileID: 1665698389}
+      objectReference: {fileID: 1163889008}
     - target: {fileID: 7215727069220563532, guid: 940f9400d4f974944b5e28cd825ce422, type: 3}
       propertyPath: playerMovement
       value: 
@@ -7469,7 +7486,7 @@ PrefabInstance:
       objectReference: {fileID: 1481920707}
     - target: {fileID: 8062609837886009289, guid: 940f9400d4f974944b5e28cd825ce422, type: 3}
       propertyPath: m_VersionIndex
-      value: 28382
+      value: 28385
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
