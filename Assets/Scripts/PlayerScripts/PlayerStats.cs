@@ -92,6 +92,9 @@ public class PlayerStats : MonoBehaviour
         playerMovement = GetComponent<PlayerMovement>();
         inventoryManager = FindObjectOfType<InventoryManager>();
 
+        //qTEMechanicScript = GameObject.FindWithTag("QTE").GetComponent<QTEMechanicScript>();
+        //qTEvent = GameObject.FindWithTag("QTEUI").GetComponent<QTEvent>();
+
         controller.slopeLimit = 45.0f;
 
         if (transitionCanvasGroup != null)

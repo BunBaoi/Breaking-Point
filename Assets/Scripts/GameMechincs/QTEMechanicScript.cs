@@ -49,6 +49,14 @@ public class QTEMechanicScript : MonoBehaviour
     {
         PositionOfPlayer = PlayerPos.PlayerPosIdle;
 
+        //objectPlayer = GameObject.FindWithTag("Player").transform;
+        //playerStats = GameObject.FindWithTag("Player").GetComponent<PlayerStats>();
+        //playerMovement = GameObject.FindWithTag("Player").GetComponent<PlayerMovement>();
+    }
+
+    void Update()
+    {
+        transform.LookAt(objectPlayer);
     }
 
     public enum PlayerPos

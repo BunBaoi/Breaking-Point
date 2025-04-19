@@ -71,6 +71,11 @@ public class PlayerMovement : MonoBehaviour
         playerStats = GetComponent<PlayerStats>();
         movement = inputActions.FindAction(movementName);
         sprint = inputActions.FindAction(sprintName);
+        playerPos = GameObject.Find("Alice");
+
+        qTEMechanicScript = GameObject.FindWithTag("QTE").GetComponent<QTEMechanicScript>();
+        qTEvent = GameObject.FindWithTag("QTEUI").GetComponent<QTEvent>();
+        targetPos = GameObject.FindWithTag("StartPos");
 
         if (movement != null) movement.Enable();
         if (sprint != null) sprint.Enable();
