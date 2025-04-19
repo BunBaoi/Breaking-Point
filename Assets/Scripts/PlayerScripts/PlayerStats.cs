@@ -92,6 +92,9 @@ public class PlayerStats : MonoBehaviour
         playerMovement = GetComponent<PlayerMovement>();
         inventoryManager = FindObjectOfType<InventoryManager>();
 
+        qTEMechanicScript = GameObject.FindWithTag("QTE").GetComponent<QTEMechanicScript>();
+        qTEvent = GameObject.FindWithTag("QTEUI").GetComponent<QTEvent>();
+
         controller.slopeLimit = 45.0f;
 
         if (transitionCanvasGroup != null)
@@ -242,7 +245,7 @@ public class PlayerStats : MonoBehaviour
             }
         }
     }
-
+    
     void HandleOxygenDrain()
     {
             if (isInOxygenDrainZone)
@@ -387,7 +390,7 @@ public class PlayerStats : MonoBehaviour
             }
         }
     }
-
+    
     // PRINT ENUM STATUS//
 
     public void STP()
@@ -567,7 +570,7 @@ public class PlayerStats : MonoBehaviour
             yield return StartCoroutine(FadeCanvasGroup(transitionCanvasGroup, 0f, 1f, 1f));
         }
 
-        StopOxygenSound();
+        //StopOxygenSound();
         Time.timeScale = 1;
         GameOverMenu.Instance.ShowGameOver();
 
@@ -619,12 +622,14 @@ public IEnumerator MoveCube(Vector3 targetPosition) // targetPosition = Player <
             timeElapsed += Time.deltaTime;
             yield return null;
         }
-        if (qTEMechanicScript.Pos_STOP_1.tag == "QTEStop" ||
-            qTEMechanicScript.Pos_STOP_2.tag == "QTEStop" ||
-            qTEMechanicScript.Pos_STOP_3.tag == "QTEStop" && 
-            qTEMechanicScript.PositionOfPlayer == QTEMechanicScript.PlayerPos.PlayerPos4 || 
-            qTEMechanicScript.PositionOfPlayer == QTEMechanicScript.PlayerPos.PlayerPos13 ||
-            qTEMechanicScript.PositionOfPlayer == QTEMechanicScript.PlayerPos.PlayerPos21) //THIS STOPS QTE BY CHANGING THE ENUM 
+        if (qTEMechanicScript.Pos_STOP_1.tag == "QTEStop" 
+            //|| qTEMechanicScript.Pos_STOP_2.tag == "QTEStop" 
+            //|| qTEMechanicScript.Pos_STOP_3.tag == "QTEStop"
+            && 
+            qTEMechanicScript.PositionOfPlayer == QTEMechanicScript.PlayerPos.PlayerPos4 
+            //|| qTEMechanicScript.PositionOfPlayer == QTEMechanicScript.PlayerPos.PlayerPos13
+            //|| qTEMechanicScript.PositionOfPlayer == QTEMechanicScript.PlayerPos.PlayerPos21
+            ) //THIS STOPS QTE BY CHANGING THE ENUM 
 
         {
             Debug.Log("Stop game here");
