@@ -13,6 +13,7 @@ public class PlayerManager : MonoBehaviour
 
     [Header("UI Settings")]
     public CanvasGroup fadeCanvasGroup;
+    public GameObject fadeCanvasGroupObject;
     public float fadeDuration = 1f;
 
     private Vector3 teleportPosition;
@@ -70,9 +71,15 @@ public class PlayerManager : MonoBehaviour
 
     private IEnumerator FadeAndLoadScene(string sceneName)
     {
+        fadeCanvasGroupObject.SetActive(true);
+
+        yield return null;
+
         yield return StartCoroutine(Fade(1f));
 
         GameManager.Instance.ShowLoadingPanel();
+
+        yield return null;
 
         AsyncOperation asyncOperation = SceneManager.LoadSceneAsync(sceneName);
         asyncOperation.allowSceneActivation = false;

@@ -377,7 +377,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   npcDialogueTree: {fileID: 11400000, guid: 418bc319823d24ef192867b74007ebb9, type: 2}
-  companionScript: {fileID: 0}
   dialogueKey: BaseCampAfterWelcomeDialogue
   requiredBoolKeysTrue:
   - EntranceWelcomeDialogueFinished
@@ -507,13 +506,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 134649135}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.123867035, y: -0, z: -0, w: 0.9922989}
-  m_LocalPosition: {x: 597.37, y: 13.56, z: -213.67}
+  m_LocalRotation: {x: 0.1609139, y: -0, z: -0, w: 0.98696846}
+  m_LocalPosition: {x: 595.21, y: 17.62, z: -212.64}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 14.231, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 18.52, y: 0, z: 0}
 --- !u!1001 &162643364
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -919,7 +918,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   npcDialogueTree: {fileID: 11400000, guid: 32d1ec973a1aa42a98396ab0627fdc78, type: 2}
-  companionScript: {fileID: 0}
   dialogueKey: BaseCampGoToBedDialogue
   requiredBoolKeysTrue:
   - EntranceAfterWelcomeDialogueFinished
@@ -1218,7 +1216,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   npcDialogueTree: {fileID: 11400000, guid: 16c24dc1405f248b5a246ca9545cfbfc, type: 2}
-  companionScript: {fileID: 0}
   dialogueKey: BaseCampAfterClimberNearTentDialogue
   requiredBoolKeysTrue:
   - BaseCampClimberNearTentDialogueCompleted
@@ -1329,19 +1326,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5035189705473903095, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.95769584
+      value: 0.8648449
       objectReference: {fileID: 0}
     - target: {fileID: 5035189705473903095, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5035189705473903095, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.28778237
+      value: 0.50203913
       objectReference: {fileID: 0}
     - target: {fileID: 5035189705473903095, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5035189705473903095, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1349,39 +1346,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5035189705473903095, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: -33.451
+      value: 60.27
       objectReference: {fileID: 0}
     - target: {fileID: 5035189705473903095, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6153531203544138019, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
-      propertyPath: playerStats
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 6153531203544138019, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
-      propertyPath: inventoryManager
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 6153531203544138019, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
-      propertyPath: refillSoundEvent.Path
-      value: event:/Oxygen Tank Gas Refill SFX
-      objectReference: {fileID: 0}
-    - target: {fileID: 6153531203544138019, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
-      propertyPath: refillSoundEvent.Guid.Data1
-      value: 1926593592
-      objectReference: {fileID: 0}
-    - target: {fileID: 6153531203544138019, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
-      propertyPath: refillSoundEvent.Guid.Data2
-      value: 1154656911
-      objectReference: {fileID: 0}
-    - target: {fileID: 6153531203544138019, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
-      propertyPath: refillSoundEvent.Guid.Data3
-      value: 420773506
-      objectReference: {fileID: 0}
-    - target: {fileID: 6153531203544138019, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
-      propertyPath: refillSoundEvent.Guid.Data4
-      value: 828340840
       objectReference: {fileID: 0}
     - target: {fileID: 7347471784184561044, guid: 45afff530023142358a6ac11ca578e9d, type: 3}
       propertyPath: m_Name
@@ -2586,17 +2555,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 24d8c550d574ebd419bafc8398b274d8, type: 3}
---- !u!114 &765842018 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6510198468096813079, guid: 24d8c550d574ebd419bafc8398b274d8, type: 3}
-  m_PrefabInstance: {fileID: 765842017}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1ee15a4f6d4f34c4189076dda80a2721, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &785959939
 GameObject:
   m_ObjectHideFlags: 0
@@ -3263,7 +3221,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   npcDialogueTree: {fileID: 11400000, guid: c7b7fa92a36bb4e35a04da31cc1ace40, type: 2}
-  companionScript: {fileID: 765842018}
   dialogueKey: Chapter2GoToLevel2
   requiredBoolKeysTrue:
   - Chapter2CinematicTriggered
@@ -4236,7 +4193,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   npcDialogueTree: {fileID: 11400000, guid: 227b6d596e3c24bc7b0ce0a476c596b0, type: 2}
-  companionScript: {fileID: 0}
   dialogueKey: BaseCampComeOverClimberNearExplorationAreaDialogue
   requiredBoolKeysTrue:
   - EntranceAfterWelcomeDialogueFinished
@@ -5277,13 +5233,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2026821443273220471, guid: dd4ae7dd7609c4af5bf4211166d2cd78, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2026821443273220471, guid: dd4ae7dd7609c4af5bf4211166d2cd78, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3240854693875661066, guid: dd4ae7dd7609c4af5bf4211166d2cd78, type: 3}
       propertyPath: yAxis
       value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 4609533624134428165, guid: dd4ae7dd7609c4af5bf4211166d2cd78, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 596.3
+      value: 601.7
       objectReference: {fileID: 0}
     - target: {fileID: 4609533624134428165, guid: dd4ae7dd7609c4af5bf4211166d2cd78, type: 3}
       propertyPath: m_LocalPosition.y
@@ -5321,13 +5285,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4808053792421982192, guid: dd4ae7dd7609c4af5bf4211166d2cd78, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4808053792421982192, guid: dd4ae7dd7609c4af5bf4211166d2cd78, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -9.342
+      objectReference: {fileID: 0}
+    - target: {fileID: 4808053792421982192, guid: dd4ae7dd7609c4af5bf4211166d2cd78, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6635465218348642610, guid: dd4ae7dd7609c4af5bf4211166d2cd78, type: 3}
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 8479374859620021849, guid: dd4ae7dd7609c4af5bf4211166d2cd78, type: 3}
       propertyPath: m_Name
-      value: Venture Forth
+      value: Venture Forth Interaction
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -6240,103 +6216,6 @@ Transform:
   - {fileID: 785959941}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &1714384177
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 998464464497987472, guid: 47c7b6961f67e4dbb82ffc6b463dc39a, type: 3}
-      propertyPath: m_Name
-      value: Time Canvas
-      objectReference: {fileID: 0}
-    - target: {fileID: 5951510921991656931, guid: 47c7b6961f67e4dbb82ffc6b463dc39a, type: 3}
-      propertyPath: m_Pivot.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5951510921991656931, guid: 47c7b6961f67e4dbb82ffc6b463dc39a, type: 3}
-      propertyPath: m_Pivot.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5951510921991656931, guid: 47c7b6961f67e4dbb82ffc6b463dc39a, type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5951510921991656931, guid: 47c7b6961f67e4dbb82ffc6b463dc39a, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5951510921991656931, guid: 47c7b6961f67e4dbb82ffc6b463dc39a, type: 3}
-      propertyPath: m_AnchorMin.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5951510921991656931, guid: 47c7b6961f67e4dbb82ffc6b463dc39a, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5951510921991656931, guid: 47c7b6961f67e4dbb82ffc6b463dc39a, type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5951510921991656931, guid: 47c7b6961f67e4dbb82ffc6b463dc39a, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5951510921991656931, guid: 47c7b6961f67e4dbb82ffc6b463dc39a, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5951510921991656931, guid: 47c7b6961f67e4dbb82ffc6b463dc39a, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5951510921991656931, guid: 47c7b6961f67e4dbb82ffc6b463dc39a, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5951510921991656931, guid: 47c7b6961f67e4dbb82ffc6b463dc39a, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5951510921991656931, guid: 47c7b6961f67e4dbb82ffc6b463dc39a, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5951510921991656931, guid: 47c7b6961f67e4dbb82ffc6b463dc39a, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5951510921991656931, guid: 47c7b6961f67e4dbb82ffc6b463dc39a, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5951510921991656931, guid: 47c7b6961f67e4dbb82ffc6b463dc39a, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5951510921991656931, guid: 47c7b6961f67e4dbb82ffc6b463dc39a, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5951510921991656931, guid: 47c7b6961f67e4dbb82ffc6b463dc39a, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5951510921991656931, guid: 47c7b6961f67e4dbb82ffc6b463dc39a, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5951510921991656931, guid: 47c7b6961f67e4dbb82ffc6b463dc39a, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 47c7b6961f67e4dbb82ffc6b463dc39a, type: 3}
 --- !u!1 &1717040938
 GameObject:
   m_ObjectHideFlags: 0
@@ -6623,7 +6502,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   npcDialogueTree: {fileID: 11400000, guid: 99d5c7e53c0554c83a8e4c1b442b5d87, type: 2}
-  companionScript: {fileID: 0}
   dialogueKey: BaseCampComeOverOliverDialogue
   requiredBoolKeysTrue:
   - EntranceAfterWelcomeDialogueFinished
@@ -7013,7 +6891,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   npcDialogueTree: {fileID: 11400000, guid: 488d46f9578cf40cb8fbae1651e6b265, type: 2}
-  companionScript: {fileID: 0}
   dialogueKey: BaseCampAfterOliverDialogue
   requiredBoolKeysTrue:
   - BaseCampOliverDialogueCompleted
@@ -7322,7 +7199,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   npcDialogueTree: {fileID: 11400000, guid: 36b52c877ffb049d99e49545cf502580, type: 2}
-  companionScript: {fileID: 0}
   dialogueKey: BaseCampArrivalDialogue
   requiredBoolKeysTrue:
   - Chapter1CinematicTriggered
@@ -7775,7 +7651,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   npcDialogueTree: {fileID: 11400000, guid: 144a23086cedf4febacc193214bbc9f9, type: 2}
-  companionScript: {fileID: 0}
   dialogueKey: BaseCampAfterClimberNearExplorationAreaDialogue
   requiredBoolKeysTrue:
   - BaseCampClimberNearExplorationAreaDialogueCompleted
@@ -8311,6 +8186,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 17
       objectReference: {fileID: 0}
+    - target: {fileID: 8100635661901401749, guid: cd0f3f491bc914de994e989cd046d44b, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -8681,7 +8560,6 @@ SceneRoots:
   - {fileID: 1339506899}
   - {fileID: 765842017}
   - {fileID: 824051523}
-  - {fileID: 1714384177}
   - {fileID: 1171396546}
   - {fileID: 1862274662}
   - {fileID: 1540181493}

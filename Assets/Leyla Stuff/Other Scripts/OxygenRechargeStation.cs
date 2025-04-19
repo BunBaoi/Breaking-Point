@@ -34,8 +34,8 @@ public class OxygenRechargeStation : MonoBehaviour
     [Header("FMOD")]
     [SerializeField] private EventReference refillSoundEvent;
 
-    private EventInstance refillSoundInstance;
-    private bool isRefillSoundPlaying = false;
+    [SerializeField] private EventInstance refillSoundInstance;
+    [SerializeField] private bool isRefillSoundPlaying = false;
 
     private void Start()
     {
@@ -44,9 +44,6 @@ public class OxygenRechargeStation : MonoBehaviour
         {
             inventoryManager = player.GetComponent<InventoryManager>();
         }
-
-        refillSoundInstance = RuntimeManager.CreateInstance(refillSoundEvent);
-        RuntimeManager.AttachInstanceToGameObject(refillSoundInstance, transform);
     }
 
     private void OnEnable()
@@ -127,7 +124,7 @@ public class OxygenRechargeStation : MonoBehaviour
         }
     }
 
-        private void StartRefilling()
+    private void StartRefilling()
     {
         if (PlayerStats.Instance != null && IsLookingAtOxygenStation())
         {
@@ -136,8 +133,31 @@ public class OxygenRechargeStation : MonoBehaviour
 
             if (!isRefillSoundPlaying && PlayerStats.Instance.Oxygen < 100)
             {
-                refillSoundInstance.start();
-                isRefillSoundPlaying = true;
+                // Create a fresh instance each time you start refilling
+                refillSoundInstance = RuntimeManager.CreateInstance(refillSoundEvent);
+
+                // Find child with "Oxygen Refill Station" tag
+                Transform refillTarget = null;
+                foreach (Transform child in transform)
+                {
+                    if (child.CompareTag("Oxygen Refill Station"))
+                    {
+                        refillTarget = child;
+                        break;
+                    }
+                }
+
+                if (refillTarget != null)
+                {
+                    RuntimeManager.AttachInstanceToGameObject(refillSoundInstance, refillTarget);
+                    refillSoundInstance.set3DAttributes(RuntimeUtils.To3DAttributes(refillTarget));
+                    refillSoundInstance.start();
+                    isRefillSoundPlaying = true;
+                }
+                else
+                {
+                    Debug.LogWarning("No refill target found for sound.");
+                }
             }
 
             StartCoroutine(RefillOxygen());
@@ -154,6 +174,7 @@ public class OxygenRechargeStation : MonoBehaviour
             if (isRefillSoundPlaying)
             {
                 refillSoundInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+                refillSoundInstance.release();
                 isRefillSoundPlaying = false;
             }
         }
