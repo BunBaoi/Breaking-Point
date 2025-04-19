@@ -17,7 +17,9 @@ public class MainMenuUI : MonoBehaviour
 
     [SerializeField] private InputActionAsset inputActions;
     [SerializeField] private string anyKeyPressActionName = "AnyKeyPress";
+    [SerializeField] private string anyKeyPressOtherButtonsActionName = "AnyKeyPressOtherButtons";
     private InputAction anyKeyPressAction;
+    private InputAction anyKeyPressOtherButtonsAction;
 
     [SerializeField] private float textFadeDuration = 1f;
     [SerializeField] private float waitDuration = 0.5f;
@@ -35,17 +37,27 @@ public class MainMenuUI : MonoBehaviour
     private void Awake()
     {
         anyKeyPressAction = inputActions.FindAction(anyKeyPressActionName);
+        anyKeyPressOtherButtonsAction = inputActions.FindAction(anyKeyPressOtherButtonsActionName);
 
         if (anyKeyPressAction != null)
         {
             anyKeyPressAction.Enable();
+            anyKeyPressAction.performed += OnAnyKeyPress;
         }
         else
         {
-            Debug.LogError($"Input action '{anyKeyPressAction}' not found in Input Action Asset!");
+            Debug.LogError($"Input action '{anyKeyPressActionName}' not found in InputActionAsset!");
         }
 
-        anyKeyPressAction.performed += OnAnyKeyPress;
+        if (anyKeyPressOtherButtonsAction != null)
+        {
+            anyKeyPressOtherButtonsAction.Enable();
+            anyKeyPressOtherButtonsAction.performed += OnAnyKeyPress;
+        }
+        else
+        {
+            Debug.LogError($"Input action '{anyKeyPressOtherButtonsActionName}' not found in InputActionAsset!");
+        }
     }
 
     private void Start()
@@ -126,8 +138,17 @@ public class MainMenuUI : MonoBehaviour
 
     private void OnDisable()
     {
-        anyKeyPressAction.performed -= OnAnyKeyPress;
-        anyKeyPressAction.Disable();
+        if (anyKeyPressAction != null)
+        {
+            anyKeyPressAction.performed -= OnAnyKeyPress;
+            anyKeyPressAction.Disable();
+        }
+
+        if (anyKeyPressOtherButtonsAction != null)
+        {
+            anyKeyPressOtherButtonsAction.performed -= OnAnyKeyPress;
+            anyKeyPressOtherButtonsAction.Disable();
+        }
     }
 
     public void OnAnyKeyPress(InputAction.CallbackContext context)
