@@ -31,13 +31,13 @@ public class QTEMechanicScript : MonoBehaviour
     [Header("QTE Active/InActive")]
     public GameObject Pos_STOP_1;
     public GameObject Pos_STOP_2;
-    //public GameObject Pos_STOP_3;
+    public GameObject Pos_STOP_3;
 
 
     public float MoTSpeed = 2f; // Player Move Speed
     public float CHKCounter = 0f;
 
-    public QTEvent qTEvent;
+    //public QTEvent qTEvent;
     public Transform objectPlayer;
     public PlayerStats playerStats;
     public PlayerMovement playerMovement;
