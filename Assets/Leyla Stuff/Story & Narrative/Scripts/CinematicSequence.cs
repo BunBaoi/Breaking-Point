@@ -565,6 +565,8 @@ public class CinematicSequence : MonoBehaviour
 
         SettingsManager.Instance.SetCinematicActive(false);
 
+        SaveManager.Instance.SaveGame();
+
         canvas.gameObject.SetActive(false);
         IsCinematicActive = false;
         OnCinematicFinished?.Invoke();

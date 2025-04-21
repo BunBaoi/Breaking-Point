@@ -4,6 +4,7 @@ using FMODUnity;
 using FMOD.Studio;
 using static PlayerStats;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -71,14 +72,37 @@ public class PlayerMovement : MonoBehaviour
         playerStats = GetComponent<PlayerStats>();
         movement = inputActions.FindAction(movementName);
         sprint = inputActions.FindAction(sprintName);
-        playerPos = GameObject.Find("Alice");
-
-        qTEMechanicScript = GameObject.FindWithTag("QTE").GetComponent<QTEMechanicScript>();
-        qTEvent = GameObject.FindWithTag("QTEUI").GetComponent<QTEvent>();
-        targetPos = GameObject.FindWithTag("StartPos");
+        playerPos = GameObject.FindWithTag("Player");
 
         if (movement != null) movement.Enable();
         if (sprint != null) sprint.Enable();
+    }
+
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name.Contains("Game") || scene.name.Contains("Level"))
+        {
+            // Try to find and assign the components safely
+            GameObject qteObject = GameObject.FindWithTag("QTE");
+            if (qteObject != null)
+                qTEMechanicScript = qteObject.GetComponent<QTEMechanicScript>();
+
+            GameObject qteUIObject = GameObject.FindWithTag("QTEUI");
+            if (qteUIObject != null)
+                qTEvent = qteUIObject.GetComponent<QTEvent>();
+
+            targetPos = GameObject.FindWithTag("StartPos");
+        }
     }
 
     void Update()
@@ -115,7 +139,7 @@ public class PlayerMovement : MonoBehaviour
             currentSpeed = 0f;
         }
 
-        //animator.SetFloat("speed", currentSpeed);
+        animator.SetFloat("speed", currentSpeed);
     }
 
     void ApplyGravity()
