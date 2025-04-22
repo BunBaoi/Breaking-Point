@@ -613,15 +613,12 @@ public IEnumerator MoveCube(Vector3 targetPosition) // targetPosition = Player <
     {
         Vector3 startPosition = qTEMechanicScript.objectPlayer.position;
         float timeElapsed = 0;
-        //Debug.Log(startPosition); // The start position is where the game object starts and leave off from. From testing the qte object moves starts and moves from the player to "targeted position"
-        //Debug.Log("Checkpoint Pos" + targetPosition); // "target" = "targetPosition"
 
         while (timeElapsed < qTEMechanicScript.MoTSpeed)
         {
             transform.position = Vector3.Lerp(startPosition, targetPosition, timeElapsed / qTEMechanicScript.MoTSpeed); // "startPosition" -> "targetPosition" + speed overtime
             timeElapsed += Time.deltaTime;
             yield return null;
-            Debug.Log("Moving");
         }
         //THIS STOPS QTE BY CHANGING THE ENUM 
         if (qTEMechanicScript.Pos_STOP_1.tag == "QTEStop" && qTEMechanicScript.PositionOfPlayer == QTEMechanicScript.PlayerPos.PlayerPos4)

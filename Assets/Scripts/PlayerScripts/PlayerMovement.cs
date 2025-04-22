@@ -139,7 +139,7 @@ public class PlayerMovement : MonoBehaviour
             currentSpeed = 0f;
         }
 
-        //animator.SetFloat("speed", currentSpeed);
+        animator.SetFloat("speed", currentSpeed);
     }
 
     void ApplyGravity()
