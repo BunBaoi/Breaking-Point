@@ -7,6 +7,7 @@ using TMPro;
 using FMOD.Studio;
 using FMODUnity;
 using Unity.VisualScripting;
+using UnityEngine.SceneManagement;
 
 public class PlayerStats : MonoBehaviour
 {
@@ -82,6 +83,8 @@ public class PlayerStats : MonoBehaviour
         {
             Instance = this;
         }
+
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
         void Start()
@@ -92,14 +95,30 @@ public class PlayerStats : MonoBehaviour
         playerMovement = GetComponent<PlayerMovement>();
         inventoryManager = FindObjectOfType<InventoryManager>();
 
-        qTEMechanicScript = GameObject.FindWithTag("QTE").GetComponent<QTEMechanicScript>();
-        qTEvent = GameObject.FindWithTag("QTEUI").GetComponent<QTEvent>();
-
         controller.slopeLimit = 45.0f;
 
         if (transitionCanvasGroup != null)
         {
             transitionCanvasGroup.gameObject.SetActive(false);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name.Contains("Game") || scene.name.Contains("Level"))
+        {
+            GameObject qteObj = GameObject.FindWithTag("QTE");
+            if (qteObj != null)
+                qTEMechanicScript = qteObj.GetComponent<QTEMechanicScript>();
+
+            GameObject qteUIObj = GameObject.FindWithTag("QTEUI");
+            if (qteUIObj != null)
+                qTEvent = qteUIObj.GetComponent<QTEvent>();
         }
     }
 

@@ -2021,6 +2021,7 @@ GameObject:
   - component: {fileID: 1121246635}
   - component: {fileID: 1121246634}
   - component: {fileID: 1121246633}
+  - component: {fileID: 1121246638}
   m_Layer: 0
   m_Name: Wise Climber
   m_TagString: NPC
@@ -2141,6 +2142,23 @@ Transform:
   - {fileID: 1852636541}
   m_Father: {fileID: 586281057}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1121246638
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1121246632}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ba74e95c946d4b1a868e03fe9fbe05a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  markerPrefab: {fileID: 4965775825754602158, guid: 45b40b2ebc75e47f29f592d7a65ced77, type: 3}
+  offset: {x: 0, y: 1.4, z: 0}
+  showIfBoolsTrue: []
+  hideIfBoolsTrue:
+  - BaseCampTrainingCompleted
 --- !u!223 &1150922513 stripped
 Canvas:
   m_CorrespondingSourceObject: {fileID: 114148789739534704, guid: d0ae1c84917b04d1daf215d126cf78c3, type: 3}
@@ -2454,6 +2472,9 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2800023770981936203, guid: dd4ae7dd7609c4af5bf4211166d2cd78, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1876428918}
     - targetCorrespondingSourceObject: {fileID: 6376614216622880214, guid: dd4ae7dd7609c4af5bf4211166d2cd78, type: 3}
       insertIndex: -1
       addedObject: {fileID: 0}
@@ -2608,7 +2629,7 @@ MonoBehaviour:
   key: 112
   key2: 109
   key3: 118
-  boolName: 
+  boolName: BaseCampTrainingCompleted
   tipManager: {fileID: 0}
   tipNumber: 0
   journalPageAdder: {fileID: 0}
@@ -3361,6 +3382,27 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1852636540}
   m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1876428916 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2800023770981936203, guid: dd4ae7dd7609c4af5bf4211166d2cd78, type: 3}
+  m_PrefabInstance: {fileID: 1262872945}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1876428918
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1876428916}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ba74e95c946d4b1a868e03fe9fbe05a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  markerPrefab: {fileID: 4965775825754602158, guid: 45b40b2ebc75e47f29f592d7a65ced77, type: 3}
+  offset: {x: 0, y: 2.2, z: 0}
+  showIfBoolsTrue: []
+  hideIfBoolsTrue: []
 --- !u!4 &1914232655 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3859812622371921254, guid: eae525995f0d24e51bf1975e1d4f4f04, type: 3}
@@ -3442,6 +3484,7 @@ GameObject:
   - component: {fileID: 1928149231}
   - component: {fileID: 1928149228}
   - component: {fileID: 1928149227}
+  - component: {fileID: 1928149232}
   m_Layer: 0
   m_Name: npc dialogue 2
   m_TagString: Tenzing
@@ -3512,6 +3555,23 @@ Transform:
   - {fileID: 1772478136}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1928149232
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1928149226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ba74e95c946d4b1a868e03fe9fbe05a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  markerPrefab: {fileID: 4965775825754602158, guid: 45b40b2ebc75e47f29f592d7a65ced77, type: 3}
+  offset: {x: 0, y: 1.4, z: 0}
+  showIfBoolsTrue: []
+  hideIfBoolsTrue:
+  - BaseCampTrainingCompleted
 --- !u!1 &2021137445
 GameObject:
   m_ObjectHideFlags: 0

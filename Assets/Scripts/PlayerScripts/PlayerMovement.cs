@@ -52,7 +52,7 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 velocity;
     private Vector2 moveInput;
 
-    private bool applyGravity = true;
+    [SerializeField] private bool applyGravity = true;
     private bool wasGravityApplied = false;
 
     void Awake()

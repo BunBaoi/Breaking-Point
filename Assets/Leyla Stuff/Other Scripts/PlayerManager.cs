@@ -184,7 +184,7 @@ public class PlayerManager : MonoBehaviour
                     playerInstance.transform.position = targetObject.transform.position;
                     playerInstance.transform.rotation = targetObject.transform.rotation;
                     shouldTeleport = false;  // Reset teleport flag after teleportation
-                    StartCoroutine(EnableCharacterControllerAfterDelay(characterController, 0.1f));
+                    StartCoroutine(EnableCharacterControllerAfterDelay(characterController, 0.5f));
                     Debug.Log($"Player teleported to {targetObject.name} - Position: {playerInstance.transform.position}, Rotation: {playerInstance.transform.rotation}");
                 }
                 else

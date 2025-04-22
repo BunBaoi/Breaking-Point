@@ -1804,7 +1804,7 @@ PrefabInstance:
     - target: {fileID: 730600553479505084, guid: d0be0bd2b6ed15646a4b0f315fae66b5, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: -8840270928745716039, guid: e6f4643c7dfa34ca3a698edd419b5cf8, type: 3}
+      objectReference: {fileID: 2100000, guid: c853be09a29974ca9ad9ae6edc01217f, type: 2}
     - target: {fileID: 2433859341134868059, guid: d0be0bd2b6ed15646a4b0f315fae66b5, type: 3}
       propertyPath: m_LocalScale.x
       value: 2.2857144
@@ -3055,6 +3055,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 47738037615667614, guid: 8d0d3b03628942a4da43b00f629daaf7, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: c853be09a29974ca9ad9ae6edc01217f, type: 2}
     - target: {fileID: 154497967182705887, guid: 8d0d3b03628942a4da43b00f629daaf7, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -3095,6 +3099,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2612125071210077024, guid: 8d0d3b03628942a4da43b00f629daaf7, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: c853be09a29974ca9ad9ae6edc01217f, type: 2}
     - target: {fileID: 2857274843767758567, guid: 8d0d3b03628942a4da43b00f629daaf7, type: 3}
       propertyPath: m_LocalPosition.x
       value: -21.45
@@ -3111,6 +3119,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: -12.571255
       objectReference: {fileID: 0}
+    - target: {fileID: 3520679796181814664, guid: 8d0d3b03628942a4da43b00f629daaf7, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: c853be09a29974ca9ad9ae6edc01217f, type: 2}
     - target: {fileID: 4570311252136545457, guid: 8d0d3b03628942a4da43b00f629daaf7, type: 3}
       propertyPath: m_LocalPosition.x
       value: -17.561638
@@ -3123,6 +3135,14 @@ PrefabInstance:
       propertyPath: m_LocalPosition.x
       value: -9.97
       objectReference: {fileID: 0}
+    - target: {fileID: 7947764938468782925, guid: 8d0d3b03628942a4da43b00f629daaf7, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: c853be09a29974ca9ad9ae6edc01217f, type: 2}
+    - target: {fileID: 8185114050120882435, guid: 8d0d3b03628942a4da43b00f629daaf7, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: c853be09a29974ca9ad9ae6edc01217f, type: 2}
     - target: {fileID: 8650669177477229471, guid: 8d0d3b03628942a4da43b00f629daaf7, type: 3}
       propertyPath: m_LocalPosition.x
       value: 1.14
@@ -4917,6 +4937,7 @@ GameObject:
   - component: {fileID: 2083321206}
   - component: {fileID: 2083321205}
   - component: {fileID: 2083321204}
+  - component: {fileID: 2083321207}
   m_Layer: 0
   m_Name: Camp 2
   m_TagString: Camp
@@ -4976,6 +4997,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2083321207
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2083321203}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ba74e95c946d4b1a868e03fe9fbe05a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  markerPrefab: {fileID: 4965775825754602158, guid: 45b40b2ebc75e47f29f592d7a65ced77, type: 3}
+  offset: {x: 0, y: 0, z: 0}
+  showIfBoolsTrue:
+  - Level2ArrivalDialogueCompleted
+  hideIfBoolsTrue:
+  - Level2ReachedCamp2
 --- !u!1001 &2128779469
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5075,7 +5114,7 @@ Transform:
   m_GameObject: {fileID: 2136351526}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -706.39, y: 142.85, z: -188.81}
+  m_LocalPosition: {x: -706.39, y: 144, z: -188.81}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
