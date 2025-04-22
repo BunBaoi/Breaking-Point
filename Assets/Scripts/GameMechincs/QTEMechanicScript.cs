@@ -56,7 +56,7 @@ public class QTEMechanicScript : MonoBehaviour
 
     void Update()
     {
-        //transform.LookAt(objectPlayer); ??????
+        //transform.LookAt(objectPlayer); causing qte object to rotate
     }
 
     public enum PlayerPos
@@ -132,6 +132,7 @@ public class QTEMechanicScript : MonoBehaviour
                     CHKCounter++;
                     StartCoroutine(playerStats.MoveCube(target)); // Move to -> "target"
                     CHKPos1 = true;
+                    Debug.Log("CHK true");
                 }
                 break;
 
