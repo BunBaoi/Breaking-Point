@@ -501,6 +501,12 @@ public class SettingsManager : MonoBehaviour
             return;
         }
 
+        if (VentureForthInteraction.IsVentureForthPanelOpen)
+        {
+            Debug.Log("Cannot open settings while Venture Forth is active.");
+            return;
+        }
+
         isMenuOpen = !isMenuOpen;
         settingsCanvas.SetActive(isMenuOpen);
 

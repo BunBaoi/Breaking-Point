@@ -41,6 +41,8 @@ public class VentureForthInteraction : MonoBehaviour
     [SerializeField] private List<string> requiredBoolKeysTrue = new List<string>();
     [SerializeField] private List<string> requiredBoolKeysFalse = new List<string>();
 
+    public static bool IsVentureForthPanelOpen { get; private set; } = false;
+
     void Awake()
     {
         // If inputActions is not assigned via the inspector, load it from the Resources/Keybinds folder
@@ -372,6 +374,8 @@ public class VentureForthInteraction : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
+        IsVentureForthPanelOpen = true;
+
         GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
 
         if (playerObject != null)
@@ -406,6 +410,8 @@ public class VentureForthInteraction : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        IsVentureForthPanelOpen = false;
 
         GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
 
