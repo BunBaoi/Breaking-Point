@@ -3,11 +3,13 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
+using FMODUnity;
 
 public class JournalUI : MonoBehaviour
 {
     [Header("UI Elements")]
     [SerializeField] private GameObject journalUI; // Parent UI container
+    [SerializeField] private EventReference pageTurnSFX;
 
     [Header("Left Page UI")]
     [SerializeField] private Image leftPageBackground;
@@ -73,7 +75,7 @@ public class JournalUI : MonoBehaviour
     private void Start()
     {
         // Find the InventoryManager and Inventory Canvas by names
-        GameObject player = GameObject.Find("Player");
+        GameObject player = GameObject.Find("Alice");
         if (player != null)
         {
             inventoryManager = player.GetComponent<InventoryManager>();
@@ -158,7 +160,7 @@ public class JournalUI : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.Alpha0))
+        /*if (Input.GetKeyDown(KeyCode.Alpha0))
         {
             Debug.Log($"Current Page Index: {currentPageIndex}");
 
@@ -196,7 +198,7 @@ public class JournalUI : MonoBehaviour
             {
                 Debug.Log("PageTracker.Instance is null.");
             }
-        }
+        }*/
     }
 
     public void SetJournalState(bool state)
@@ -445,6 +447,7 @@ public class JournalUI : MonoBehaviour
             currentPageIndex += 2; // Move forward by two pages
             PageTracker.Instance.SetCurrentPageIndex(currentPageIndex);
             UpdateJournalUI();
+            RuntimeManager.PlayOneShot(pageTurnSFX);
             Debug.Log($"Pages {currentPageIndex + 1} and {currentPageIndex + 2} updated");
         }
         /*else if (currentPageIndex + 1 < PageTracker.Instance.Pages.Count)
@@ -475,6 +478,7 @@ public class JournalUI : MonoBehaviour
             currentPageIndex -= 2; // Move back by two pages
             PageTracker.Instance.SetCurrentPageIndex(currentPageIndex);
             UpdateJournalUI();
+            RuntimeManager.PlayOneShot(pageTurnSFX);
             Debug.Log($"Pages {currentPageIndex + 1} and {currentPageIndex + 2} updated");
         }
         else if (currentPageIndex - 1 >= 0)

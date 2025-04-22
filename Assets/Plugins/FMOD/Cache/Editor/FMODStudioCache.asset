@@ -1837,6 +1837,33 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 240
+--- !u!114 &-302964109114645709
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Page Turn SFX
+  m_EditorClassIdentifier: 
+  Path: event:/Page Turn SFX
+  Guid:
+    Data1: -742692152
+    Data2: 1265083561
+    Data3: 554283935
+    Data4: -1261910588
+  Banks:
+  - {fileID: 4426019277400368754}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 1000
 --- !u!114 &-183726730606990452
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2048,12 +2075,13 @@ MonoBehaviour:
   - {fileID: 4452320629164318110}
   - {fileID: 907562468884068073}
   - {fileID: 607342914835041092}
+  - {fileID: -302964109114645709}
   EditorParameters: []
   MasterBanks:
   - {fileID: 4426019277400368754}
   StringsBanks:
   - {fileID: 8901448029410065974}
-  cacheTime: 638801543008323959
+  cacheTime: 638809905311364667
   cacheVersion: 131620
 --- !u!114 &49747036387007053
 MonoBehaviour:
@@ -2989,10 +3017,10 @@ MonoBehaviour:
   Path: Assets/Resources/Breaking-Point-Audio-FMOD/Build/Desktop/Master.bank
   Name: Master
   StudioPath: bank:/Master
-  lastModified: 638801543008323959
+  lastModified: 638809905310027208
   FileSizes:
   - Name: Desktop
-    Value: 23230016
+    Value: 23240064
   Exists: 1
 --- !u!114 &4452320629164318110
 MonoBehaviour:
@@ -3974,10 +4002,10 @@ MonoBehaviour:
   Path: Assets/Resources/Breaking-Point-Audio-FMOD/Build/Desktop/Master.strings.bank
   Name: Master.strings
   StudioPath: bank:/Master.strings
-  lastModified: 638801409242874242
+  lastModified: 638809905311364667
   FileSizes:
   - Name: Desktop
-    Value: 6306
+    Value: 6350
   Exists: 1
 --- !u!114 &9219985514146342073
 MonoBehaviour:

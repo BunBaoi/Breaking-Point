@@ -69,6 +69,10 @@ public class SettingsManager : MonoBehaviour
     private Bus masterMusicBus;
     private Bus menuMusicBus;
 
+    [Header("Tips Setting")]
+    [SerializeField] private Toggle showTipsToggle;
+    public static bool showTipsEnabled = true;
+
     [Header("Reset to Default Settings")]
     [SerializeField] private Button resetButton;
     [SerializeField] private TMP_Text resetMessageText;
@@ -320,6 +324,20 @@ public class SettingsManager : MonoBehaviour
             menuMusicSlider.onValueChanged.AddListener(UpdateMenuMusicVolume);
         }
 
+        // TIPS SETTINGS
+
+        showTipsEnabled = PlayerPrefs.GetInt("ShowTips", 1) == 1;
+
+        if (showTipsToggle != null)
+        {
+            showTipsToggle.isOn = showTipsEnabled;
+            showTipsToggle.onValueChanged.AddListener(delegate { ToggleShowTips(showTipsToggle.isOn); });
+        }
+        else
+        {
+            Debug.LogWarning("Show Tips Toggle not assigned!");
+        }
+
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
@@ -368,6 +386,13 @@ public class SettingsManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void ToggleShowTips(bool value)
+    {
+        showTipsEnabled = value;
+        PlayerPrefs.SetInt("ShowTips", value ? 1 : 0);
+        PlayerPrefs.Save();
     }
 
     private void ApplyPlayerSettings()
@@ -734,6 +759,14 @@ public class SettingsManager : MonoBehaviour
         brightnessSlider.value = 0.5f;
         UpdateBrightness(0.5f);
         PlayerPrefs.SetFloat("Brightness", 0.5f);
+
+        // Reset Show Tips
+        showTipsEnabled = true;
+        if (showTipsToggle != null)
+        {
+            showTipsToggle.isOn = true;
+        }
+        PlayerPrefs.SetInt("ShowTips", 1);
 
         // Reset Mouse Sensitivity
         mouseSensitivity = 100f;
