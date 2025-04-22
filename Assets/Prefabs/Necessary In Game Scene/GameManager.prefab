@@ -26323,14 +26323,14 @@ MonoBehaviour:
     sfxEvents: []
     shouldMusicLoop: 1
     shouldSFXLoop: 0
-  - stateName: Level 1 Intro Beginning
+  - stateName: Level 1 Wind
     musicEvent:
       Guid:
-        Data1: 0
-        Data2: 0
-        Data3: 0
-        Data4: 0
-      Path: 
+        Data1: 1892999442
+        Data2: 1090364904
+        Data3: 1283031707
+        Data4: -1732319094
+      Path: event:/No Audio
     sfxEvents:
     - Guid:
         Data1: 1084600121
@@ -26340,14 +26340,14 @@ MonoBehaviour:
       Path: event:/Whistle Wind SFX
     shouldMusicLoop: 1
     shouldSFXLoop: 1
-  - stateName: Level 1 Talked to Sherpa Entrance NPC
+  - stateName: Level 1 Main
     musicEvent:
       Guid:
-        Data1: 0
-        Data2: 0
-        Data3: 0
-        Data4: 0
-      Path: 
+        Data1: -829719389
+        Data2: 1168696647
+        Data3: 1316054677
+        Data4: -1448707400
+      Path: event:/Embrace Music
     sfxEvents:
     - Guid:
         Data1: 1084600121
@@ -26357,21 +26357,55 @@ MonoBehaviour:
       Path: event:/Whistle Wind SFX
     shouldMusicLoop: 1
     shouldSFXLoop: 1
-  - stateName: Test1
+  - stateName: Level 2 Start
     musicEvent:
       Guid:
-        Data1: 1165018787
-        Data2: 1328834260
-        Data3: -1494058361
-        Data4: 882716713
-      Path: event:/Tradegy Music
+        Data1: 1892999442
+        Data2: 1090364904
+        Data3: 1283031707
+        Data4: -1732319094
+      Path: event:/No Audio
     sfxEvents:
     - Guid:
-        Data1: 1084600121
-        Data2: 1225941282
-        Data3: -1605859688
-        Data4: 1048420916
-      Path: event:/Whistle Wind SFX
+        Data1: 1629063067
+        Data2: 1232768008
+        Data3: -826952534
+        Data4: 311755850
+      Path: event:/Steady Wind SFX
+    shouldMusicLoop: 1
+    shouldSFXLoop: 1
+  - stateName: Level 2 Main
+    musicEvent:
+      Guid:
+        Data1: -829719389
+        Data2: 1168696647
+        Data3: 1316054677
+        Data4: -1448707400
+      Path: event:/Embrace Music
+    sfxEvents:
+    - Guid:
+        Data1: 1629063067
+        Data2: 1232768008
+        Data3: -826952534
+        Data4: 311755850
+      Path: event:/Steady Wind SFX
+    shouldMusicLoop: 1
+    shouldSFXLoop: 1
+  - stateName: Level 2 End
+    musicEvent:
+      Guid:
+        Data1: -829719389
+        Data2: 1168696647
+        Data3: 1316054677
+        Data4: -1448707400
+      Path: event:/Embrace Music
+    sfxEvents:
+    - Guid:
+        Data1: 1929616748
+        Data2: 1125818260
+        Data3: 281503669
+        Data4: -634850341
+      Path: event:/Gust Wind SFX
     shouldMusicLoop: 1
     shouldSFXLoop: 1
   initialStateName: Main Menu Soundtrack
