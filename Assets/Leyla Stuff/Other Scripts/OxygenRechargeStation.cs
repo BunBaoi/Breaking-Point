@@ -11,7 +11,6 @@ public class OxygenRechargeStation : MonoBehaviour
     [SerializeField] private float refillRate = 1f; // Default refill rate per second
     [SerializeField] private bool isRefilling = false;
     [SerializeField] private bool isPlayerInTrigger = false;
-    [SerializeField] private PlayerStats playerStats;
 
     [Header("Interact Text Settings")]
     [SerializeField] private GameObject interactTextPrefab;
@@ -35,19 +34,16 @@ public class OxygenRechargeStation : MonoBehaviour
     [Header("FMOD")]
     [SerializeField] private EventReference refillSoundEvent;
 
-    private EventInstance refillSoundInstance;
-    private bool isRefillSoundPlaying = false;
+    [SerializeField] private EventInstance refillSoundInstance;
+    [SerializeField] private bool isRefillSoundPlaying = false;
 
     private void Start()
     {
-        GameObject player = GameObject.Find("Player");
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
             inventoryManager = player.GetComponent<InventoryManager>();
         }
-
-        refillSoundInstance = RuntimeManager.CreateInstance(refillSoundEvent);
-        RuntimeManager.AttachInstanceToGameObject(refillSoundInstance, transform, GetComponent<Rigidbody>());
     }
 
     private void OnEnable()
@@ -128,17 +124,40 @@ public class OxygenRechargeStation : MonoBehaviour
         }
     }
 
-        private void StartRefilling()
+    private void StartRefilling()
     {
-        if (playerStats != null && IsLookingAtOxygenStation())
+        if (PlayerStats.Instance != null && IsLookingAtOxygenStation())
         {
             Debug.Log("Refilling oxygen...");
             isRefilling = true;
 
-            if (!isRefillSoundPlaying && playerStats.Oxygen < 100)
+            if (!isRefillSoundPlaying && PlayerStats.Instance.Oxygen < 100)
             {
-                refillSoundInstance.start();
-                isRefillSoundPlaying = true;
+                // Create a fresh instance each time you start refilling
+                refillSoundInstance = RuntimeManager.CreateInstance(refillSoundEvent);
+
+                // Find child with "Oxygen Refill Station" tag
+                Transform refillTarget = null;
+                foreach (Transform child in transform)
+                {
+                    if (child.CompareTag("Oxygen Refill Station"))
+                    {
+                        refillTarget = child;
+                        break;
+                    }
+                }
+
+                if (refillTarget != null)
+                {
+                    RuntimeManager.AttachInstanceToGameObject(refillSoundInstance, refillTarget);
+                    refillSoundInstance.set3DAttributes(RuntimeUtils.To3DAttributes(refillTarget));
+                    refillSoundInstance.start();
+                    isRefillSoundPlaying = true;
+                }
+                else
+                {
+                    Debug.LogWarning("No refill target found for sound.");
+                }
             }
 
             StartCoroutine(RefillOxygen());
@@ -155,6 +174,7 @@ public class OxygenRechargeStation : MonoBehaviour
             if (isRefillSoundPlaying)
             {
                 refillSoundInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+                refillSoundInstance.release();
                 isRefillSoundPlaying = false;
             }
         }
@@ -285,7 +305,6 @@ public class OxygenRechargeStation : MonoBehaviour
     {
         if (other.CompareTag("Player") && IsHoldingRequiredItem())
         {
-            playerStats = other.GetComponent<PlayerStats>();
             player = other.transform;
             isPlayerInTrigger = true;
             Debug.Log("player entered oxygen refill trigger");
@@ -415,7 +434,7 @@ if (interactTextInstance != null && !IsHoldingRequiredItem() && !IsLookingAtOxyg
         int layerMask = LayerMask.GetMask("Oxygen Refill Station");
 
         // Perform the raycast with the layer mask to limit the detection to that layer.
-        if (Physics.Raycast(ray, out hit, 3f, layerMask)) // Check within 3 meters
+        if (Physics.Raycast(ray, out hit, 3f, layerMask, QueryTriggerInteraction.Ignore)) // Check within 3 meters
         {
             return hit.collider.CompareTag("Oxygen Refill Station"); // Ensure the looked-at object has the correct tag
         }
@@ -433,13 +452,13 @@ if (interactTextInstance != null && !IsHoldingRequiredItem() && !IsLookingAtOxyg
 
     private IEnumerator RefillOxygen()
     {
-        while (isRefilling && playerStats != null && playerStats.Oxygen < 100)
+        while (isRefilling && PlayerStats.Instance != null && PlayerStats.Instance.Oxygen < 100)
         {
-            playerStats.Oxygen += refillRate * Time.deltaTime;
+            PlayerStats.Instance.Oxygen += refillRate * Time.deltaTime;
 
-            playerStats.Oxygen = Mathf.Min(playerStats.Oxygen, 100f);
+            PlayerStats.Instance.Oxygen = Mathf.Min(PlayerStats.Instance.Oxygen, 100f);
 
-            if (playerStats.Oxygen >= 100f && isRefillSoundPlaying)
+            if (PlayerStats.Instance.Oxygen >= 100f && isRefillSoundPlaying)
             {
                 refillSoundInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
                 isRefillSoundPlaying = false;

@@ -13,6 +13,7 @@ public class PlayerManager : MonoBehaviour
 
     [Header("UI Settings")]
     public CanvasGroup fadeCanvasGroup;
+    public GameObject fadeCanvasGroupObject;
     public float fadeDuration = 1f;
 
     private Vector3 teleportPosition;
@@ -48,9 +49,17 @@ public class PlayerManager : MonoBehaviour
     // Teleport function that takes a tag to find an empty GameObject to teleport to
     public void TeleportToScene(string sceneName, string targetTag)
     {
+        Time.timeScale = 1f;
         targetTagToFind = targetTag;
         shouldTeleport = true;
         StartCoroutine(FadeAndLoadScene(sceneName));
+
+
+        PlayerMovement playerMovement = playerInstance.GetComponent<PlayerMovement>();
+            if (playerMovement != null)
+        {
+            playerMovement.SetApplyGravity(false);
+        }
 
         CharacterController characterController = playerInstance.GetComponent<CharacterController>();
         if (characterController != null)
@@ -62,9 +71,15 @@ public class PlayerManager : MonoBehaviour
 
     private IEnumerator FadeAndLoadScene(string sceneName)
     {
+        fadeCanvasGroupObject.SetActive(true);
+
+        yield return null;
+
         yield return StartCoroutine(Fade(1f));
 
         GameManager.Instance.ShowLoadingPanel();
+
+        yield return null;
 
         AsyncOperation asyncOperation = SceneManager.LoadSceneAsync(sceneName);
         asyncOperation.allowSceneActivation = false;
@@ -73,7 +88,7 @@ public class PlayerManager : MonoBehaviour
         {
             if (asyncOperation.progress >= 0.9f)
             {
-                yield return new WaitForSeconds(0.5f);
+                yield return new WaitForSecondsRealtime(0.5f);
                 asyncOperation.allowSceneActivation = true;
             }
 
@@ -198,6 +213,12 @@ public class PlayerManager : MonoBehaviour
         {
             characterController.enabled = true;
             Debug.Log("CharacterController re-enabled.");
+        }
+
+        PlayerMovement playerMovement = playerInstance.GetComponent<PlayerMovement>();
+        if (playerMovement != null)
+        {
+            playerMovement.SetApplyGravity(true);
         }
     }
 

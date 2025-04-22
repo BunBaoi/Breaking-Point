@@ -13,7 +13,7 @@ public class NPCDialogue : MonoBehaviour
 
     [Header("Interact Text")]
     [SerializeField] private GameObject interactTextPrefab;
-    [SerializeField] private float yAxis = 0.9f;
+    [SerializeField] private float yAxis = 0.1f;
     [SerializeField] private float defaultYAxis = 0.9f;
 
     [Header("Testing Purposes")]
@@ -79,6 +79,7 @@ public class NPCDialogue : MonoBehaviour
         if (!isDialoguePressed && interactTextPrefab != null && interactTextInstance == null && CanStartDialogue())
         {
             interactTextInstance = Instantiate(interactTextPrefab);
+            interactTextInstance.SetActive(false);
 
             interactTextInstance.transform.SetParent(transform, false);
 
@@ -97,27 +98,8 @@ public class NPCDialogue : MonoBehaviour
 
                     Transform playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
 
-                    if (playerTransform != null)
-                    {
-                        // Direction from NPC to player
-                        Vector3 toPlayer = (playerTransform.position - transform.position).normalized;
+                    PositionAndRotateInteractText(playerTransform, false);
 
-                        // Set position slightly in front of NPC, facing the player
-                        Vector3 frontOfNPC = transform.position + toPlayer * 1.0f;
-
-                        frontOfNPC.y += yAxis;
-
-                        // Set world position
-                        interactTextInstance.transform.position = frontOfNPC;
-
-                        // Rotate text to face player
-                        Vector3 lookDirection = (playerTransform.position - frontOfNPC);
-                        lookDirection.y = 0;
-                        if (lookDirection != Vector3.zero)
-                        {
-                            interactTextInstance.transform.rotation = Quaternion.LookRotation(lookDirection);
-                        }
-                    }
                 }
                 else
                 {
@@ -296,6 +278,43 @@ public class NPCDialogue : MonoBehaviour
         }
     }
 
+    void PositionAndRotateInteractText(Transform targetPlayer, bool smooth = false)
+    {
+        if (interactTextInstance == null || targetPlayer == null) return;
+
+        // Flattened direction to player (ignores Y)
+        Vector3 toPlayer = targetPlayer.position - transform.position;
+        toPlayer.y = 0;
+        toPlayer.Normalize();
+
+        // Calculate the desired position in front of the NPC (in world space)
+        Vector3 frontOfNPC = transform.position + toPlayer * 0.8f;
+        frontOfNPC.y += yAxis; // You control the Y position
+
+        // Smooth or snap to position
+        if (smooth)
+        {
+            interactTextInstance.transform.position = Vector3.Lerp(
+                interactTextInstance.transform.position,
+                frontOfNPC,
+                Time.deltaTime * 15f
+            );
+        }
+        else
+        {
+            interactTextInstance.transform.position = frontOfNPC;
+        }
+
+        // Look at player, but stay horizontal
+        Vector3 lookDirection = targetPlayer.position - interactTextInstance.transform.position;
+        lookDirection.y = 0;
+
+        if (lookDirection != Vector3.zero)
+        {
+            interactTextInstance.transform.rotation = Quaternion.LookRotation(lookDirection);
+        }
+    }
+
     private void OnTriggerStay(Collider other)
     {
         if (other.CompareTag("Player") && playerInRange)
@@ -304,23 +323,8 @@ public class NPCDialogue : MonoBehaviour
             {
                 UpdateSprite(iconObject.gameObject, interactActionName);
 
-                Transform playerTransform = other.transform;
-
-                // Get direction from NPC to player
-                Vector3 toPlayer = (playerTransform.position - transform.position).normalized;
-
-                // Position the interact text in front of NPC toward the player
-                Vector3 frontOfNPC = transform.position + toPlayer * 1.0f;
-                frontOfNPC.y += yAxis;
-                interactTextInstance.transform.position = Vector3.Lerp(interactTextInstance.transform.position, frontOfNPC, Time.deltaTime * 15f);
-
-                // Make it face the player
-                Vector3 lookDirection = (playerTransform.position - frontOfNPC);
-                lookDirection.y = 0;
-                if (lookDirection != Vector3.zero)
-                {
-                    interactTextInstance.transform.rotation = Quaternion.LookRotation(lookDirection);
-                }
+                PositionAndRotateInteractText(player, true);
+                interactTextInstance.SetActive(true);
             }
         }
     }
@@ -360,7 +364,8 @@ public class NPCDialogue : MonoBehaviour
         RaycastHit hit;
         Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
 
-        if (Physics.Raycast(ray, out hit, 3f))
+        int layerMask = ~LayerMask.GetMask("Ignore Raycast");
+        if (Physics.Raycast(ray, out hit, 3f, layerMask, QueryTriggerInteraction.Ignore))
         {
             Debug.Log("Raycast hit: " + hit.collider.name);
             if (hit.collider != null && hit.collider.gameObject.name == "NPC Mesh" && hit.collider.transform.IsChildOf(transform) && playerInRange)
@@ -426,6 +431,12 @@ public class NPCDialogue : MonoBehaviour
         if (npcDialogueTree != null)
         {
             DialogueManager.Instance.StartDialogue(npcDialogueTree);
+
+            if (CallingCompanionMethods.Instance != null)
+            {
+                CallingCompanionMethods.Instance.CallTeleportToPlayer();
+                CallingCompanionMethods.Instance.CallFacePlayer();
+            }
         }
     }
 

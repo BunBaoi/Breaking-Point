@@ -5,7 +5,6 @@ public class NPCDialogueTrigger : MonoBehaviour
 {
     [Header("Dialogue Settings")]
     [SerializeField] private DialogueTree npcDialogueTree;
-    [SerializeField] private CompanionScript companionScript;
     private bool isDialogueTriggered;
 
     [SerializeField] private string dialogueKey = "DialogueTriggered";
@@ -92,6 +91,12 @@ public class NPCDialogueTrigger : MonoBehaviour
             PlayerPrefs.SetInt(dialogueKey, 1);
             PlayerPrefs.Save();
             DialogueManager.Instance.StartDialogue(npcDialogueTree);
+
+            if (CallingCompanionMethods.Instance != null)
+            {
+                CallingCompanionMethods.Instance.CallTeleportToPlayer();
+                CallingCompanionMethods.Instance.CallFacePlayer();
+            }
         }
     }
 }

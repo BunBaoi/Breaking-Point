@@ -4,6 +4,7 @@ using FMODUnity;
 using FMOD.Studio;
 using static PlayerStats;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -52,6 +53,7 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 moveInput;
 
     private bool applyGravity = true;
+    private bool wasGravityApplied = false;
 
     void Awake()
     {
@@ -70,9 +72,37 @@ public class PlayerMovement : MonoBehaviour
         playerStats = GetComponent<PlayerStats>();
         movement = inputActions.FindAction(movementName);
         sprint = inputActions.FindAction(sprintName);
+        playerPos = GameObject.FindWithTag("Player");
 
         if (movement != null) movement.Enable();
         if (sprint != null) sprint.Enable();
+    }
+
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name.Contains("Game") || scene.name.Contains("Level"))
+        {
+            // Try to find and assign the components safely
+            GameObject qteObject = GameObject.FindWithTag("QTE");
+            if (qteObject != null)
+                qTEMechanicScript = qteObject.GetComponent<QTEMechanicScript>();
+
+            GameObject qteUIObject = GameObject.FindWithTag("QTEUI");
+            if (qteUIObject != null)
+                qTEvent = qteUIObject.GetComponent<QTEvent>();
+
+            targetPos = GameObject.FindWithTag("StartPos");
+        }
     }
 
     void Update()
@@ -118,10 +148,16 @@ public class PlayerMovement : MonoBehaviour
         {
             velocity.y += gravity * Time.deltaTime;
             controller.Move(velocity * Time.deltaTime);
+
+            // Debug log for gravity application
+            // Debug.Log($"Applying Gravity: {velocity.y} (gravity: {gravity})");
         }
         else
         {
             velocity.y = 0;
+
+            // Debug log when gravity is not applied
+            // Debug.Log("Gravity disabled: velocity.y set to 0");
         }
     }
 
@@ -151,6 +187,7 @@ public class PlayerMovement : MonoBehaviour
             qTEMechanicScript.QTEMove();
             canMove = false;
             playerStats.QTEState = true;
+            qTEMechanicScript.QTEMechanicScriptActive = true;
         }
     }
 
@@ -159,14 +196,21 @@ public class PlayerMovement : MonoBehaviour
         canMove = state;
     }
 
-    // Animation event for Left Footstep
+    // Left Footstep
     public void PlayLeftFootstepSound()
     {
         if (leftFootstepEvents.Length == 0) return;
 
+        Transform footTransform = transform;
+
         EventReference soundEventReference = leftFootstepEvents[leftFootstepIndex];
 
         EventInstance footstepInstance = RuntimeManager.CreateInstance(soundEventReference);
+
+        // Set the 3D attributes for the footstep sound based on the foot's position
+        Vector3 footPosition = footTransform.position + new Vector3(0, 0, 0.3f);
+        footstepInstance.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(footPosition));
+
         footstepInstance.start();
         footstepInstance.release();
 
@@ -174,14 +218,21 @@ public class PlayerMovement : MonoBehaviour
         leftFootstepIndex = (leftFootstepIndex + 1) % leftFootstepEvents.Length;
     }
 
-    // Animation event for Right Footstep
+    // Right Footstep
     public void PlayRightFootstepSound()
     {
         if (rightFootstepEvents.Length == 0) return;
 
+        Transform footTransform = transform;
+
         EventReference soundEventReference = rightFootstepEvents[rightFootstepIndex];
 
         EventInstance footstepInstance = RuntimeManager.CreateInstance(soundEventReference);
+
+        // Set the 3D attributes for the footstep sound based on the foot's position
+        Vector3 footPosition = footTransform.position + new Vector3(0, 0, 0.3f);
+        footstepInstance.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(footPosition));
+
         footstepInstance.start();
         footstepInstance.release();
 
@@ -189,12 +240,11 @@ public class PlayerMovement : MonoBehaviour
         rightFootstepIndex = (rightFootstepIndex + 1) % rightFootstepEvents.Length;
     }
 
-    
     public void binocularZoom()
     {
         if (Input.GetKey(KeyCode.Z))
         {
-            Debug.Log("Z button pressed");
+            //Debug.Log("Z button pressed");
             playerCamera.fieldOfView = zoomFOV;
             binocularsUI.enabled = true;
         }

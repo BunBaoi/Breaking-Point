@@ -23,6 +23,10 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private float scrollSpeed = 0.03f;
     public Dictionary<string, bool> dialogueTreeProgress = new Dictionary<string, bool>();
 
+    [Header("NPC Dialogue Settings")]
+    [SerializeField] private GameObject npcDialogueTextPrefab;
+    private GameObject activeNPCBubble;
+
     [Header("Colour Settings")]
     [SerializeField] private string npcNameColorHex = "#D95959"; // Default colour
     [SerializeField] private string dialogueTextColorHex = "#4DB7C0"; // Default colour
@@ -79,6 +83,7 @@ public class DialogueManager : MonoBehaviour
     private Coroutine currentLookAtNpcCoroutine;
     private Coroutine scrollingCoroutine;
     private Coroutine indicatorCoroutine;
+    private string currentNpcTag = null;
 
     private List<GameObject> instantiatedButtons = new List<GameObject>();
 
@@ -597,12 +602,6 @@ public class DialogueManager : MonoBehaviour
 
         PlayerStats.Instance.FadeOut();
 
-        if (CallingCompanionMethods.Instance != null)
-        {
-            CallingCompanionMethods.Instance.CallTeleportToPlayer();
-            CallingCompanionMethods.Instance.CallFacePlayer();
-        }
-
         GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
 
         if (playerObject != null)
@@ -835,20 +834,20 @@ public class DialogueManager : MonoBehaviour
     {
         if (!string.IsNullOrEmpty(node.npcTag))
         {
-            // Find all NPCs with the given tag
+            currentNpcTag = node.npcTag; // Update the current tag
+
             GameObject[] npcs = GameObject.FindGameObjectsWithTag(node.npcTag);
             if (npcs.Length > 0)
             {
                 GameObject closestNpc = null;
-                float closestDistance = Mathf.Infinity; // Start with a very large distance
+                float closestDistance = Mathf.Infinity;
 
-                // Find the closest NPC
                 GameObject player = GameObject.FindGameObjectWithTag("Player");
+
                 foreach (GameObject npc in npcs)
                 {
                     if (npc != null && player != null)
                     {
-                        // Calculate the distance from the player to the center of the NPC
                         Vector3 npcCenter = npc.transform.position;
                         float distance = Vector3.Distance(player.transform.position, npcCenter);
 
@@ -860,22 +859,29 @@ public class DialogueManager : MonoBehaviour
                     }
                 }
 
-                // If closest NPC found, start the look at NPC process
                 if (closestNpc != null)
                 {
                     if (currentLookAtNpcCoroutine != null)
-                    {
                         StopCoroutine(currentLookAtNpcCoroutine);
-                    }
 
-                    // Start a new coroutine to look at the closest NPC
-                    currentLookAtNpcCoroutine = StartCoroutine(SmoothLookAtNpc(closestNpc));
+                    currentLookAtNpcCoroutine = StartCoroutine(SmoothLookAtNpc(closestNpc, currentNpcTag));
                 }
+            }
+        }
+        else
+        {
+            // Stop if NPC tag is null/empty
+            currentNpcTag = null;
+
+            if (currentLookAtNpcCoroutine != null)
+            {
+                StopCoroutine(currentLookAtNpcCoroutine);
+                currentLookAtNpcCoroutine = null;
             }
         }
     }
 
-    private IEnumerator SmoothLookAtNpc(GameObject npc)
+    private IEnumerator SmoothLookAtNpc(GameObject npc, string tagAtStart)
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         GameObject cameraObject = GameObject.FindGameObjectWithTag("PlayerCamera");
@@ -884,44 +890,30 @@ public class DialogueManager : MonoBehaviour
         {
             mainCamera = cameraObject.GetComponent<Camera>();
         }
+
         if (npc != null && mainCamera != null && player != null)
         {
-            // Calculate the position to look at
-            Vector3 npcHeadPosition = npc.transform.position + Vector3.up * 1.7f; // Can be adjusted based on NPC Mesh to look at head
-
-            // Calculate the direction vector from the camera to the NPC's head
-            Vector3 targetDirection = npcHeadPosition - mainCamera.transform.position;
-
-            // Calculate the target rotation based on the direction (this will affect both yaw and pitch)
-            Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
-
             CameraController cameraController = mainCamera.GetComponent<CameraController>();
+            float smoothSpeed = 2f;
 
-            // Smoothly rotate the camera to the target rotation
-            while (Quaternion.Angle(mainCamera.transform.rotation, targetRotation) > 0.1f)
+            while (currentNpcTag == tagAtStart && !string.IsNullOrEmpty(currentNpcTag))
             {
-                // Smoothly rotate the camera horizontally (yaw) and vertically (pitch)
+                Transform head = npc.transform.Find("Head");
+                Vector3 npcHeadPosition = head != null ? head.position : npc.transform.position + Vector3.up * 1.0f;
+
+                Vector3 targetDirection = npcHeadPosition - mainCamera.transform.position;
+                Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
+
                 Quaternion currentRotation = mainCamera.transform.rotation;
+                float targetYaw = Mathf.LerpAngle(currentRotation.eulerAngles.y, targetRotation.eulerAngles.y, Time.deltaTime * smoothSpeed);
+                float targetPitch = Mathf.LerpAngle(cameraController.xRotation, targetRotation.eulerAngles.x, Time.deltaTime * smoothSpeed);
 
-                // Smoothly interpolate the yaw (horizontal rotation) towards the target yaw
-                float targetYaw = Mathf.LerpAngle(currentRotation.eulerAngles.y, targetRotation.eulerAngles.y, Time.deltaTime * 2f);
-                float targetPitch = Mathf.LerpAngle(cameraController.xRotation, targetRotation.eulerAngles.x, Time.deltaTime * 2f);
-
-                // Apply the smooth yaw (horizontal) and pitch (vertical) to the camera
                 mainCamera.transform.rotation = Quaternion.Euler(targetPitch, targetYaw, 0);
-
-                // Also rotate the player (body) to face the NPC (yaw only)
                 player.transform.rotation = Quaternion.Euler(0, targetYaw, 0);
-
-                // Update the camera's xRotation to reflect the smooth pitch (vertical rotation)
                 cameraController.xRotation = targetPitch;
 
                 yield return null;
             }
-
-            // Final alignment with the NPC's head (ensure no overshooting)
-            mainCamera.transform.rotation = targetRotation;
-            player.transform.rotation = Quaternion.Euler(0, targetRotation.eulerAngles.y, 0);
         }
     }
 
@@ -995,6 +987,26 @@ public class DialogueManager : MonoBehaviour
 
                     // Set the pitch and start the sound
                     currentSound.setPitch(pitch);
+
+                    // Try to find the NPC GameObject
+                    GameObject targetObject = null;
+
+                    if (!string.IsNullOrEmpty(node.npcName))
+                    {
+                        targetObject = GameObject.Find(node.npcName);
+                    }
+
+                    // Fallback to player if NPC is not found or name is null
+                    if (targetObject == null)
+                    {
+                        targetObject = GameObject.FindWithTag("PlayerCamera");
+                    }
+
+                    if (targetObject != null)
+                    {
+                        currentSound.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(targetObject.transform));
+                    }
+
                     currentSound.start();
                 }
             }
@@ -1140,5 +1152,169 @@ public class DialogueManager : MonoBehaviour
     public void SetAutomaticDialogueState(bool isAutomatic)
     {
         isAutomaticDialogueActive = isAutomatic;
+    }
+
+    // NPC DIALOGUE
+
+    public void StartNPCDialogue(DialogueTree dialogueTree, Transform npcTransform)
+    {
+        if (activeNPCBubble != null)
+            Destroy(activeNPCBubble);
+
+        if (dialogueTree == null || dialogueTree.dialogueNodes == null || dialogueTree.dialogueNodes.Count == 0)
+        {
+            Debug.LogWarning("Dialogue tree is empty or null.");
+            return;
+        }
+
+        if (GetDialogueProgress(dialogueTree.treeID))
+        {
+            Debug.Log("Dialogue with treeID " + dialogueTree.treeID + " has already been completed.");
+            return;
+        }
+
+        SetDialogueProgress(dialogueTree.treeID, true);
+
+        // Start with the first dialogue node and NPC
+        DialogueNode firstNode = dialogueTree.dialogueNodes[0];
+        GameObject npc = GameObject.Find(firstNode.npcName); // Find NPC by name
+        if (npc == null)
+        {
+            Debug.LogWarning("NPC not found: " + firstNode.npcName);
+            return;
+        }
+
+        Collider npcCollider = npc.GetComponent<Collider>();
+        if (npcCollider == null)
+        {
+            Debug.LogWarning("NPC collider not found.");
+            return;
+        }
+
+        Vector3 bubblePosition = npcCollider.bounds.center + Vector3.up * 1.3f; // Adjust bubble height
+
+        activeNPCBubble = Instantiate(npcDialogueTextPrefab, bubblePosition, Quaternion.identity);
+        activeNPCBubble.transform.SetParent(npcTransform);
+
+        TMP_Text bubbleText = activeNPCBubble.GetComponentInChildren<TMP_Text>();
+
+        StartCoroutine(PlayNPCDialogueSequence(dialogueTree, bubbleText));
+    }
+
+    private IEnumerator PlayNPCDialogueSequence(DialogueTree tree, TMP_Text textField)
+    {
+        FMOD.Studio.EventInstance currentSound = default;
+
+        // Process each dialogue node
+        foreach (DialogueNode node in tree.dialogueNodes)
+        {
+            string fullText = node.dialogueText;
+            textField.text = "";
+
+            GameObject npc = GameObject.Find(node.npcName); // Update the NPC based on the current node
+            if (npc == null)
+            {
+                Debug.LogWarning("NPC not found: " + node.npcName);
+                continue; // Skip to the next node
+            }
+
+            Collider npcCollider = npc.GetComponent<Collider>();
+            if (npcCollider == null)
+            {
+                Debug.LogWarning("NPC collider not found.");
+                continue; // Skip to the next node
+            }
+
+            // Reposition the dialogue bubble above the current NPC's head
+            Vector3 bubblePosition = npcCollider.bounds.center + Vector3.up * 1.3f;
+            activeNPCBubble.transform.position = bubblePosition;
+
+            // Handle audio for dialogue
+            DialogueAudio audioSettings = node.dialogueAudio;
+            int validCharCount = 0;
+            int npcHash = node.npcName.GetHashCode();
+            bool hasPlayedFirstSound = false;
+
+            // If not using per-letter dialogue audio, play single sound
+            if (!node.useDialogueAudio)
+            {
+                if (currentSound.isValid())
+                {
+                    currentSound.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+                    currentSound.release();
+                }
+
+                if (!node.fmodSoundEvent.IsNull)
+                {
+                    currentSound = FMODUnity.RuntimeManager.CreateInstance(node.fmodSoundEvent);
+                    currentSound.start();
+                }
+            }
+
+            // Display the text one letter at a time
+            for (int i = 0; i < fullText.Length; i++)
+            {
+                textField.text = fullText.Substring(0, i + 1);
+                char currentChar = fullText[i];
+
+                if (node.useDialogueAudio && char.IsLetter(currentChar))
+                {
+                    validCharCount++;
+
+                    if (audioSettings != null && (!hasPlayedFirstSound || validCharCount % audioSettings.frequency == 0))
+                    {
+                        hasPlayedFirstSound = true;
+
+                        if (currentSound.isValid())
+                        {
+                            currentSound.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+                            currentSound.release();
+                        }
+
+                        int letterIndex = char.ToLower(currentChar) - 'a';
+                        letterIndex = Mathf.Clamp(letterIndex, 0, audioSettings.fmodSoundEvents.Length - 1);
+                        EventReference soundEventReference = audioSettings.fmodSoundEvents[letterIndex];
+
+                        currentSound = FMODUnity.RuntimeManager.CreateInstance(soundEventReference);
+                        float pitch = Mathf.Lerp(audioSettings.minPitch, audioSettings.maxPitch, Mathf.Abs(npcHash % 100) / 100f);
+                        currentSound.setPitch(pitch);
+
+                        // Try to find the NPC GameObject
+                        GameObject targetObject = null;
+
+                        if (!string.IsNullOrEmpty(node.npcName))
+                        {
+                            targetObject = GameObject.Find(node.npcName);
+                        }
+
+                        // Fallback to player if NPC is not found or name is null
+                        if (targetObject == null)
+                        {
+                            targetObject = GameObject.FindWithTag("PlayerCamera");
+                        }
+
+                        if (targetObject != null)
+                        {
+                            currentSound.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(targetObject.transform));
+                        }
+
+                        currentSound.start();
+                    }
+                }
+
+                yield return new WaitForSeconds(scrollSpeed);
+            }
+
+            yield return new WaitForSeconds(3f); // Wait for a moment before continuing
+        }
+
+        // Stop the audio and release the resources
+        if (currentSound.isValid())
+        {
+            currentSound.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+            currentSound.release();
+        }
+
+        Destroy(activeNPCBubble);
     }
 }

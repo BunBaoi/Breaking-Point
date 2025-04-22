@@ -37,6 +37,8 @@ public class QTEvent : MonoBehaviour
     {
         //KeyTextBox = GetComponentsInChildren<UI_ReloadButton>(true);
         CountDownTimer = 8f; // Change QTE STARTING CountDownTimer HERE
+        playerStats = GameObject.FindWithTag("Player").GetComponent<PlayerStats>();
+        qTEMechanicScript = GameObject.FindWithTag("QTE").GetComponent<QTEMechanicScript>();
     }
 
     void Update()
@@ -76,6 +78,7 @@ public class QTEvent : MonoBehaviour
 
             qTEMechanicScript.QTEMove(); // Moves Player to Pos
             //qTEMechanic.QTEMechanicScriptActive = false; // Can't remember why this was needed might delete it
+
 
         }
         else if(CountDownTimer <= 0 && WaitingKeyLoad != CorrectKeyCounter)
