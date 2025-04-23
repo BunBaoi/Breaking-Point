@@ -101,6 +101,14 @@ public class PlayerStats : MonoBehaviour
         {
             transitionCanvasGroup.gameObject.SetActive(false);
         }
+
+        GameObject qteObj = GameObject.FindWithTag("QTE");
+        if (qteObj != null)
+            qTEMechanicScript = qteObj.GetComponent<QTEMechanicScript>();
+
+        GameObject qteUIObj = GameObject.FindWithTag("QTEUI");
+        if (qteUIObj != null)
+            qTEvent = qteUIObj.GetComponent<QTEvent>();
     }
 
     private void OnDestroy()
