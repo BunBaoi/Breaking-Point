@@ -76,6 +76,16 @@ public class PlayerMovement : MonoBehaviour
 
         if (movement != null) movement.Enable();
         if (sprint != null) sprint.Enable();
+
+        GameObject qteObject = GameObject.FindWithTag("QTE");
+        if (qteObject != null)
+            qTEMechanicScript = qteObject.GetComponent<QTEMechanicScript>();
+
+        GameObject qteUIObject = GameObject.FindWithTag("QTEUI");
+        if (qteUIObject != null)
+            qTEvent = qteUIObject.GetComponent<QTEvent>();
+
+        targetPos = GameObject.FindWithTag("StartPos");
     }
 
     private void OnEnable()
