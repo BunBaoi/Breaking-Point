@@ -364,7 +364,6 @@ public class BedManager : MonoBehaviour
                 HideInteractText();
             }
 
-            // Check if the interact action was triggered
             if (interactAction.triggered && inTrigger)
             {
                 if (hit.collider.CompareTag(bedTag) && !isInteracting)
@@ -388,7 +387,7 @@ public class BedManager : MonoBehaviour
 
         if (spriteRenderer != null)
         {
-            // Dynamically update sprite scale if keybinding changes during the game
+            // update sprite scale if keybinding changes during the game
             UpdateSpriteScale();
         }
     }
@@ -435,7 +434,7 @@ public class BedManager : MonoBehaviour
             }
 
             // NEW: Check for ClimbingSystem and disable it
-            ClimbingSystem climbingSystem = playerObject.GetComponent<ClimbingSystem>();
+            /*ClimbingSystem climbingSystem = playerObject.GetComponent<ClimbingSystem>();
             if (climbingSystem != null)
             {
                 climbingSystem.enabled = false;
@@ -447,12 +446,11 @@ public class BedManager : MonoBehaviour
             {
                 playerRigidbody.isKinematic = true; // Make rigidbody kinematic to prevent physics
                 playerRigidbody.velocity = Vector3.zero; // Zero out velocity
-            }
+            }*/
 
             PlayerStats.Instance.FadeOut();
         }
 
-        // Get the collider of the bed to determine the height for positioning
         Collider bedCollider = bed.GetComponent<Collider>();
         if (bedCollider == null)
         {
@@ -461,21 +459,18 @@ public class BedManager : MonoBehaviour
         }
 
         // Get the world-space center of the bed collider
-        Vector3 colliderCenter = bedCollider.bounds.center; // This gives the center in world space, considering rotation
+        Vector3 colliderCenter = bedCollider.bounds.center;
 
         // Adjust the position to be at the collider's center, accounting for rotation
         Vector3 targetPosition = colliderCenter + bed.transform.up * (bedCollider.bounds.extents.y + yPositionOffset) +
                                  bed.transform.right * xPositionOffset + bed.transform.forward * zPositionOffset;
 
-        // Position the player at the calculated target position
         player.transform.position = targetPosition;
 
-        // Optionally, you can rotate the player to align with the bed's rotation if necessary
         player.transform.rotation = bed.transform.rotation; // Align the player's rotation with the bed
 
         Debug.Log($"Teleporting player to: {targetPosition}");
 
-        // Disable the CharacterController while teleporting the player
         CharacterController characterController = player.GetComponent<CharacterController>();
         if (characterController != null)
         {
@@ -491,10 +486,9 @@ public class BedManager : MonoBehaviour
             characterController.enabled = true;
         }*/
 
-        // Align player's Y rotation to match the bed's Y rotation (keeping the player's original X and Z rotations intact)
         player.rotation = Quaternion.Euler(player.eulerAngles.x, bed.rotation.eulerAngles.y, player.eulerAngles.z); // Align Y rotation with the bed's rotation
 
-        // Adjust player's rotation to make them lie flat on their back (90 degrees around the X-axis)
+        // Adjust player's rotation to make them lie flat on their back (90 degrees)
         Quaternion targetRotation = Quaternion.Euler(-90, player.rotation.eulerAngles.y, player.rotation.eulerAngles.z);
         while (Quaternion.Angle(player.rotation, targetRotation) > 0.1f)
         {
@@ -537,7 +531,7 @@ public class BedManager : MonoBehaviour
             }
 
             // NEW: Reset player position slightly above the bed to prevent falling through
-            player.position = new Vector3(player.position.x, player.position.y + 0.1f, player.position.z);
+            // player.position = new Vector3(player.position.x, player.position.y + 0.1f, player.position.z);
 
             PlayerStats.Instance.ReplenishEnergy(100f);
             PlayerStats.Instance.FadeIn();
@@ -554,20 +548,20 @@ public class BedManager : MonoBehaviour
             }
 
             // NEW: Reset rigidbody state
-            Rigidbody playerRigidbody = player.GetComponent<Rigidbody>();
+            /*Rigidbody playerRigidbody = player.GetComponent<Rigidbody>();
             if (playerRigidbody != null)
             {
                 playerRigidbody.isKinematic = false;
                 playerRigidbody.velocity = Vector3.zero;
                 playerRigidbody.useGravity = true;
-            }
+            }*/
 
             // Re-enable climbing system
-            ClimbingSystem climbingSystem = player.GetComponent<ClimbingSystem>();
+            /*ClimbingSystem climbingSystem = player.GetComponent<ClimbingSystem>();
             if (climbingSystem != null)
             {
                 climbingSystem.enabled = true;
-            }
+            }*/
 
             if (inventoryManager != null)
             {
@@ -678,7 +672,7 @@ public class BedManager : MonoBehaviour
         }
 
         // NEW: Reset player position slightly above the bed to prevent falling through
-        player.position = new Vector3(player.position.x, player.position.y + 0.1f, player.position.z);
+        // player.position = new Vector3(player.position.x, player.position.y + 0.1f, player.position.z);
 
         PlayerStats.Instance.ReplenishEnergy(100f);
         PlayerStats.Instance.FadeIn();
@@ -696,20 +690,20 @@ public class BedManager : MonoBehaviour
         }
 
         // NEW: Reset rigidbody state
-        Rigidbody playerRigidbody = player.GetComponent<Rigidbody>();
+        /*Rigidbody playerRigidbody = player.GetComponent<Rigidbody>();
         if (playerRigidbody != null)
         {
             playerRigidbody.isKinematic = false;
             playerRigidbody.velocity = Vector3.zero;
             playerRigidbody.useGravity = true;
-        }
+        }*/
 
         // Re-enable climbing system
-        ClimbingSystem climbingSystem = player.GetComponent<ClimbingSystem>();
+        /*ClimbingSystem climbingSystem = player.GetComponent<ClimbingSystem>();
         if (climbingSystem != null)
         {
             climbingSystem.enabled = true;
-        }
+        }*/
 
         SaveManager.Instance.SaveGame();
         cameraController.SetLookState(true);

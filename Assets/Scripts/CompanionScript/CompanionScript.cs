@@ -23,6 +23,8 @@ public class CompanionScript : MonoBehaviour
     public AudioSource audioSource;
     public AudioClip[] companionSounds;
 
+    private Coroutine teleportRoutine;
+
     [Header("Keybindings")]
     /*[Tooltip("Key to toggle talking state")]
     public KeyCode talkKey = KeyCode.F;
@@ -311,24 +313,41 @@ public class CompanionScript : MonoBehaviour
         }
     }*/
 
-    public void TeleportToPlayer()
+    public void StartTeleportingToPlayer()
     {
-        if (player != null)
+        if (teleportRoutine == null)
         {
-            Vector3 playerRight = player.right;
-            Vector3 playerLeft = -playerRight;
+            teleportRoutine = StartCoroutine(TeleportWhenClearSight());
+        }
+    }
 
-            // Calculate the desired position
-            Vector3 desiredPosition = teleportLeft ?
-                player.position + playerLeft * minDistanceToPlayer :
-                player.position + playerRight * minDistanceToPlayer;
+    private IEnumerator TeleportWhenClearSight()
+    {
+        while (true)
+        {
+            if (player == null)
+            {
+                teleportRoutine = null;
+                yield break;
+            }
 
-            // Add a small Y offset to avoid ground clipping issues
-            desiredPosition.y += 0.1f;
+            Vector3[] directions = { -player.right, player.right };
 
-            teleportLeft = !teleportLeft;
+            foreach (Vector3 dir in directions)
+            {
+                Vector3 desiredPosition = player.position + dir * minDistanceToPlayer;
+                desiredPosition.y += 0.1f;
 
-            TeleportToPosition(desiredPosition);
+                if (!Physics.Linecast(desiredPosition, player.position, out RaycastHit hit, LayerMask.GetMask("Default")))
+                {
+                    TeleportToPosition(desiredPosition);
+                    teleportRoutine = null;
+                    yield break;
+                }
+            }
+
+            // Wait a short time before checking again
+            yield return new WaitForSeconds(0.25f);
         }
     }
 

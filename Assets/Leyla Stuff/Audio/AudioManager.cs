@@ -53,14 +53,14 @@ public class AudioManager : MonoBehaviour
     void Update()
     {
         // TESTING PURPOSES
-        if (Input.GetKeyDown(KeyCode.C))
+        /*if (Input.GetKeyDown(KeyCode.C))
         {
             ChangeState("Level 1 Soundtrack");
         }
         if (Input.GetKeyDown(KeyCode.E))
         {
             ChangeState("Test1");
-        }
+        }*/
     }
 
     // Change the audio state based on state name

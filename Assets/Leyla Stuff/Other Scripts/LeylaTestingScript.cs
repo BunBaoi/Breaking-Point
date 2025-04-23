@@ -30,14 +30,14 @@ public class LeylaTestingScript : MonoBehaviour
     {
         if (Input.GetKeyDown(key))
         {
-            BoolManager.Instance.SetBool(boolName, true);
+            // BoolManager.Instance.SetBool(boolName, true);
             // cinematicSequence.StartCinematic();
             // SceneManager.LoadScene("MainMenu");
             // SaveManager.Instance.SaveGame();
             // Debug.Log("save game");
-            /*Debug.Log("add page");
-            journalPageAdder.AddObjectivesPage(objectivesPage);
-            // tipManager.ShowTip(tipNumber);
+            // Debug.Log("add page");
+            // journalPageAdder.AddObjectivesPage(objectivesPage);
+            tipManager.ShowTip(tipNumber);
             /*if (BoolManager.Instance != null)
             {
                 BoolManager.Instance.SetBool(boolName, true);
