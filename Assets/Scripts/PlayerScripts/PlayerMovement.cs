@@ -52,7 +52,7 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 velocity;
     private Vector2 moveInput;
 
-    private bool applyGravity = true;
+    [SerializeField] private bool applyGravity = true;
     private bool wasGravityApplied = false;
 
     void Awake()
@@ -76,6 +76,16 @@ public class PlayerMovement : MonoBehaviour
 
         if (movement != null) movement.Enable();
         if (sprint != null) sprint.Enable();
+
+        GameObject qteObject = GameObject.FindWithTag("QTE");
+        if (qteObject != null)
+            qTEMechanicScript = qteObject.GetComponent<QTEMechanicScript>();
+
+        GameObject qteUIObject = GameObject.FindWithTag("QTEUI");
+        if (qteUIObject != null)
+            qTEvent = qteUIObject.GetComponent<QTEvent>();
+
+        targetPos = GameObject.FindWithTag("StartPos");
     }
 
     private void OnEnable()

@@ -131,6 +131,8 @@ public class TipManager : MonoBehaviour
 
     public void ShowTip(int tipIndex)
     {
+        if (!SettingsManager.showTipsEnabled) return;
+
         if (shownTipIDs.Contains(tips[tipIndex].tipID))
         {
             return; // Skip this tip if it's already been shown

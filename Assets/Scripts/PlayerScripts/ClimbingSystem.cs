@@ -14,7 +14,7 @@ public class ClimbingSystem : MonoBehaviour
     public Transform rightHandTransform;
     private PlayerMovement playerMovement;
     private PlayerStats playerStats; // Reference to PlayerStats
-    private Rigidbody playerRigidbody; // Reference to player's Rigidbody
+    // private Rigidbody playerRigidbody; // Reference to player's Rigidbody
 
     [Header("Climbing Settings")]
     public float climbSpeed = 3f;
@@ -129,7 +129,7 @@ public class ClimbingSystem : MonoBehaviour
         }
 
         // Get the player's Rigidbody if it exists
-        playerRigidbody = GetComponent<Rigidbody>();
+        // playerRigidbody = GetComponent<Rigidbody>();
 
         if (!controller)
         {
@@ -249,13 +249,13 @@ public class ClimbingSystem : MonoBehaviour
         if (IsClimbing())
         {
             // Ensure gravity and other physics forces are completely disabled
-            if (GetComponent<Rigidbody>() != null)
+            /*if (GetComponent<Rigidbody>() != null)
             {
                 Rigidbody rb = GetComponent<Rigidbody>();
                 rb.useGravity = false;
                 rb.velocity = Vector3.zero; // Zero out any existing velocity
                 rb.isKinematic = true; // Make rigidbody kinematic while climbing
-            }
+            }*/
 
             // Only move body if at least one hand is fully attached and the pull delay has elapsed
             if (((leftHandAttached && !leftHandMoving) || (rightHandAttached && !rightHandMoving)) && isPulling)
@@ -689,12 +689,13 @@ public class ClimbingSystem : MonoBehaviour
             isActivelyClimbing = false;
 
             // Re-enable physics if we have a Rigidbody
-            if (GetComponent<Rigidbody>() != null)
+            /*if (GetComponent<Rigidbody>() != null)
             {
                 Rigidbody rb = GetComponent<Rigidbody>();
                 rb.isKinematic = false;
                 rb.useGravity = true;
-            }
+                rb.position = transform.position;
+            }*/
 
             // Reset player status to free roam if PlayerStats exists
             if (playerStats != null)
@@ -720,12 +721,13 @@ public class ClimbingSystem : MonoBehaviour
         isActivelyClimbing = false;
 
         // Re-enable physics if we have a Rigidbody
-        if (GetComponent<Rigidbody>() != null)
+        /*if (GetComponent<Rigidbody>() != null)
         {
             Rigidbody rb = GetComponent<Rigidbody>();
             rb.isKinematic = false;
             rb.useGravity = true;
-        }
+            rb.position = transform.position;
+        }*/
 
         // Reset player status to free roam if PlayerStats exists
         if (playerStats != null)
@@ -810,7 +812,7 @@ public class ClimbingSystem : MonoBehaviour
                 if (rb != null && rb.isKinematic)
                 {
                     // Move the transform directly when using kinematic rigidbody
-                    transform.position += movement;
+                    // transform.position += movement;
                 }
                 else
                 {

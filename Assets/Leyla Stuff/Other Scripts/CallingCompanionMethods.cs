@@ -58,7 +58,7 @@ public class CallingCompanionMethods : MonoBehaviour
     {
         if (companionScript != null)
         {
-            companionScript.TeleportToPlayer();
+            companionScript.StartTeleportingToPlayer();
         }
     }
 
