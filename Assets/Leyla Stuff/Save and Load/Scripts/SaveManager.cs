@@ -407,6 +407,8 @@ public class SaveManager : MonoBehaviour
         // Restore Inventory
         InventoryManager.Instance.LoadInventory(data.inventoryItems);
 
+        PlayerStats.Instance.IsAlive = true;
+
         StartCoroutine(FadeFromBlack(2f));
 
         Debug.Log("Game loaded.");

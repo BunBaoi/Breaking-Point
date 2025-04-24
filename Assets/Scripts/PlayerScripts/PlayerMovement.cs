@@ -40,6 +40,8 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Animator")]
     public Animator animator;
+    private bool overrideAnimationSpeed = false;
+    private float overrideSpeedValue = 0f;
 
     [Header("Keybinds")]
     [SerializeField] private InputActionAsset inputActions;
@@ -77,7 +79,7 @@ public class PlayerMovement : MonoBehaviour
         if (movement != null) movement.Enable();
         if (sprint != null) sprint.Enable();
 
-        GameObject qteObject = GameObject.FindWithTag("QTE");
+        /*GameObject qteObject = GameObject.FindWithTag("QTE");
         if (qteObject != null)
             qTEMechanicScript = qteObject.GetComponent<QTEMechanicScript>();
 
@@ -85,10 +87,10 @@ public class PlayerMovement : MonoBehaviour
         if (qteUIObject != null)
             qTEvent = qteUIObject.GetComponent<QTEvent>();
 
-        targetPos = GameObject.FindWithTag("StartPos");
+        targetPos = GameObject.FindWithTag("StartPos");*/
     }
 
-    private void OnEnable()
+    /*private void OnEnable()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
@@ -113,7 +115,7 @@ public class PlayerMovement : MonoBehaviour
 
             targetPos = GameObject.FindWithTag("StartPos");
         }
-    }
+    }*/
 
     void Update()
     {
@@ -126,7 +128,7 @@ public class PlayerMovement : MonoBehaviour
         UpdateAnimation();
 
         ApplyGravity();
-        QTEControl();
+        // QTEControl();
         binocularZoom();
     }
 
@@ -141,15 +143,24 @@ public class PlayerMovement : MonoBehaviour
 
     void UpdateAnimation()
     {
-        // Calculate the current speed based on movement input and sprinting
-        float currentSpeed = moveInput.magnitude * (IsSprint ? 1f : 0.5f);
+        float currentSpeed;
 
-        if (!canMove)
+        if (overrideAnimationSpeed)
         {
-            currentSpeed = 0f;
+            currentSpeed = overrideSpeedValue;
+        }
+        else
+        {
+            currentSpeed = moveInput.magnitude * (IsSprint ? 1f : 0.5f);
+            if (!canMove) currentSpeed = 0f;
         }
 
         animator.SetFloat("speed", currentSpeed);
+    }
+    public void SetAnimationSpeedOverride(bool state, float value = 0f)
+    {
+        overrideAnimationSpeed = state;
+        overrideSpeedValue = value;
     }
 
     void ApplyGravity()
@@ -190,7 +201,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    public void QTEControl()
+    /*public void QTEControl()
     {
         if (Input.GetKeyDown(KeyCode.F) && playerStats.stateOfPlayer == PlayerStatus.QTE)
         {
@@ -199,7 +210,7 @@ public class PlayerMovement : MonoBehaviour
             playerStats.QTEState = true;
             qTEMechanicScript.QTEMechanicScriptActive = true;
         }
-    }
+    }*/
 
     public void SetMovementState(bool state)
     {

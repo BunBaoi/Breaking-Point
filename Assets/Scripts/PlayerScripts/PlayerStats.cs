@@ -84,7 +84,7 @@ public class PlayerStats : MonoBehaviour
             Instance = this;
         }
 
-        SceneManager.sceneLoaded += OnSceneLoaded;
+        // SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
         void Start()
@@ -102,16 +102,16 @@ public class PlayerStats : MonoBehaviour
             transitionCanvasGroup.gameObject.SetActive(false);
         }
 
-        GameObject qteObj = GameObject.FindWithTag("QTE");
+        /*GameObject qteObj = GameObject.FindWithTag("QTE");
         if (qteObj != null)
             qTEMechanicScript = qteObj.GetComponent<QTEMechanicScript>();
 
         GameObject qteUIObj = GameObject.FindWithTag("QTEUI");
         if (qteUIObj != null)
-            qTEvent = qteUIObj.GetComponent<QTEvent>();
+            qTEvent = qteUIObj.GetComponent<QTEvent>();*/
     }
 
-    private void OnDestroy()
+    /*private void OnDestroy()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
@@ -128,7 +128,7 @@ public class PlayerStats : MonoBehaviour
             if (qteUIObj != null)
                 qTEvent = qteUIObj.GetComponent<QTEvent>();
         }
-    }
+    }*/
 
     void Update()
     {
@@ -530,6 +530,8 @@ public class PlayerStats : MonoBehaviour
         if (!IsAlive || isInCamp) return;
 
         IsAlive = false;
+
+        Debug.Log("player died");
 
         if (inventoryManager != null)
         {

@@ -13,6 +13,7 @@ public class GameOverMenu : MonoBehaviour
 
     private PlayerMovement playerMovement;
     private InventoryManager inventoryManager;
+    private CameraController cameraController;
 
     private void Awake()
     {
@@ -55,7 +56,17 @@ public class GameOverMenu : MonoBehaviour
 
     public void LoadLastCheckpoint()
     {
-        SaveManager.Instance.LoadGame();
+        GameObject playerObj = GameObject.FindGameObjectWithTag("PlayerCamera");
+        if (playerObj != null)
+        {
+            cameraController = playerObj.GetComponent<CameraController>();
+        }
+
+        if (cameraController != null)
+        {
+            cameraController.SetLookState(true);
+        }
+    SaveManager.Instance.LoadGame();
     }
 
     public void ShowGameOver()
