@@ -1133,7 +1133,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2880428877973528562, guid: 1a7c33efe8cd742d98de760985fe3a04, type: 3}
       propertyPath: boolKey
-      value: Level2WentToBed
+      value: Camp2WentToBed
       objectReference: {fileID: 0}
     - target: {fileID: 2880428877973528562, guid: 1a7c33efe8cd742d98de760985fe3a04, type: 3}
       propertyPath: cinematicSequenceTag
@@ -2622,10 +2622,36 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2800023770981936203, guid: dd4ae7dd7609c4af5bf4211166d2cd78, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1070557467}
     - targetCorrespondingSourceObject: {fileID: 6376614216622880214, guid: dd4ae7dd7609c4af5bf4211166d2cd78, type: 3}
       insertIndex: -1
       addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: dd4ae7dd7609c4af5bf4211166d2cd78, type: 3}
+--- !u!1 &1070557466 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2800023770981936203, guid: dd4ae7dd7609c4af5bf4211166d2cd78, type: 3}
+  m_PrefabInstance: {fileID: 1070557465}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1070557467
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1070557466}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ba74e95c946d4b1a868e03fe9fbe05a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  markerPrefab: {fileID: 4965775825754602158, guid: 45b40b2ebc75e47f29f592d7a65ced77, type: 3}
+  offset: {x: 0, y: 2.5, z: 0}
+  showIfBoolsTrue:
+  - GoToLevel3
+  hideIfBoolsTrue:
+  - Level3ArrivalDialogueCompleted
 --- !u!1001 &1110063146
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4513,7 +4539,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a5cb8e2c19054134a72bce394e9bc35, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  npcDialogueTree: {fileID: 0}
+  npcDialogueTree: {fileID: 11400000, guid: d6636715360911745881a56471cac0b6, type: 2}
   dialogueKey: GoToLevel3Dialogue
   requiredBoolKeysTrue:
   - Chapter3CinematicTriggered
