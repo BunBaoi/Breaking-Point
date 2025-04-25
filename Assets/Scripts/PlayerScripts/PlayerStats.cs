@@ -7,6 +7,7 @@ using TMPro;
 using FMOD.Studio;
 using FMODUnity;
 using Unity.VisualScripting;
+using UnityEngine.SceneManagement;
 
 public class PlayerStats : MonoBehaviour
 {
@@ -82,6 +83,8 @@ public class PlayerStats : MonoBehaviour
         {
             Instance = this;
         }
+
+        // SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
         void Start()
@@ -98,7 +101,34 @@ public class PlayerStats : MonoBehaviour
         {
             transitionCanvasGroup.gameObject.SetActive(false);
         }
+
+        /*GameObject qteObj = GameObject.FindWithTag("QTE");
+        if (qteObj != null)
+            qTEMechanicScript = qteObj.GetComponent<QTEMechanicScript>();
+
+        GameObject qteUIObj = GameObject.FindWithTag("QTEUI");
+        if (qteUIObj != null)
+            qTEvent = qteUIObj.GetComponent<QTEvent>();*/
     }
+
+    /*private void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name.Contains("Game") || scene.name.Contains("Level"))
+        {
+            GameObject qteObj = GameObject.FindWithTag("QTE");
+            if (qteObj != null)
+                qTEMechanicScript = qteObj.GetComponent<QTEMechanicScript>();
+
+            GameObject qteUIObj = GameObject.FindWithTag("QTEUI");
+            if (qteUIObj != null)
+                qTEvent = qteUIObj.GetComponent<QTEvent>();
+        }
+    }*/
 
     void Update()
     {
@@ -242,7 +272,7 @@ public class PlayerStats : MonoBehaviour
             }
         }
     }
-
+    
     void HandleOxygenDrain()
     {
             if (isInOxygenDrainZone)
@@ -387,7 +417,7 @@ public class PlayerStats : MonoBehaviour
             }
         }
     }
-
+    
     // PRINT ENUM STATUS//
 
     public void STP()
@@ -501,6 +531,8 @@ public class PlayerStats : MonoBehaviour
 
         IsAlive = false;
 
+        Debug.Log("player died");
+
         if (inventoryManager != null)
         {
             inventoryManager.enabled = false;
@@ -567,7 +599,7 @@ public class PlayerStats : MonoBehaviour
             yield return StartCoroutine(FadeCanvasGroup(transitionCanvasGroup, 0f, 1f, 1f));
         }
 
-        StopOxygenSound();
+        //StopOxygenSound();
         Time.timeScale = 1;
         GameOverMenu.Instance.ShowGameOver();
 
@@ -610,8 +642,6 @@ public IEnumerator MoveCube(Vector3 targetPosition) // targetPosition = Player <
     {
         Vector3 startPosition = qTEMechanicScript.objectPlayer.position;
         float timeElapsed = 0;
-        //Debug.Log(startPosition); // The start position is where the game object starts and leave off from. From testing the qte object moves starts and moves from the player to "targeted position"
-        //Debug.Log("Checkpoint Pos" + targetPosition); // "target" = "targetPosition"
 
         while (timeElapsed < qTEMechanicScript.MoTSpeed)
         {
@@ -619,33 +649,33 @@ public IEnumerator MoveCube(Vector3 targetPosition) // targetPosition = Player <
             timeElapsed += Time.deltaTime;
             yield return null;
         }
-        if (qTEMechanicScript.Pos_STOP_1.tag == "QTEStop" ||
-            qTEMechanicScript.Pos_STOP_2.tag == "QTEStop" ||
-            qTEMechanicScript.Pos_STOP_3.tag == "QTEStop" && 
-            qTEMechanicScript.PositionOfPlayer == QTEMechanicScript.PlayerPos.PlayerPos4 || 
-            qTEMechanicScript.PositionOfPlayer == QTEMechanicScript.PlayerPos.PlayerPos13 ||
-            qTEMechanicScript.PositionOfPlayer == QTEMechanicScript.PlayerPos.PlayerPos21) //THIS STOPS QTE BY CHANGING THE ENUM 
-
+        //THIS STOPS QTE BY CHANGING THE ENUM 
+        if (qTEMechanicScript.Pos_STOP_1.tag == "QTEStop" && qTEMechanicScript.PositionOfPlayer == QTEMechanicScript.PlayerPos.PlayerPos4)
         {
             Debug.Log("Stop game here");
             qTEMechanicScript.QTEMechanicScriptActive = false;
             QTEState = false;
             qTEMechanicScript.playerMovement.canMove = true;
-
         }
-        if (qTEMechanicScript.QTEMechanicScriptActive == true) // CHANGE HEARRRRRRRRRR
+        else if (qTEMechanicScript.Pos_STOP_2.tag == "QTEStop" && qTEMechanicScript.PositionOfPlayer == QTEMechanicScript.PlayerPos.PlayerPos13)
+        {
+            Debug.Log("Stop game here");
+            qTEMechanicScript.QTEMechanicScriptActive = false;
+            QTEState = false;
+            qTEMechanicScript.playerMovement.canMove = true;
+        }
+        else if (qTEMechanicScript.Pos_STOP_3.tag == "QTEStop" && qTEMechanicScript.PositionOfPlayer == QTEMechanicScript.PlayerPos.PlayerPos21)
+        {
+            Debug.Log("Stop game here");
+            qTEMechanicScript.QTEMechanicScriptActive = false;
+            QTEState = false;
+            qTEMechanicScript.playerMovement.canMove = true;
+        }
+        else //if (qTEMechanicScript.QTEMechanicScriptActive == true) // CHANGE HEARRRRRRRRRR
         {
             qTEvent.OpenreloadUI(); // PLAYING TWICE UPON QTE COMPLETION AND MOVE COMPLETION // UPDATE may not need to be fixed
             //qTEMechanicScript.QTEMechanicScriptActive = true; // KEY TO ACTIVATINE TIMER 
         }
-        //else
-        //{
-        //    qTEMechanicScript.QTEMechanicScriptActive = false;
-        //    QTEState = false;
-        //    qTEMechanicScript.CHKPos4 = true;
-        //    qTEMechanicScript.playerMovement.canMove = true;
-        //    Debug.Log("Player Movement Unlocked");
-        //}
 
     }
 

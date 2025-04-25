@@ -13,6 +13,7 @@ public class PlayerManager : MonoBehaviour
 
     [Header("UI Settings")]
     public CanvasGroup fadeCanvasGroup;
+    public GameObject fadeCanvasGroupObject;
     public float fadeDuration = 1f;
 
     private Vector3 teleportPosition;
@@ -48,6 +49,7 @@ public class PlayerManager : MonoBehaviour
     // Teleport function that takes a tag to find an empty GameObject to teleport to
     public void TeleportToScene(string sceneName, string targetTag)
     {
+        Time.timeScale = 1f;
         targetTagToFind = targetTag;
         shouldTeleport = true;
         StartCoroutine(FadeAndLoadScene(sceneName));
@@ -69,9 +71,15 @@ public class PlayerManager : MonoBehaviour
 
     private IEnumerator FadeAndLoadScene(string sceneName)
     {
+        fadeCanvasGroupObject.SetActive(true);
+
+        yield return null;
+
         yield return StartCoroutine(Fade(1f));
 
         GameManager.Instance.ShowLoadingPanel();
+
+        yield return null;
 
         AsyncOperation asyncOperation = SceneManager.LoadSceneAsync(sceneName);
         asyncOperation.allowSceneActivation = false;
@@ -80,7 +88,7 @@ public class PlayerManager : MonoBehaviour
         {
             if (asyncOperation.progress >= 0.9f)
             {
-                yield return new WaitForSeconds(0.5f);
+                yield return new WaitForSecondsRealtime(0.5f);
                 asyncOperation.allowSceneActivation = true;
             }
 
@@ -176,7 +184,7 @@ public class PlayerManager : MonoBehaviour
                     playerInstance.transform.position = targetObject.transform.position;
                     playerInstance.transform.rotation = targetObject.transform.rotation;
                     shouldTeleport = false;  // Reset teleport flag after teleportation
-                    StartCoroutine(EnableCharacterControllerAfterDelay(characterController, 0.1f));
+                    StartCoroutine(EnableCharacterControllerAfterDelay(characterController, 0.5f));
                     Debug.Log($"Player teleported to {targetObject.name} - Position: {playerInstance.transform.position}, Rotation: {playerInstance.transform.rotation}");
                 }
                 else

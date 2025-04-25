@@ -459,7 +459,7 @@
                     "path": "<Mouse>/rightButton",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": "Keyboard",
                     "action": "Climb Right Grab",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -821,6 +821,15 @@
                     "processors": "",
                     "interactions": "Press",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "AnyKeyPressOtherButtons",
+                    "type": "Button",
+                    "id": "38b58cd3-edd0-4f57-9f1b-ebd07ae03d7f",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Press",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -837,12 +846,67 @@
                 },
                 {
                     "name": "",
+                    "id": "c00bebf7-990b-42d8-a1f5-b6f1e015424a",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "AnyKeyPressOtherButtons",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e831c72f-56d3-401c-93c1-f1be1ac2f8a1",
+                    "path": "<Mouse>/backButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "AnyKeyPressOtherButtons",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7f2be0dd-bb9e-4e42-8fb0-0fec8dbacb6b",
+                    "path": "<Mouse>/forwardButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "AnyKeyPressOtherButtons",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7cd1b392-0e24-48e4-b7f2-5c38a8b66bc3",
+                    "path": "<Mouse>/middleButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "AnyKeyPressOtherButtons",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "d1e2d69e-8555-46e2-869f-4332d8eff3cb",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "AnyKeyPressOtherButtons",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "f27d39b0-6853-4be3-83ed-e6d93bf03b21",
                     "path": "<Gamepad>/buttonEast",
                     "interactions": "",
                     "processors": "",
                     "groups": "Controller",
-                    "action": "AnyKeyPress",
+                    "action": "AnyKeyPressOtherButtons",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -853,7 +917,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Controller",
-                    "action": "AnyKeyPress",
+                    "action": "AnyKeyPressOtherButtons",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -864,7 +928,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Controller",
-                    "action": "AnyKeyPress",
+                    "action": "AnyKeyPressOtherButtons",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -875,7 +939,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Controller",
-                    "action": "AnyKeyPress",
+                    "action": "AnyKeyPressOtherButtons",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -886,7 +950,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Controller",
-                    "action": "AnyKeyPress",
+                    "action": "AnyKeyPressOtherButtons",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -897,7 +961,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Controller",
-                    "action": "AnyKeyPress",
+                    "action": "AnyKeyPressOtherButtons",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -908,7 +972,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Controller",
-                    "action": "AnyKeyPress",
+                    "action": "AnyKeyPressOtherButtons",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -919,7 +983,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Controller",
-                    "action": "AnyKeyPress",
+                    "action": "AnyKeyPressOtherButtons",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -930,7 +994,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Controller",
-                    "action": "AnyKeyPress",
+                    "action": "AnyKeyPressOtherButtons",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -941,7 +1005,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Controller",
-                    "action": "AnyKeyPress",
+                    "action": "AnyKeyPressOtherButtons",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -952,7 +1016,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Controller",
-                    "action": "AnyKeyPress",
+                    "action": "AnyKeyPressOtherButtons",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -963,7 +1027,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Controller",
-                    "action": "AnyKeyPress",
+                    "action": "AnyKeyPressOtherButtons",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -974,7 +1038,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Controller",
-                    "action": "AnyKeyPress",
+                    "action": "AnyKeyPressOtherButtons",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -985,7 +1049,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Controller",
-                    "action": "AnyKeyPress",
+                    "action": "AnyKeyPressOtherButtons",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -996,7 +1060,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Controller",
-                    "action": "AnyKeyPress",
+                    "action": "AnyKeyPressOtherButtons",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -1007,7 +1071,139 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Controller",
-                    "action": "AnyKeyPress",
+                    "action": "AnyKeyPressOtherButtons",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "QTE",
+            "id": "f1dffe94-b2c6-4f02-8610-231b29614ace",
+            "actions": [
+                {
+                    "name": "QTEButton1",
+                    "type": "Button",
+                    "id": "5c4c62ac-931e-4dfd-8410-cf1c357c1ef2",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Press(behavior=1)",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "QTEButton2",
+                    "type": "Button",
+                    "id": "69950890-34df-4a07-a26f-b75968c0a3a4",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Press(behavior=1)",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "QTEButton3",
+                    "type": "Button",
+                    "id": "e2833597-c0d5-4151-bfa1-9e07d7647e84",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Press(behavior=1)",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "QTEButton4",
+                    "type": "Button",
+                    "id": "716ef360-3d45-4a82-8bf1-2786d0c8e00e",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Press(behavior=1)",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "787bb8f4-9bc5-4ea8-bff0-339ad0c941e9",
+                    "path": "<Keyboard>/f",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "QTEButton1",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "91d001fb-73a1-42c2-80a2-d9e0cc1e9e69",
+                    "path": "<Gamepad>/buttonEast",
+                    "interactions": "Press(behavior=1)",
+                    "processors": "",
+                    "groups": "Controller",
+                    "action": "QTEButton1",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3f86dd6b-5803-4910-a077-1d71da7836c9",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "QTEButton2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f058c0ed-bba7-4ba3-9a21-6e19192e914c",
+                    "path": "<Gamepad>/buttonNorth",
+                    "interactions": "Press(behavior=1)",
+                    "processors": "",
+                    "groups": "Controller",
+                    "action": "QTEButton2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "82709220-0aaf-4c29-89b8-a46546153464",
+                    "path": "<Keyboard>/z",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "QTEButton3",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "07b430c5-2f46-41df-acb7-981a3f76061b",
+                    "path": "<Gamepad>/buttonSouth",
+                    "interactions": "Press(behavior=1)",
+                    "processors": "",
+                    "groups": "Controller",
+                    "action": "QTEButton3",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c157ee81-c90c-4698-952d-39144b27f1e1",
+                    "path": "<Keyboard>/x",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "QTEButton4",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "96fc8acf-ca84-4caa-b6bc-deb9dba52415",
+                    "path": "<Gamepad>/buttonWest",
+                    "interactions": "Press(behavior=1)",
+                    "processors": "",
+                    "groups": "Controller",
+                    "action": "QTEButton4",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

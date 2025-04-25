@@ -326,7 +326,7 @@ GameObject:
   - component: {fileID: 1044324045968970683}
   m_Layer: 0
   m_Name: PlayerPosition (3)
-  m_TagString: Untagged
+  m_TagString: QTEStop
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -358,7 +358,7 @@ GameObject:
   - component: {fileID: 9130125930492027275}
   m_Layer: 0
   m_Name: PlayerPosition
-  m_TagString: Untagged
+  m_TagString: StartPos
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -391,7 +391,7 @@ GameObject:
   - component: {fileID: 7215727069220563532}
   m_Layer: 0
   m_Name: QTELadderBridge
-  m_TagString: Untagged
+  m_TagString: QTE
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -437,9 +437,28 @@ MonoBehaviour:
   Pos2: {fileID: 6554847979031752303}
   Pos3: {fileID: 6760652131548821110}
   Pos4: {fileID: 968078516498805096}
+  Pos5: {fileID: 0}
+  Pos6: {fileID: 0}
+  Pos7: {fileID: 0}
+  Pos8: {fileID: 0}
+  Pos9: {fileID: 0}
+  Pos10: {fileID: 0}
+  Pos11: {fileID: 0}
+  Pos12: {fileID: 0}
+  Pos13: {fileID: 0}
+  Pos14: {fileID: 0}
+  Pos15: {fileID: 0}
+  Pos16: {fileID: 0}
+  Pos17: {fileID: 0}
+  Pos18: {fileID: 0}
+  Pos19: {fileID: 0}
+  Pos20: {fileID: 0}
+  Pos21: {fileID: 0}
+  Pos_STOP_1: {fileID: 0}
+  Pos_STOP_2: {fileID: 0}
+  Pos_STOP_3: {fileID: 0}
   MoTSpeed: 2
   CHKCounter: 0
-  qTEvent: {fileID: 0}
   objectPlayer: {fileID: 0}
   playerStats: {fileID: 0}
   playerMovement: {fileID: 0}
@@ -449,6 +468,23 @@ MonoBehaviour:
   CHKPos2: 0
   CHKPos3: 0
   CHKPos4: 0
+  CHKPos5: 0
+  CHKPos6: 0
+  CHKPos7: 0
+  CHKPos8: 0
+  CHKPos9: 0
+  CHKPos10: 0
+  CHKPos11: 0
+  CHKPos12: 0
+  CHKPos13: 0
+  CHKPos14: 0
+  CHKPos15: 0
+  CHKPos16: 0
+  CHKPos17: 0
+  CHKPos18: 0
+  CHKPos19: 0
+  CHKPos20: 0
+  CHKPos21: 0
 --- !u!1 &2728434189436856726
 GameObject:
   m_ObjectHideFlags: 0
@@ -1751,6 +1787,10 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: a65ee7f3024ee40fc8fb46fcc65df267, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: a351ac3a62501dd4088410281d0cf3d5, type: 2}
     - target: {fileID: 919132149155446097, guid: a65ee7f3024ee40fc8fb46fcc65df267, type: 3}
       propertyPath: m_Name
       value: Asset_Ladder

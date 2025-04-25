@@ -5,7 +5,6 @@ public class NPCDialogueTrigger : MonoBehaviour
 {
     [Header("Dialogue Settings")]
     [SerializeField] private DialogueTree npcDialogueTree;
-    [SerializeField] private CompanionScript companionScript;
     private bool isDialogueTriggered;
 
     [SerializeField] private string dialogueKey = "DialogueTriggered";

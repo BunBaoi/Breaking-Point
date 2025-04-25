@@ -4,6 +4,7 @@ using FMODUnity;
 using FMOD.Studio;
 using static PlayerStats;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -39,6 +40,8 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Animator")]
     public Animator animator;
+    private bool overrideAnimationSpeed = false;
+    private float overrideSpeedValue = 0f;
 
     [Header("Keybinds")]
     [SerializeField] private InputActionAsset inputActions;
@@ -51,7 +54,7 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 velocity;
     private Vector2 moveInput;
 
-    private bool applyGravity = true;
+    [SerializeField] private bool applyGravity = true;
     private bool wasGravityApplied = false;
 
     void Awake()
@@ -71,10 +74,48 @@ public class PlayerMovement : MonoBehaviour
         playerStats = GetComponent<PlayerStats>();
         movement = inputActions.FindAction(movementName);
         sprint = inputActions.FindAction(sprintName);
+        playerPos = GameObject.FindWithTag("Player");
 
         if (movement != null) movement.Enable();
         if (sprint != null) sprint.Enable();
+
+        /*GameObject qteObject = GameObject.FindWithTag("QTE");
+        if (qteObject != null)
+            qTEMechanicScript = qteObject.GetComponent<QTEMechanicScript>();
+
+        GameObject qteUIObject = GameObject.FindWithTag("QTEUI");
+        if (qteUIObject != null)
+            qTEvent = qteUIObject.GetComponent<QTEvent>();
+
+        targetPos = GameObject.FindWithTag("StartPos");*/
     }
+
+    /*private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name.Contains("Game") || scene.name.Contains("Level"))
+        {
+            // Try to find and assign the components safely
+            GameObject qteObject = GameObject.FindWithTag("QTE");
+            if (qteObject != null)
+                qTEMechanicScript = qteObject.GetComponent<QTEMechanicScript>();
+
+            GameObject qteUIObject = GameObject.FindWithTag("QTEUI");
+            if (qteUIObject != null)
+                qTEvent = qteUIObject.GetComponent<QTEvent>();
+
+            targetPos = GameObject.FindWithTag("StartPos");
+        }
+    }*/
 
     void Update()
     {
@@ -87,7 +128,7 @@ public class PlayerMovement : MonoBehaviour
         UpdateAnimation();
 
         ApplyGravity();
-        QTEControl();
+        // QTEControl();
         binocularZoom();
     }
 
@@ -102,15 +143,24 @@ public class PlayerMovement : MonoBehaviour
 
     void UpdateAnimation()
     {
-        // Calculate the current speed based on movement input and sprinting
-        float currentSpeed = moveInput.magnitude * (IsSprint ? 1f : 0.5f);
+        float currentSpeed;
 
-        if (!canMove)
+        if (overrideAnimationSpeed)
         {
-            currentSpeed = 0f;
+            currentSpeed = overrideSpeedValue;
+        }
+        else
+        {
+            currentSpeed = moveInput.magnitude * (IsSprint ? 1f : 0.5f);
+            if (!canMove) currentSpeed = 0f;
         }
 
-        //animator.SetFloat("speed", currentSpeed);
+        animator.SetFloat("speed", currentSpeed);
+    }
+    public void SetAnimationSpeedOverride(bool state, float value = 0f)
+    {
+        overrideAnimationSpeed = state;
+        overrideSpeedValue = value;
     }
 
     void ApplyGravity()
@@ -151,7 +201,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    public void QTEControl()
+    /*public void QTEControl()
     {
         if (Input.GetKeyDown(KeyCode.F) && playerStats.stateOfPlayer == PlayerStatus.QTE)
         {
@@ -160,7 +210,7 @@ public class PlayerMovement : MonoBehaviour
             playerStats.QTEState = true;
             qTEMechanicScript.QTEMechanicScriptActive = true;
         }
-    }
+    }*/
 
     public void SetMovementState(bool state)
     {

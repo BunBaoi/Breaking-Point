@@ -37,7 +37,7 @@ public class QTEMechanicScript : MonoBehaviour
     public float MoTSpeed = 2f; // Player Move Speed
     public float CHKCounter = 0f;
 
-    public QTEvent qTEvent;
+    //public QTEvent qTEvent;
     public Transform objectPlayer;
     public PlayerStats playerStats;
     public PlayerMovement playerMovement;
@@ -49,6 +49,14 @@ public class QTEMechanicScript : MonoBehaviour
     {
         PositionOfPlayer = PlayerPos.PlayerPosIdle;
 
+        objectPlayer = GameObject.FindWithTag("Player").transform;
+        playerStats = GameObject.FindWithTag("Player").GetComponent<PlayerStats>();
+        playerMovement = GameObject.FindWithTag("Player").GetComponent<PlayerMovement>();
+    }
+
+    void Update()
+    {
+        //transform.LookAt(objectPlayer); causing qte object to rotate
     }
 
     public enum PlayerPos

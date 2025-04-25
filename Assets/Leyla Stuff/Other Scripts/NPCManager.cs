@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class NPCManager : MonoBehaviour
 {
@@ -6,6 +7,11 @@ public class NPCManager : MonoBehaviour
     public float rotationSpeed = 5f;
 
     private Transform player;
+
+    private void Awake()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
 
     void Start()
     {
@@ -19,8 +25,27 @@ public class NPCManager : MonoBehaviour
             Debug.LogError("Player not found in scene.");
         }
     }
+    private void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
 
-    void Update()
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name.Contains("Game") || scene.name.Contains("Level"))
+        {
+            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+            if (playerObj != null)
+            {
+                player = playerObj.transform;
+            }
+            else
+            {
+                Debug.LogError("Player not found in scene.");
+            }
+        }
+    }
+        void Update()
     {
         if (player == null) return;
 
