@@ -164,6 +164,18 @@ public class KeybindSettings: MonoBehaviour
             }
         }
 
+        if (action.actionMap.name == "QTE")
+        {
+            Debug.Log($"Skipping action '{action.name}' because it's in the 'QTE' action map.");
+            return;
+        }
+
+        if (action.actionMap.name == "Main Menu")
+        {
+            Debug.Log($"Skipping action '{action.name}' because it's in the 'Main Menu' action map.");
+            return;
+        }
+
         if (action.bindings.Count > 1 && action.bindings[0].isComposite)
         {
             string[] directions = { "Move Forward", "Move Backward", "Move Left", "Move Right" };
