@@ -66,7 +66,10 @@ public class GameOverMenu : MonoBehaviour
         {
             cameraController.SetLookState(true);
         }
-    SaveManager.Instance.LoadGame();
+
+        Time.timeScale = 1f;
+
+        SaveManager.Instance.LoadGame();
     }
 
     public void ShowGameOver()

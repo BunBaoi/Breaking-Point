@@ -23,7 +23,7 @@ public class NPCDialogue : MonoBehaviour
     [Header("Keybinds")]
     [SerializeField] private InputActionAsset inputActions;
     [SerializeField] private string interactActionName = "Interact";
-    [SerializeField] private KeyCode clearPlayerPrefs = KeyCode.C;
+    // [SerializeField] private KeyCode clearPlayerPrefs = KeyCode.C;
 
     [Header("Bool Conditions")]
     [SerializeField] private List<string> requiredBoolKeysTrue = new List<string>();
@@ -103,12 +103,12 @@ public class NPCDialogue : MonoBehaviour
                 }
                 else
                 {
-                    interactTextInstance.transform.localPosition = new Vector3(0, defaultYAxis, 0);
+                    interactTextInstance.transform.localPosition = new Vector3(0, defaultYAxis, 0.3f);
                 }
             }
             else
             {
-                interactTextInstance.transform.localPosition = new Vector3(0, defaultYAxis, 0);
+                interactTextInstance.transform.localPosition = new Vector3(0, defaultYAxis, 0.3f);
             }
 
             string interactText = "Talk"; // Default text
@@ -288,7 +288,7 @@ public class NPCDialogue : MonoBehaviour
         toPlayer.Normalize();
 
         // Calculate the desired position in front of the NPC (in world space)
-        Vector3 frontOfNPC = transform.position + toPlayer * 0.8f;
+        Vector3 frontOfNPC = transform.position + toPlayer * 0.3f;
         frontOfNPC.y += yAxis; // You control the Y position
 
         // Smooth or snap to position

@@ -120,6 +120,20 @@ public class InventoryManager : MonoBehaviour
         PlayerPrefs.SetInt("SelectedSlotIndex", selectedSlotIndex);
         PlayerPrefs.Save();
     }
+    public void ClearInventory()
+    {
+        // Clear the items in all slots
+        foreach (var slot in slots)
+        {
+            slot.ClearSlot();
+        }
+
+        selectedSlotIndex = 0;
+
+        // Update UI to reflect cleared inventory
+        UpdateSlotImageForAllSlots(selectedSlotIndex);
+    }
+
 
     public void LoadInventory(List<string> inventoryItems)
     {

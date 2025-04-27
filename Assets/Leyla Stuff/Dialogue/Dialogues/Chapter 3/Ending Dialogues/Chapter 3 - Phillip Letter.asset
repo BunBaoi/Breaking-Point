@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6aae8174bec24705b4c5b1137a31e2a, type: 3}
+  m_Name: Chapter 3 - Phillip Letter
+  m_EditorClassIdentifier: 
+  chapterName: 
+  eventIds:
+  - Level3LetterCinematic
+  dialoguesAndAudio:
+  - dialogue: Phillip,
+    npcName: Alice
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
+  - dialogue: "I\u2019ve carried you with me through every step of this climb, and
+      it\u2019s time to admit something to myself.\r"
+    npcName: Alice
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
+  - dialogue: "I\u2019m letting go.\r"
+    npcName: Alice
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
+  - dialogue: "Not because I want to, but because I need to move forward, and I can\u2019t
+      do it while holding onto the past.\r"
+    npcName: Alice
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
+  - dialogue: "You\u2019ll always be with me, in my heart, in my memories, in everything
+      I\u2019ve become.\r\r"
+    npcName: Alice
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
+  - dialogue: "I\u2019ll never forget you. But it\u2019s time I honour you by living
+      the life you always believed in for me.\r\r"
+    npcName: Alice
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
+  - dialogue: "It\u2019s time I forgive myself and stop being afraid.\r\r\r"
+    npcName: Alice
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
+  - dialogue: "I love you, and I always will.\r\r\r\r"
+    npcName: Alice
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
+  - dialogue: "- Alice\r\r\r\r"
+    npcName: Alice
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
+  randomTexts:
+  - Phillip,
+  - carried you
+  - letting go
+  - need to
+  - my heart
+  - honour you
+  - forgive
+  - love you
+  - '- Alice'
+  cinematicImage: {fileID: 0}
+  pointA: 
+  pointB: 
+  randomTextPrefab: {fileID: 1868577807128867544, guid: 068a5638994a64419a4469ea43007930, type: 3}

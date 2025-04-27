@@ -12,8 +12,6 @@ public class QTEManager : MonoBehaviour
     [Header("Input Settings")]
     [SerializeField] private InputActionAsset inputActions;
     [SerializeField] private List<string> qteActionNames = new List<string> { "QTEButton1", "QTEButton2", "QTEButton3", "QTEButton4" };
-    [SerializeField] private string anyKeyActionName = "AnyKeyPress";
-    [SerializeField] private string anyKeyPressOtherButtonsActionName = "AnyKeyPressOtherButtons";
 
     [Header("UI")]
     [SerializeField] private GameObject qteIconPrefab;
@@ -35,6 +33,43 @@ public class QTEManager : MonoBehaviour
     private void Awake()
     {
         if (Instance == null) Instance = this;
+    }
+    private void OnEnable()
+    {
+        // Enable listening to *any* input, not just the QTE action
+        foreach (var actionName in qteActionNames)
+        {
+            InputAction action = inputActions.FindAction(actionName);
+            if (action != null)
+            {
+                action.Enable();
+                action.performed += OnAnyButtonPressed;  // Listen for all button presses
+            }
+        }
+    }
+
+    private void OnDisable()
+    {
+        // Clean up listeners when QTE ends
+        foreach (var actionName in qteActionNames)
+        {
+            InputAction action = inputActions.FindAction(actionName);
+            if (action != null)
+            {
+                action.Disable();
+                action.performed -= OnAnyButtonPressed;
+            }
+        }
+    }
+
+    private void OnAnyButtonPressed(InputAction.CallbackContext context)
+    {
+        // If QTE is active and the wrong button is pressed
+        if (qteActive && context.action.name != currentActionName)
+        {
+            Debug.Log($"Wrong button '{context.action.name}' pressed. QTE Failed.");
+            FailQTE();  // Fail QTE
+        }
     }
 
     public void StartQTE(Transform destination, QTETrigger nextTrigger = null)
@@ -78,24 +113,6 @@ public class QTEManager : MonoBehaviour
 
         action.Enable();
         action.performed += OnQTEButtonPressed;
-
-        InputAction anyKeyAction = inputActions.FindAction(anyKeyActionName);
-        if (anyKeyAction == null)
-        {
-            Debug.LogError($"Input Action '{anyKeyActionName}' not found!");
-            yield break;
-        }
-        anyKeyAction.Enable();
-        anyKeyAction.performed += OnAnyKeyPressed;
-
-        InputAction anyKeyPressOtherAction = inputActions.FindAction(anyKeyPressOtherButtonsActionName);
-        if (anyKeyPressOtherAction == null)
-        {
-            Debug.LogError($"Input Action '{anyKeyPressOtherButtonsActionName}' not found!");
-            yield break;
-        }
-        anyKeyPressOtherAction.Enable();
-        anyKeyPressOtherAction.performed += OnAnyKeyPressedOtherButtons;
 
         currentIcon = Instantiate(qteIconPrefab, iconSpawnPoint);
         Transform fillTransform = currentIcon.transform.Find("Fill");
@@ -156,22 +173,6 @@ public class QTEManager : MonoBehaviour
             // Proceed to move the player to the target location
             StartCoroutine(MovePlayerToTarget());
         }
-    }
-
-    private void OnAnyKeyPressed(InputAction.CallbackContext context)
-    {
-        if (!qteActive) return;
-
-        Debug.Log("QTE FAILED! Other key pressed.");
-        FailQTE();
-    }
-
-    private void OnAnyKeyPressedOtherButtons(InputAction.CallbackContext context)
-    {
-        if (!qteActive) return;
-
-        Debug.Log("QTE FAILED! Other key pressed.");
-        FailQTE();
     }
 
     private IEnumerator MovePlayerToTarget()
@@ -249,20 +250,6 @@ public class QTEManager : MonoBehaviour
         {
             action.Disable();
             action.performed -= OnQTEButtonPressed;
-        }
-
-        InputAction anyKeyAction = inputActions.FindAction(anyKeyActionName);
-        if (anyKeyAction != null)
-        {
-            anyKeyAction.Disable();
-            anyKeyAction.performed -= OnAnyKeyPressed;
-        }
-
-        InputAction anyKeyPressOtherAction = inputActions.FindAction(anyKeyPressOtherButtonsActionName);
-        if (anyKeyPressOtherAction != null)
-        {
-            anyKeyPressOtherAction.Disable();
-            anyKeyPressOtherAction.performed -= OnAnyKeyPressedOtherButtons;
         }
     }
 

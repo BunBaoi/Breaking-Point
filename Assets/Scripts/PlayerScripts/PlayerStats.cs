@@ -66,7 +66,7 @@ public class PlayerStats : MonoBehaviour
     private InventoryManager inventoryManager;
     [SerializeField] private Canvas inventoryCanvas;
     [SerializeField] private GameObject[] playerHands;
-    [SerializeField] public QTEMechanicScript qTEMechanicScript;
+    // [SerializeField] public QTEMechanicScript qTEMechanicScript;
     public QTEvent qTEvent;
     public Vector3 targetPosition;
 
@@ -638,7 +638,7 @@ public class PlayerStats : MonoBehaviour
         canvasGroup.alpha = endAlpha;
     }
 
-public IEnumerator MoveCube(Vector3 targetPosition) // targetPosition = Player <-
+/*public IEnumerator MoveCube(Vector3 targetPosition) // targetPosition = Player <-
     {
         Vector3 startPosition = qTEMechanicScript.objectPlayer.position;
         float timeElapsed = 0;
@@ -677,7 +677,7 @@ public IEnumerator MoveCube(Vector3 targetPosition) // targetPosition = Player <
             //qTEMechanicScript.QTEMechanicScriptActive = true; // KEY TO ACTIVATINE TIMER 
         }
 
-    }
+    }*/
 
     // drain energy
     public void DrainEnergy(float amount)

@@ -10,7 +10,7 @@ public class PlayerMovement : MonoBehaviour
 {
     [Header("Player")]
     public QTEvent qTEvent;
-    public QTEMechanicScript qTEMechanicScript;
+    // public QTEMechanicScript qTEMechanicScript;
     public CharacterController controller;
     private PlayerStats playerStats;
     public Camera playerCamera;

@@ -292,6 +292,11 @@ public class SaveManager : MonoBehaviour
             cameraController.xRotation = data.cameraXRotation;
         }
 
+        BoolManager.Instance.ClearAllBools();
+        PageTracker.Instance.ClearPages();
+        DialogueManager.Instance.ClearDialogueProgress();
+        InventoryManager.Instance.ClearInventory();
+
         // Restore bools
         foreach (var boolState in data.boolStates)
         {
@@ -380,6 +385,7 @@ public class SaveManager : MonoBehaviour
             playerStats.Oxygen = data.oxygen;
             playerStats.Energy = data.energy;
         }
+
 
         // Restore dialogue progress
         foreach (var dialogueState in data.dialogueStates)

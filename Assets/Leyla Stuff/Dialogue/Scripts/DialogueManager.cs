@@ -263,6 +263,11 @@ public class DialogueManager : MonoBehaviour
         return new List<string>(dialogueTreeProgress.Keys);
     }
 
+    public void ClearDialogueProgress()
+    {
+        dialogueTreeProgress.Clear(); // Clears all dialogue progress
+    }
+
     private void Update()
     {
         foreach (var entry in dialogueTreeProgress)

@@ -135,6 +135,11 @@ public class PlayerManager : MonoBehaviour
                 {
                     Debug.Log("No existing Player found in scene. Instantiating player prefab.");
                     playerInstance = Instantiate(playerPrefab);
+                    // Immediately move player very high up
+                    Vector3 tempPos = playerInstance.transform.position;
+                    tempPos.y = 1000f;
+                    playerInstance.transform.position = tempPos;
+
                     DontDestroyOnLoad(playerInstance);
                     Debug.Log("Player prefab instantiated and marked as DontDestroyOnLoad.");
                 }

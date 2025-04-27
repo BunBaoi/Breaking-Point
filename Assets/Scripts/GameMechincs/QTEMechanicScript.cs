@@ -1,10 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
 
-public class QTEMechanicScript : MonoBehaviour
-{
+/*public class QTEMechanicScript : MonoBehaviour
+
     [Header("QTE Position")]
     public GameObject Pos1;
     public GameObject Pos2;
@@ -42,7 +41,7 @@ public class QTEMechanicScript : MonoBehaviour
     public PlayerStats playerStats;
     public PlayerMovement playerMovement;
 
-    public PlayerPos PositionOfPlayer;
+    // public PlayerPos PositionOfPlayer;
     public bool QTEMechanicScriptActive;
 
     public void Start()
@@ -108,7 +107,7 @@ public class QTEMechanicScript : MonoBehaviour
     public bool CHKPos20;
     public bool CHKPos21;
 
-    public void QTEMove()
+   public void QTEMove()
     {
         switch (PositionOfPlayer)
         {
@@ -322,7 +321,7 @@ public class QTEMechanicScript : MonoBehaviour
                 {
                     // Player move to Target position
                     Vector3 target = Pos17.transform.position; // Update target position to Pos 4
-                    PositionOfPlayer = PlayerPos.PlayerPos17; // Update Switch
+                 //   PositionOfPlayer = PlayerPos.PlayerPos17; // Update Switch
                     CHKCounter++;
                     StartCoroutine(playerStats.MoveCube(target));
                     CHKPos16 = true;
@@ -336,7 +335,7 @@ public class QTEMechanicScript : MonoBehaviour
                 {
                     // Player move to Target position
                     Vector3 target = Pos18.transform.position; // Update target position to Pos 4
-                    PositionOfPlayer = PlayerPos.PlayerPos18; // Update Switch
+                  //  PositionOfPlayer = PlayerPos.PlayerPos18; // Update Switch
                     CHKCounter++;
                     StartCoroutine(playerStats.MoveCube(target));
                     CHKPos17 = true;
@@ -350,7 +349,7 @@ public class QTEMechanicScript : MonoBehaviour
                 {
                     // Player move to Target position
                     Vector3 target = Pos19.transform.position; // Update target position to Pos 4
-                    PositionOfPlayer = PlayerPos.PlayerPos19; // Update Switch
+                   // PositionOfPlayer = PlayerPos.PlayerPos19; // Update Switch
                     CHKCounter++;
                     StartCoroutine(playerStats.MoveCube(target));
                     CHKPos18 = true;
@@ -364,7 +363,7 @@ public class QTEMechanicScript : MonoBehaviour
                 {
                     // Player move to Target position
                     Vector3 target = Pos20.transform.position; // Update target position to Pos 4
-                    PositionOfPlayer = PlayerPos.PlayerPos20; // Update Switch
+                   // PositionOfPlayer = PlayerPos.PlayerPos20; // Update Switch
                     CHKCounter++;
                     StartCoroutine(playerStats.MoveCube(target));
                     CHKPos19 = true;
@@ -372,7 +371,7 @@ public class QTEMechanicScript : MonoBehaviour
                 }
                 break;
 
-            case PlayerPos.PlayerPos20:
+           /* case PlayerPos.PlayerPos20:
                 //Debug.Log("Player Position 3");
                 if (CHKPos20 == false)
                 {
@@ -391,12 +390,12 @@ public class QTEMechanicScript : MonoBehaviour
                 if (CHKPos21 == false)
                 {
                     // Player move to Target position
-                    /*
+                    
                     Vector3 target = Pos22.transform.position; // Update target position to Pos 4
                     PositionOfPlayer = PlayerPos.PlayerPos22; // Update Switch
                     CHKCounter++;
                     StartCoroutine(playerStats.MoveCube(target));
-                    */
+                    
                     CHKPos21 = true;
 
                 }
@@ -405,4 +404,4 @@ public class QTEMechanicScript : MonoBehaviour
         }
     }
 
-}
+}*/

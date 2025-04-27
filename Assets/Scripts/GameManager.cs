@@ -11,8 +11,14 @@ public class GameManager : MonoBehaviour
     [SerializeField] private CinematicSequence chapter1CinematicSequence;
     [SerializeField] private CinematicSequence chapter2CinematicSequence;
     [SerializeField] private CinematicSequence chapter3CinematicSequence;
+    [SerializeField] private CinematicSequence level3Flashback;
 
-    [SerializeField] private GameObject loadPanel;
+    [SerializeField] private SceneTransitionController sceneTransition;
+   [SerializeField] private string sceneToLoad = "MainMenu";
+    [SerializeField] private string boolName = "";
+    [SerializeField] private bool returnToMainMenuTriggered = false;
+
+   [SerializeField] private GameObject loadPanel;
     [SerializeField] private Image loadImage;
     [SerializeField] private float rotationSpeed = 100f;
 
@@ -101,7 +107,14 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        
+        if (BoolManager.Instance.GetBool(boolName) && !returnToMainMenuTriggered)
+        {
+            if (sceneTransition != null)
+            {
+                returnToMainMenuTriggered = true;
+                sceneTransition.StartTransition(sceneToLoad);
+            }
+        }
     }
 
     public void LoadLevel1Cinematic()
@@ -117,5 +130,9 @@ public class GameManager : MonoBehaviour
     public void LoadLevel3Cinematic()
     {
         chapter3CinematicSequence.StartCinematic();
+    }
+    public void StartLevel3Flashback()
+    {
+        level3Flashback.StartCinematic();
     }
 }

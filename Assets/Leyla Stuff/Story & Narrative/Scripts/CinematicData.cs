@@ -15,6 +15,9 @@ public class CinematicData : ScriptableObject
     [Header("Random Texts")]
     public string[] randomTexts;
 
+    [Header("Optional Cinematic Image")]
+    public Sprite cinematicImage;
+
     [Header("Camera Points")]
     public string pointA;
     public string pointB;

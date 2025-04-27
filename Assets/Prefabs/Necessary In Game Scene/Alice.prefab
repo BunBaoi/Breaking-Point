@@ -4700,7 +4700,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e96ce123db5e74c9c93b01997898a950, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultSlotCount: 4
+  defaultSlotCount: 6
   inventorySlotPrefab: {fileID: 5735570166801149588, guid: 3201d870346264af99b1292678d5e5a0, type: 3}
   inventoryPanel: {fileID: 5744453229000609243}
   leftHandPosition: {fileID: 819369333697391953}
@@ -4891,7 +4891,7 @@ MonoBehaviour:
   leftHandTransform: {fileID: 819369333697391953}
   rightHandTransform: {fileID: 4434075183205336615}
   climbSpeed: 2
-  maxClimbDistance: 3
+  maxClimbDistance: 5
   climbableTag: Climbable
   icepickMoveSpeed: 5
   digInDelay: 0.2
@@ -4943,7 +4943,7 @@ MonoBehaviour:
   bodyPositionOffset: 1
   initialSnapPercentage: 0.3
   targetOffsetDistance: 0.2
-  climbingEnergyDrainRate: 1
+  climbingEnergyDrainRate: 0.2
   lowEnergyClimbSpeedMultiplier: 0.5
   lowEnergyThreshold: 20
   upwardBias: 0.5
@@ -5018,8 +5018,8 @@ MonoBehaviour:
     Path: event:/Masked Breathing Laboured 3 SFX
   previousEnergy: 0
   Energy: 100
-  EnergyDrainRate: 0.3
-  SprintEnergyDrainRate: 1
+  EnergyDrainRate: 0.2
+  SprintEnergyDrainRate: 0.5
   isInEnergyDrainZone: 0
   energyChanged: 0
   transitionCanvasGroup: {fileID: 625708046556408257}

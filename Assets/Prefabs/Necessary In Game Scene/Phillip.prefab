@@ -40,8 +40,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1395352580966981234}
-  - component: {fileID: 6085861122308439825}
-  - component: {fileID: 3632035273730034022}
   - component: {fileID: 6510198468096813079}
   - component: {fileID: 7337646201647246905}
   - component: {fileID: 4634771873638419874}
@@ -69,56 +67,6 @@ Transform:
   - {fileID: 6775265546122111422}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &6085861122308439825
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2769650652238981293}
-  m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &3632035273730034022
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2769650652238981293}
-  m_Enabled: 0
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &6510198468096813079
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -137,7 +85,7 @@ MonoBehaviour:
   maxDistanceToPlayer: 2
   companionSpeed: 5
   stateOfCompanion: 0
-  companionModel: {fileID: 2769650652238981293}
+  companionModel: {fileID: 5503143011769832112}
   audioSource: {fileID: 0}
   companionSounds: []
 --- !u!195 &7337646201647246905
@@ -2409,5 +2357,10 @@ PrefabInstance:
 --- !u!4 &5121938325519108106 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5870258540061236090, guid: fdbf1d99ff961b74ab4a723c2a34a489, type: 3}
+  m_PrefabInstance: {fileID: 1613307704934863728}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &5503143011769832112 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6502223311676490176, guid: fdbf1d99ff961b74ab4a723c2a34a489, type: 3}
   m_PrefabInstance: {fileID: 1613307704934863728}
   m_PrefabAsset: {fileID: 0}

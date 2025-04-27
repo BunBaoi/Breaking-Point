@@ -20,7 +20,7 @@ public class LeylaTestingScript : MonoBehaviour
     [SerializeField] private Vector3 teleportPosition;
 
     // Start is called before the first frame update
-    void Start()
+    /*void Start()
     {
         
     }
@@ -45,11 +45,12 @@ public class LeylaTestingScript : MonoBehaviour
             else
             {
                 Debug.LogError("BoolManager.Instance is null.");
-            }*/
-        }
-        if (Input.GetKeyDown(key2))
+            }
+        }*/
+        /*if (Input.GetKeyDown(key2))
         {
-            callingCompanionMethods.CallTeleportToPosition(teleportPosition);
+            BoolManager.Instance.SetBool(boolName, true);
+        // callingCompanionMethods.CallTeleportToPosition(teleportPosition);
             // SaveManager.Instance.LoadGame();
             // Debug.Log("load game");
         }
@@ -59,5 +60,5 @@ public class LeylaTestingScript : MonoBehaviour
             // gameOverMenu.ShowGameOver();
             // Debug.Log("load game");
         }
-    }
+    }*/
 }

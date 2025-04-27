@@ -23,7 +23,7 @@ public class QTEvent : MonoBehaviour
     public KeyCode _Key;
     public UI_ReloadButton[] KeyTextBox;
     public PlayerStats playerStats;
-    public QTEMechanicScript qTEMechanicScript;
+    // public QTEMechanicScript qTEMechanicScript;
 
     public int WaitingKeyLoad;
     public int CorrectKeyCounter;
@@ -33,12 +33,12 @@ public class QTEvent : MonoBehaviour
     [Header("QTE Timer")]
     public float CountDownTimer;
 
-    void Start()
+    /*void Start()
     {
         //KeyTextBox = GetComponentsInChildren<UI_ReloadButton>(true);
         CountDownTimer = 8f; // Change QTE STARTING CountDownTimer HERE
         playerStats = GameObject.FindWithTag("Player").GetComponent<PlayerStats>();
-        qTEMechanicScript = GameObject.FindWithTag("QTE").GetComponent<QTEMechanicScript>();
+        // qTEMechanicScript = GameObject.FindWithTag("QTE").GetComponent<QTEMechanicScript>();
     }
 
     void Update()
@@ -86,5 +86,5 @@ public class QTEvent : MonoBehaviour
             playerStats.IsAlive = false;
             Debug.Log("Player is dead");
         }
-    }
+    }*/
 }

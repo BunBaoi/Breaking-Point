@@ -4,6 +4,7 @@ using System.Collections;
 using FMODUnity;
 using System.Collections.Generic;
 using Cinemachine;
+using UnityEngine.UI;
 
 public class CinematicSequence : MonoBehaviour
 {
@@ -15,6 +16,7 @@ public class CinematicSequence : MonoBehaviour
     [SerializeField] private TMP_Text dialogueText;
     [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private Canvas canvas;
+    [SerializeField] private Image cinematicImageHolder;
 
     [Header("Dialogue Display Settings")]
     [SerializeField] private float dialogueSpeedFactor = 0.05f;
@@ -96,7 +98,7 @@ public class CinematicSequence : MonoBehaviour
                 dayNightCycle.StopTime();
             }
             GameObject playerCamera = GameObject.FindGameObjectWithTag("PlayerCamera");
-            if (playerCamera !=null)
+            if (playerCamera != null)
             {
                 cameraController = playerCamera.GetComponent<CameraController>();
                 if (cameraController != null)
@@ -108,21 +110,30 @@ public class CinematicSequence : MonoBehaviour
             IsCinematicActive = true;
             StartCoroutine(PlayCinematic());
 
-            instantiatedCamera = Instantiate(cinematicCameraPrefab);
+            bool hasValidPoints = !string.IsNullOrEmpty(cinematicData.pointA) && !string.IsNullOrEmpty(cinematicData.pointB);
 
-            Transform pointATransform = GameObject.Find(cinematicData.pointA)?.transform;
-
-            if (pointATransform != null)
+            if (hasValidPoints)
             {
-                instantiatedCamera.transform.position = pointATransform.position;
-                instantiatedCamera.transform.rotation = pointATransform.rotation;
+                instantiatedCamera = Instantiate(cinematicCameraPrefab);
+
+                Transform pointATransform = GameObject.Find(cinematicData.pointA)?.transform;
+
+                if (pointATransform != null)
+                {
+                    instantiatedCamera.transform.position = pointATransform.position;
+                    instantiatedCamera.transform.rotation = pointATransform.rotation;
+                }
+                else
+                {
+                    Debug.LogWarning("Point A GameObject not found! Camera will use default position.");
+                }
+
+                instantiatedCamera.gameObject.SetActive(true);
             }
             else
             {
-                Debug.LogWarning("Point A GameObject not found! Camera will use default position.");
+                Debug.LogWarning("Cinematic points not set properly. Cinematic camera will not be instantiated.");
             }
-
-            instantiatedCamera.gameObject.SetActive(true);
         }
         else
         {
@@ -188,7 +199,21 @@ public class CinematicSequence : MonoBehaviour
     {
         Debug.Log("Starting cinematic fade-in");
         canvas.gameObject.SetActive(true);
-        // yield return StartCoroutine(FadeCanvasGroup(canvasGroup, 1f, 1f));
+        canvasGroup.alpha = 1f;
+
+        // Set and fade in the cinematic image if it exists
+        if (cinematicData.cinematicImage != null)
+        {
+            cinematicImageHolder.sprite = cinematicData.cinematicImage;
+            cinematicImageHolder.gameObject.SetActive(true);
+            yield return StartCoroutine(FadeImage(cinematicImageHolder, 1f, 1f)); // Fade image to fully visible
+
+            yield return new WaitForSeconds(0.2f);
+        }
+        else
+        {
+            cinematicImageHolder.gameObject.SetActive(false);
+        }
 
         // Play each dialogue in order
         for (int i = 0; i < cinematicData.dialoguesAndAudio.Length; i++)
@@ -206,6 +231,8 @@ public class CinematicSequence : MonoBehaviour
             }
 
             bool dialogueFinished = false;
+            yield return StartCoroutine(FadeText(dialogueText, textFadeInDuration, 1f));
+
             yield return StartCoroutine(DisplayDialogue(dialogueAudio.dialogue, dialogueAudio.npcName, dialogueAudio.dialogueAudio, () => dialogueFinished = true));
 
             while (!dialogueFinished)
@@ -230,9 +257,33 @@ public class CinematicSequence : MonoBehaviour
 
         yield return StartCoroutine(ShowChapterText());
 
+        if (cinematicData.cinematicImage != null)
+        {
+            yield return StartCoroutine(FadeImage(cinematicImageHolder, 1f, 0f)); // Fade image to transparent
+            cinematicImageHolder.gameObject.SetActive(false);
+        }
+
         yield return StartCoroutine(FadeCanvasGroup(canvasGroup, 1f, 0f));
 
         yield return StartCoroutine(PanCamera());
+
+        yield return StartCoroutine(TriggerEventIDs());
+    }
+
+    private IEnumerator FadeImage(Image image, float duration, float targetAlpha)
+    {
+        float startAlpha = image.color.a;
+        float elapsedTime = 0f;
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            float alpha = Mathf.Lerp(startAlpha, targetAlpha, elapsedTime / duration);
+            image.color = new Color(image.color.r, image.color.g, image.color.b, alpha);
+            yield return null;
+        }
+
+        image.color = new Color(image.color.r, image.color.g, image.color.b, targetAlpha);
     }
 
     private IEnumerator DisplayDialogue(string dialogue, string npcName, DialogueAudio dialogueAudio, System.Action onDialogueComplete)
@@ -305,6 +356,14 @@ public class CinematicSequence : MonoBehaviour
     private IEnumerator ShowChapterText()
     {
         HideRandomText();
+
+        // NEW: Check if chapter name is empty or null
+        if (string.IsNullOrEmpty(cinematicData.chapterName))
+        {
+            StartCoroutine(FadeCanvasGroup(canvasGroup, 1f, 0f));
+            Debug.Log("Chapter name is null or empty. Skipping chapter text display.");
+            yield break; // Exit the coroutine early, skip showing chapter text
+        }
 
         chapterText.gameObject.SetActive(true);
         chapterText.text = cinematicData.chapterName;
@@ -494,8 +553,8 @@ public class CinematicSequence : MonoBehaviour
                 Destroy(instantiatedCamera.gameObject);
                 Debug.Log("Cinematic camera removed.");
 
-                yield return new WaitForSeconds(0.1f);
-                StartCoroutine(TriggerEventIDs());
+                // yield return new WaitForSeconds(0.1f);
+                // StartCoroutine(TriggerEventIDs());
             }
             else
             {

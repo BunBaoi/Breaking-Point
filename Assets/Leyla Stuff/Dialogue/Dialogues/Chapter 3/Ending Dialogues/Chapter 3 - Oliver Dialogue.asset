@@ -1,0 +1,130 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49d908a81e1ab4345bdb9ed5793418b1, type: 3}
+  m_Name: Chapter 3 - Oliver Dialogue
+  m_EditorClassIdentifier: 
+  treeID: d5b405ea-df85-4712-a68c-9c8a68a47d30
+  dialogueNodes:
+  - dialogueText: "Hey..\r"
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
+    eventIds: []
+    options: []
+    npcName: Alice
+    npcTag: NPC
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+  - dialogueText: "Hey\u2026 didn\u2019t expect to see you here.\r"
+    dialogueAudio: {fileID: 11400000, guid: 7aa603cac70ac442cbe1e5af68e9852b, type: 2}
+    eventIds: []
+    options: []
+    npcName: Oliver
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+  - dialogueText: "Neither did I. Thought I was the only one crazy enough to make
+      it.\r"
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
+    eventIds: []
+    options: []
+    npcName: Alice
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+  - dialogueText: Seems like we both are. But hey, we made it.
+    dialogueAudio: {fileID: 11400000, guid: 7aa603cac70ac442cbe1e5af68e9852b, type: 2}
+    eventIds: []
+    options: []
+    npcName: Oliver
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+  - dialogueText: "Did you\u2026\r"
+    dialogueAudio: {fileID: 11400000, guid: 7aa603cac70ac442cbe1e5af68e9852b, type: 2}
+    eventIds: []
+    options: []
+    npcName: Oliver
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+  - dialogueText: "Maybe.. Want to head down together.\r"
+    dialogueAudio: {fileID: 11400000, guid: 7aa603cac70ac442cbe1e5af68e9852b, type: 2}
+    eventIds: []
+    options: []
+    npcName: Oliver
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+  - dialogueText: "\u2026 \u2026"
+    dialogueAudio: {fileID: 0}
+    eventIds: []
+    options: []
+    npcName: Alice
+    npcTag: 
+    useDialogueAudio: 0
+    fmodSoundEvent:
+      Guid:
+        Data1: 1892999442
+        Data2: 1090364904
+        Data3: 1283031707
+        Data4: -1732319094
+      Path: event:/No Audio
+  - dialogueText: Sure.
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
+    eventIds:
+    - Level3TalkedToOliver
+    options: []
+    npcName: Alice
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 1892999442
+        Data2: 1090364904
+        Data3: 1283031707
+        Data4: -1732319094
+      Path: event:/No Audio
