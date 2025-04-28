@@ -30,10 +30,15 @@ public class LeylaTestingScript : MonoBehaviour
     {
         if (Input.GetKeyDown(key))
         {
+            string timestamp = System.DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            string filename = Application.dataPath + "/Screenshots/screenshot_" + timestamp + ".png";
+
+            ScreenCapture.CaptureScreenshot(filename);
+            Debug.Log("Screenshot saved to: " + filename);
             // BoolManager.Instance.SetBool(boolName, true);
             // cinematicSequence.StartCinematic();
             // SceneManager.LoadScene("MainMenu");
-            SaveManager.Instance.SaveGame();
+            // SaveManager.Instance.SaveGame();
             // Debug.Log("save game");
             // Debug.Log("add page");
             // journalPageAdder.AddObjectivesPage(objectivesPage);
@@ -45,9 +50,9 @@ public class LeylaTestingScript : MonoBehaviour
             else
             {
                 Debug.LogError("BoolManager.Instance is null.");
-            }
+            }*/
         }
-        if (Input.GetKeyDown(key2))
+        /*if (Input.GetKeyDown(key2))
         {
           // BoolManager.Instance.SetBool(boolName, true);
         // callingCompanionMethods.CallTeleportToPosition(teleportPosition);
@@ -60,5 +65,5 @@ public class LeylaTestingScript : MonoBehaviour
             // gameOverMenu.ShowGameOver();
             // Debug.Log("load game");
         }
-    }*/
-}
+    }
+}*/
