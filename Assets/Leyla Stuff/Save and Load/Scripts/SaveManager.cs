@@ -127,6 +127,12 @@ public class SaveManager : MonoBehaviour
             }
         }
 
+        // Save dropped items' positions
+        foreach (var item in ObjectTracker.Instance.GetDroppedItems())
+        {
+            data.droppedItems.Add(item);
+        }
+
         // Save the current day, hours, and minutes
         DayNightCycle dayNightCycle = FindObjectOfType<DayNightCycle>();
         if (dayNightCycle != null)
@@ -347,6 +353,22 @@ public class SaveManager : MonoBehaviour
                     Debug.LogWarning($"Object {objState.objectName} not found in the scene.");
                 }
             }
+        }
+
+        // Restore dropped items' positions
+        foreach (var droppedItem in data.droppedItems)
+        {
+            // Check if the dropped item prefab is already in the Resources folder (or other location you load from)
+            GameObject droppedObject = Instantiate(Resources.Load<GameObject>(droppedItem.objectName));
+
+            // Ensure the item's position is correctly set
+            droppedObject.transform.position = droppedItem.position.ToVector3();
+
+            // Optionally, ensure that the object is active
+            droppedObject.SetActive(true);
+
+            // Register the dropped object with the ObjectTracker to track it
+            ObjectTracker.Instance.TrackDroppedItem(droppedItem.objectName, droppedObject.transform.position);
         }
 
         // Restore the saved time

@@ -13,6 +13,8 @@ public class ObjectTracker : MonoBehaviour
 
     [SerializeField] private LayerMask layersToTrack;
 
+    private List<DroppedItemData> droppedItems = new List<DroppedItemData>();
+
     private void Awake()
     {
         if (Instance == null)
@@ -103,6 +105,26 @@ public class ObjectTracker : MonoBehaviour
     public Dictionary<string, string> GetTrackedObjects()
     {
         return objectUniqueIDs;
+    }
+    public void TrackDroppedItem(string objectName, Vector3 position)
+    {
+        // Remove the item from the destroyed objects list if it exists
+        if (destroyedObjects.Contains(objectName))
+        {
+            destroyedObjects.Remove(objectName);
+            Debug.Log($"Removed {objectName} from destroyed objects.");
+        }
+
+        // Add the item to the dropped items list
+        DroppedItemData droppedItem = new DroppedItemData(objectName, position);
+        droppedItems.Add(droppedItem);
+        Debug.Log($"Tracked {objectName} as a dropped item.");
+    }
+
+    // Add this method to retrieve dropped items
+    public List<DroppedItemData> GetDroppedItems()
+    {
+        return droppedItems;
     }
 
     // Mark the object as destroyed

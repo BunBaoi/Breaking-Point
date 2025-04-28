@@ -12,6 +12,9 @@ public class MainMenuUI : MonoBehaviour
     [SerializeField] private GameObject mainMenuPanel;
     [SerializeField] private CanvasGroup introCanvasGroup;
     [SerializeField] private CanvasGroup mainMenuCanvasGroup;
+    [SerializeField] private GameObject creditsPanel;
+    [SerializeField] private CanvasGroup creditsCanvasGroup;
+    private bool isTransitioning = false;
 
     [SerializeField] private float fadeDuration = 1f; // Duration for the fade effect
 
@@ -200,6 +203,38 @@ public class MainMenuUI : MonoBehaviour
 
         SaveManager.Instance.LoadGame();
     }
+    public void OpenCredits()
+    {
+        if (isTransitioning) return;
+        StartCoroutine(FadeCanvasGroups(mainMenuCanvasGroup, creditsCanvasGroup, mainMenuPanel, creditsPanel));
+    }
+
+    public void BackToMainMenu()
+    {
+        if (isTransitioning) return;
+        StartCoroutine(FadeCanvasGroups(creditsCanvasGroup, mainMenuCanvasGroup, creditsPanel, mainMenuPanel));
+    }
+
+    private IEnumerator FadeCanvasGroups(CanvasGroup fromCanvas, CanvasGroup toCanvas, GameObject fromPanel, GameObject toPanel)
+    {
+        float timeElapsed = 0f;
+
+        toPanel.SetActive(true); // Make sure the panel is active
+
+        while (timeElapsed < fadeDuration)
+        {
+            fromCanvas.alpha = Mathf.Lerp(1f, 0f, timeElapsed / fadeDuration);
+            toCanvas.alpha = Mathf.Lerp(0f, 1f, timeElapsed / fadeDuration);
+            timeElapsed += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        fromCanvas.alpha = 0f;
+        toCanvas.alpha = 1f;
+
+        fromPanel.SetActive(false); // Hide the panel that faded out
+    }
+
 
     public void OpenSettings()
     {

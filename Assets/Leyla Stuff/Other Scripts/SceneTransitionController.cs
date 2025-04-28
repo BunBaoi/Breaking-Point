@@ -52,6 +52,7 @@ public class SceneTransitionController : MonoBehaviour
 
     private IEnumerator Transition(string sceneName)
     {
+        canvasGroup.gameObject.SetActive(true);
         // Fade to black
         while (canvasGroup.alpha < 1)
         {
@@ -84,6 +85,7 @@ public class SceneTransitionController : MonoBehaviour
         GameManager.Instance.HideLoadingPanel();
 
         canvasGroup.alpha = 0f;
+        canvasGroup.gameObject.SetActive(false);
         StartCoroutine(DestroyObject());
     }
 

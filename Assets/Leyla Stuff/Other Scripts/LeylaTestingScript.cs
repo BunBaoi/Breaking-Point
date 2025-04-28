@@ -33,11 +33,11 @@ public class LeylaTestingScript : MonoBehaviour
             // BoolManager.Instance.SetBool(boolName, true);
             // cinematicSequence.StartCinematic();
             // SceneManager.LoadScene("MainMenu");
-            // SaveManager.Instance.SaveGame();
+            SaveManager.Instance.SaveGame();
             // Debug.Log("save game");
             // Debug.Log("add page");
             // journalPageAdder.AddObjectivesPage(objectivesPage);
-            tipManager.ShowTip(tipNumber);
+            // tipManager.ShowTip(tipNumber);
             /*if (BoolManager.Instance != null)
             {
                 BoolManager.Instance.SetBool(boolName, true);
@@ -46,17 +46,17 @@ public class LeylaTestingScript : MonoBehaviour
             {
                 Debug.LogError("BoolManager.Instance is null.");
             }
-        }*/
-        /*if (Input.GetKeyDown(key2))
+        }
+        if (Input.GetKeyDown(key2))
         {
-            BoolManager.Instance.SetBool(boolName, true);
+          // BoolManager.Instance.SetBool(boolName, true);
         // callingCompanionMethods.CallTeleportToPosition(teleportPosition);
-            // SaveManager.Instance.LoadGame();
+            SaveManager.Instance.LoadGame();
             // Debug.Log("load game");
         }
         if (Input.GetKeyDown(key3))
         {
-            PlayerManager.Instance.TeleportToScene("Leylas Testing Ground", "Tenzing");
+            // PlayerManager.Instance.TeleportToScene("Leylas Testing Ground", "Tenzing");
             // gameOverMenu.ShowGameOver();
             // Debug.Log("load game");
         }

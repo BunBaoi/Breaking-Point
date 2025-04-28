@@ -27,7 +27,7 @@ public class DayNightCycle : MonoBehaviour
 
     [Header("Lantern Light Settings")]
     [SerializeField] private LayerMask lanternLayerMask;
-    private Light[] lanternLights;
+    [SerializeField] private Light[] lanternLights;
 
     [Header("Ambient Light Settings")]
     [SerializeField] private Gradient ambientColourGradient;
@@ -100,6 +100,8 @@ public class DayNightCycle : MonoBehaviour
         UpdateLighting();
 
         SetInitialSkyboxState();
+
+        FindLanternLights();
     }
 
     private void SetInitialSkyboxState()
@@ -188,24 +190,30 @@ public class DayNightCycle : MonoBehaviour
         }
     }
 
+    private void FindLanternLights()
+    {
+        // Find all lights in the scene
+        Light[] allLights = FindObjectsOfType<Light>();
+
+        // Filter only the ones on the Lantern layer
+        lanternLights = System.Array.FindAll(allLights, light => ((1 << light.gameObject.layer) & lanternLayerMask.value) != 0);
+
+        // If nothing is found, keep it null
+        if (lanternLights == null || lanternLights.Length == 0)
+        {
+            lanternLights = null;
+        }
+    }
+
     private void ToggleLanternLights(bool enable)
     {
         if (lanternLights == null || lanternLights.Length == 0)
-        {
-            lanternLights = FindObjectsOfType<Light>();
-
-            // Ensure lights in the lantern layer are found
-            lanternLights = System.Array.FindAll(lanternLights, light => ((1 << light.gameObject.layer) & lanternLayerMask) != 0);
-        }
-
-        if (lanternLights.Length == 0) return;
+            return; // No lanterns found, nothing to do
 
         foreach (var lanternLight in lanternLights)
         {
-            if (((1 << lanternLight.gameObject.layer) & lanternLayerMask) != 0)
-            {
+            if (lanternLight != null) // Check in case something got destroyed
                 lanternLight.enabled = enable;
-            }
         }
     }
 

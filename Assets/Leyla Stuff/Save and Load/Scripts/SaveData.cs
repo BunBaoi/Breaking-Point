@@ -20,6 +20,9 @@ public class SaveData
     public List<string> inventoryItems = new();
     public List<string> shownTipIDs = new List<string>();
 
+    [Header("Dropped Items")]
+    public List<DroppedItemData> droppedItems = new List<DroppedItemData>();
+
     [Header("Player Stats")]
     public float oxygen;
     public float energy;
@@ -98,6 +101,19 @@ public struct ObjectActiveState
         this.objectName = objectName;
         this.isActive = isActive;
         this.isDestroyed = isDestroyed;
+    }
+}
+
+[Serializable]
+public struct DroppedItemData
+{
+    public string objectName;
+    public SerializableVector3 position;
+
+    public DroppedItemData(string objectName, Vector3 position)
+    {
+        this.objectName = objectName;
+        this.position = new SerializableVector3(position);
     }
 }
 

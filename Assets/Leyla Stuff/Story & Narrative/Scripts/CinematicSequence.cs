@@ -267,6 +267,8 @@ public class CinematicSequence : MonoBehaviour
 
         yield return StartCoroutine(PanCamera());
 
+        yield return new WaitForSeconds(0.6f);
+
         yield return StartCoroutine(TriggerEventIDs());
     }
 

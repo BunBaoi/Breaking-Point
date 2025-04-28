@@ -75,7 +75,7 @@ public class JournalUI : MonoBehaviour
     private void Start()
     {
         // Find the InventoryManager and Inventory Canvas by names
-        GameObject player = GameObject.Find("Alice");
+        GameObject player = GameObject.FindWithTag("Player");
         if (player != null)
         {
             inventoryManager = player.GetComponent<InventoryManager>();

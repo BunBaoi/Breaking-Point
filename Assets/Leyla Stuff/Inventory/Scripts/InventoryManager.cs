@@ -559,6 +559,8 @@ public class InventoryManager : MonoBehaviour
                 Vector3 dropPosition = hit.point;
                 GameObject droppedItem = Instantiate(item.itemPrefab, dropPosition, Quaternion.identity);
 
+                ObjectTracker.Instance.TrackDroppedItem(item.itemPrefab.name, droppedItem.transform.position);
+
                 MeshRenderer meshRenderer = droppedItem.GetComponent<MeshRenderer>();
                 if (meshRenderer != null)
                 {
@@ -582,6 +584,8 @@ public class InventoryManager : MonoBehaviour
                 Vector3 fallbackPosition = leftHandPosition.position - Vector3.up * 1f;
                 GameObject droppedItem = Instantiate(item.itemPrefab, fallbackPosition, Quaternion.identity);
                 droppedItem.GetComponent<ItemPickUp>().item = item;
+
+                ObjectTracker.Instance.TrackDroppedItem(item.itemPrefab.name, droppedItem.transform.position);
             }
             EnableItemPickup(item);
         }
