@@ -772,6 +772,9 @@ public class InventoryManager : MonoBehaviour
             heldLeftHandItemInstance = Instantiate(item.itemPrefab, leftHandPosition.position, leftHandPosition.rotation);
             heldLeftHandItemInstance.transform.SetParent(leftHandPosition);
 
+            // Apply regular scale for single hand items
+            heldLeftHandItemInstance.transform.localScale = new Vector3(1f, 1f, 1f);
+
             // Check if this is an icepick by name or tag
             if (item.name.ToLower().Contains("icepick") || item.itemPrefab.CompareTag("Icepick"))
             {
@@ -782,8 +785,12 @@ public class InventoryManager : MonoBehaviour
         }
         else if (item.handType == Item.HandType.DoubleHand)
         {
+            // Left hand item with mirrored scale
             heldLeftHandItemInstance = Instantiate(item.itemPrefab, leftHandPosition.position, leftHandPosition.rotation);
             heldLeftHandItemInstance.transform.SetParent(leftHandPosition);
+
+            // Mirror the item in the left hand by inverting X scale
+            heldLeftHandItemInstance.transform.localScale = new Vector3(-1f, 1f, 1f);
 
             // Check if this is an icepick by name or tag
             if (item.name.ToLower().Contains("icepick") || item.itemPrefab.CompareTag("Icepick"))
@@ -791,8 +798,12 @@ public class InventoryManager : MonoBehaviour
                 PositionIcepickByHinge(heldLeftHandItemInstance, leftHandPosition);
             }
 
+            // Right hand item with normal scale
             heldRightHandItemInstance = Instantiate(item.itemPrefab, rightHandPosition.position, rightHandPosition.rotation);
             heldRightHandItemInstance.transform.SetParent(rightHandPosition);
+
+            // Normal scale for right hand
+            heldRightHandItemInstance.transform.localScale = new Vector3(1f, 1f, 1f);
 
             // If it's a double-handed icepick, do the same for the right hand
             if (item.name.ToLower().Contains("icepick") || item.itemPrefab.CompareTag("Icepick"))
@@ -855,6 +866,9 @@ public class InventoryManager : MonoBehaviour
             heldLeftHandItemInstance = Instantiate(item.itemPrefab, leftHandPosition.position, leftHandPosition.rotation);
             heldLeftHandItemInstance.transform.SetParent(leftHandPosition);
 
+            // Apply regular scale
+            heldLeftHandItemInstance.transform.localScale = new Vector3(1f, 1f, 1f);
+
             // Check if this is an icepick
             if (item.name.ToLower().Contains("icepick") || item.itemPrefab.CompareTag("Icepick"))
             {
@@ -866,9 +880,12 @@ public class InventoryManager : MonoBehaviour
         // For double-hand items, equip on both hands
         else if (item.handType == Item.HandType.DoubleHand)
         {
-            // Left hand item
+            // Left hand item with mirrored X scale
             heldLeftHandItemInstance = Instantiate(item.itemPrefab, leftHandPosition.position, leftHandPosition.rotation);
             heldLeftHandItemInstance.transform.SetParent(leftHandPosition);
+
+            // Mirror the item in the left hand by inverting X scale
+            heldLeftHandItemInstance.transform.localScale = new Vector3(-1f, 1f, 1f);
 
             if (item.name.ToLower().Contains("icepick") || item.itemPrefab.CompareTag("Icepick"))
             {
@@ -877,9 +894,12 @@ public class InventoryManager : MonoBehaviour
 
             DisablePickUpCollider(heldLeftHandItemInstance);
 
-            // Right hand item
+            // Right hand item with normal scale
             heldRightHandItemInstance = Instantiate(item.itemPrefab, rightHandPosition.position, rightHandPosition.rotation);
             heldRightHandItemInstance.transform.SetParent(rightHandPosition);
+
+            // Normal scale for right hand
+            heldRightHandItemInstance.transform.localScale = new Vector3(1f, 1f, 1f);
 
             if (item.name.ToLower().Contains("icepick") || item.itemPrefab.CompareTag("Icepick"))
             {
