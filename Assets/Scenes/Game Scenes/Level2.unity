@@ -3514,6 +3514,69 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7436132690263128, guid: f38180869ec704600b6c97e8751b09b7, type: 3}
   m_PrefabInstance: {fileID: 1382868766}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1438507677
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1438507679}
+  - component: {fileID: 1438507678}
+  m_Layer: 0
+  m_Name: SnowManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1438507678
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1438507677}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5868ede5faa755a4bb057153d9bea823, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 0}
+  snowParticlePrefab: {fileID: 4615988384918216616, guid: a92ed6761637e1248a6847dffecc57f9, type: 3}
+  gridSize: 20
+  activationDistance: 40
+  deactivationDistance: 25
+  heightAbovePlayer: 15
+  maxSnowHeight: 5000
+  minSnowHeight: -100
+  terrainLayer:
+    serializedVersion: 2
+    m_Bits: 131072
+  raycastDistance: 100
+  initialPoolSize: 30
+  maxPoolSize: 60
+  prewarmTime: 5
+  predictionMultiplier: 1.5
+  playerVelocityInfluence: 20
+  fadeInTime: 0.2
+  fadeOutTime: 0.5
+--- !u!4 &1438507679
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1438507677}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1449715220
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8005,3 +8068,4 @@ SceneRoots:
   - {fileID: 967282041}
   - {fileID: 1709862084}
   - {fileID: 321327129}
+  - {fileID: 1438507679}

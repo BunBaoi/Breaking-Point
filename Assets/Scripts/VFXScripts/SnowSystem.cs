@@ -53,13 +53,33 @@ public class SnowSystem : MonoBehaviour
 
     void Start()
     {
+        // Try to find the player if not assigned
         if (player == null)
-            player = Camera.main.transform;
+        {
+            FindPlayer();
+        }
 
         lastPlayerPosition = player.position;
         InitializePool();
         UpdateSnowGrid();
         lastPlayerGridPos = GetGridPosition(player.position);
+    }
+
+    void FindPlayer()
+    {
+        // First try to find by tag
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+
+        if (playerObj != null)
+        {
+            player = playerObj.transform;
+        }
+        else
+        {
+            // Fallback to camera if no player found
+            Debug.LogWarning("No object with 'Player' tag found. Falling back to main camera.");
+            player = Camera.main.transform;
+        }
     }
 
     void InitializePool()
