@@ -3,19 +3,23 @@ using System.Collections.Generic;
 
 public class NPCDialogueTrigger : MonoBehaviour
 {
-    [SerializeField] private DialogueTree npcDialogueTree; // NPC's dialogue tree reference
-    private bool isDialogueTriggered;
+    [Header("Dialogue Settings")]
+    [SerializeField] private DialogueTree npcDialogueTree;
+    // private bool isDialogueTriggered;
 
-    private Transform player; // Reference to the player's transform
     [SerializeField] private string dialogueKey = "DialogueTriggered";
+
+    private bool isDialogueTriggered = false;
 
     [Header("Bool Conditions")]
     [SerializeField] private List<string> requiredBoolKeysTrue = new List<string>(); // List of bool keys that should be true
     [SerializeField] private List<string> requiredBoolKeysFalse = new List<string>(); // List of bool keys that should be false
 
+    private Transform player; // Reference to the player's transform
+
     private void Start()
     {
-        isDialogueTriggered = PlayerPrefs.GetInt("DialogueTriggered", 0) == 1;
+        // isDialogueTriggered = PlayerPrefs.GetInt("DialogueTriggered", 0) == 1;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -25,7 +29,7 @@ public class NPCDialogueTrigger : MonoBehaviour
         {
             player = other.transform; // Store player reference
             // Automatically trigger dialogue if conditions are met and it hasn't been triggered yet
-            if (!isDialogueTriggered && CanStartDialogue())
+            if (CanStartDialogue())
             {
                 StartDialogue();
             }
@@ -40,7 +44,7 @@ public class NPCDialogueTrigger : MonoBehaviour
             player = other.transform; // Keep track of the player's position
 
             // Recheck if the conditions are met and the dialogue has not been triggered yet
-            if (!isDialogueTriggered && CanStartDialogue())
+            if (CanStartDialogue())
             {
                 StartDialogue();
             }
@@ -78,6 +82,11 @@ public class NPCDialogueTrigger : MonoBehaviour
             }
         }
 
+        if (isDialogueTriggered)
+        {
+            return false;
+        }
+
         return true; // All conditions are met, return true
     }
 
@@ -86,9 +95,16 @@ public class NPCDialogueTrigger : MonoBehaviour
         if (npcDialogueTree != null)
         {
             isDialogueTriggered = true;
+            // isDialogueTriggered = true;
             PlayerPrefs.SetInt(dialogueKey, 1);
             PlayerPrefs.Save();
             DialogueManager.Instance.StartDialogue(npcDialogueTree);
+
+            if (CallingCompanionMethods.Instance != null)
+            {
+                CallingCompanionMethods.Instance.CallTeleportToPlayer();
+                CallingCompanionMethods.Instance.CallFacePlayer();
+            }
         }
     }
 }

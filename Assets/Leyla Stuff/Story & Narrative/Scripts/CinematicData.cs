@@ -10,23 +10,28 @@ public class CinematicData : ScriptableObject
     public List<string> eventIds = new List<string>();
 
     [Header("Dialogue and Audio Events")]
-    public CinematicDataDialogueAudio[] dialoguesAndAudio; // Array of dialogue and corresponding FMOD audio events
+    public CinematicDataDialogueAudio[] dialoguesAndAudio;
 
     [Header("Random Texts")]
-    public string[] randomTexts; // Array for random texts
+    public string[] randomTexts;
+
+    [Header("Optional Cinematic Image")]
+    public Sprite cinematicImage;
 
     [Header("Camera Points")]
-    public string pointA; // Starting camera point
-    public string pointB; // Ending camera point
+    public string pointA;
+    public string pointB;
 
     [Header("Random Text Prefab")]
-    public GameObject randomTextPrefab; // Prefab for displaying random texts
+    public GameObject randomTextPrefab;
 }
 
 [System.Serializable]
 public class CinematicDataDialogueAudio
 {
     [TextArea]
-    public string dialogue; // Dialogue text
-    public EventReference fmodAudioEvent; // FMOD audio event for this dialogue
+    public string dialogue;
+    public string npcName;
+    public DialogueAudio dialogueAudio;
+
 }

@@ -73,6 +73,30 @@ MonoBehaviour:
             m_StringArgument: BaseCampArrivalDialogueFinished
             m_BoolArgument: 0
           m_CallState: 2
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: ForTipManager, Assembly-CSharp
+          m_MethodName: CallShowTip
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: BaseCampArrivalDialogueFinished
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: ForTipManager, Assembly-CSharp
+          m_MethodName: CallShowTip
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 1
+            m_FloatArgument: 0
+            m_StringArgument: BaseCampArrivalDialogueFinished
+            m_BoolArgument: 0
+          m_CallState: 2
   - eventId: EntranceWelcomeDialogueFinished
     onDialogueTriggered:
       m_PersistentCalls:
@@ -115,6 +139,22 @@ MonoBehaviour:
             m_IntArgument: 0
             m_FloatArgument: 0
             m_StringArgument: EntranceAfterWelcomeDialogueFinished
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventId: BaseCampOnboarding1
+    onDialogueTriggered:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: ForBoolManager, Assembly-CSharp
+          m_MethodName: SetBoolVariable
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: BaseCampOnboarding1
             m_BoolArgument: 0
           m_CallState: 2
   - eventId: BaseCampClimberNearTentDialogueCompleted
@@ -197,6 +237,46 @@ MonoBehaviour:
             m_StringArgument: BaseCampClimberNearExplorationAreaDialogueCompleted
             m_BoolArgument: 0
           m_CallState: 2
+  - eventId: BaseCampAfterClimberNearExplorationAreaDialogueCompleted
+    onDialogueTriggered:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: ForBoolManager, Assembly-CSharp
+          m_MethodName: SetBoolVariable
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: BaseCampAfterClimberNearExplorationAreaDialogueCompleted
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: JournalPageAdder, Assembly-CSharp
+          m_MethodName: AddObjectivesPage
+          m_Mode: 2
+          m_Arguments:
+            m_ObjectArgument: {fileID: 11400000, guid: 149749c27fe184c15b663fe0835c2549, type: 2}
+            m_ObjectArgumentAssemblyTypeName: ObjectivesPage, Assembly-CSharp
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: BaseCampAfterClimberNearExplorationAreaDialogueCompleted
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: ForTipManager, Assembly-CSharp
+          m_MethodName: CallShowTip
+          m_Mode: 3
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 2
+            m_FloatArgument: 0
+            m_StringArgument: BaseCampAfterClimberNearExplorationAreaDialogueCompleted
+            m_BoolArgument: 0
+          m_CallState: 2
   - eventId: BaseCampTrainingCompleted
     onDialogueTriggered:
       m_PersistentCalls:
@@ -227,5 +307,161 @@ MonoBehaviour:
             m_IntArgument: 0
             m_FloatArgument: 0
             m_StringArgument: BaseCampGoToSleepDialogue
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventId: CompanionTeleportToPlayer
+    onDialogueTriggered:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: CallingCompanionMethods, Assembly-CSharp
+          m_MethodName: CallTeleportToPlayer
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventId: CompanionFacePlayer
+    onDialogueTriggered:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: CallingCompanionMethods, Assembly-CSharp
+          m_MethodName: CallFacePlayer
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventId: GoToLevel2
+    onDialogueTriggered:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: ForBoolManager, Assembly-CSharp
+          m_MethodName: SetBoolVariable
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: GoToLevel2
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: JournalPageAdder, Assembly-CSharp
+          m_MethodName: AddObjectivesPage
+          m_Mode: 2
+          m_Arguments:
+            m_ObjectArgument: {fileID: 11400000, guid: 09d268ca9fea947be97b184bad5fc0bd, type: 2}
+            m_ObjectArgumentAssemblyTypeName: ObjectivesPage, Assembly-CSharp
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: GoToLevel2
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventId: ReachedLevel2
+    onDialogueTriggered:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: ForBoolManager, Assembly-CSharp
+          m_MethodName: SetBoolVariable
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: ReachedLevel2
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: JournalPageAdder, Assembly-CSharp
+          m_MethodName: AddObjectivesPage
+          m_Mode: 2
+          m_Arguments:
+            m_ObjectArgument: {fileID: 11400000, guid: f27512bd13c6b487e82773b2c73e762e, type: 2}
+            m_ObjectArgumentAssemblyTypeName: ObjectivesPage, Assembly-CSharp
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: GoToLevel2
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: ForBoolManager, Assembly-CSharp
+          m_MethodName: SetBoolVariable
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: Level2ArrivalDialogueCompleted
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventId: Level2ReachedCamp2
+    onDialogueTriggered:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: ForBoolManager, Assembly-CSharp
+          m_MethodName: SetBoolVariable
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: Level2ReachedCamp2
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: JournalPageAdder, Assembly-CSharp
+          m_MethodName: AddObjectivesPage
+          m_Mode: 2
+          m_Arguments:
+            m_ObjectArgument: {fileID: 11400000, guid: cc3be554c0371d945994e98c5845d25b, type: 2}
+            m_ObjectArgumentAssemblyTypeName: ObjectivesPage, Assembly-CSharp
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: GoToLevel2
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventId: GoToLevel3
+    onDialogueTriggered:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: ForBoolManager, Assembly-CSharp
+          m_MethodName: SetBoolVariable
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: GoToLevel3
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 0}
+          m_TargetAssemblyTypeName: JournalPageAdder, Assembly-CSharp
+          m_MethodName: AddObjectivesPage
+          m_Mode: 2
+          m_Arguments:
+            m_ObjectArgument: {fileID: 11400000, guid: dd2f0bc630f3ee64397043cacc0a3d63, type: 2}
+            m_ObjectArgumentAssemblyTypeName: ObjectivesPage, Assembly-CSharp
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: GoToLevel2
             m_BoolArgument: 0
           m_CallState: 2

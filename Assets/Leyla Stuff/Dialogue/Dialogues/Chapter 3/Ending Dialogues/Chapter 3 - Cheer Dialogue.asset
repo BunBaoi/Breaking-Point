@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49d908a81e1ab4345bdb9ed5793418b1, type: 3}
+  m_Name: Chapter 3 - Cheer Dialogue
+  m_EditorClassIdentifier: 
+  treeID: ee3a48c3-c19a-4dda-a6f6-912307e90551
+  dialogueNodes:
+  - dialogueText: Phillip! We did it!
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
+    eventIds:
+    - Level3DisappearPhillip
+    options: []
+    npcName: Alice
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+  - dialogueText: Yeah. <i>You</i> did it.
+    dialogueAudio: {fileID: 11400000, guid: 7aa603cac70ac442cbe1e5af68e9852b, type: 2}
+    eventIds: []
+    options: []
+    npcName: Phillip
+    npcTag: Phillip
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+  - dialogueText: Phillip? Where are you?
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
+    eventIds: []
+    options: []
+    npcName: Alice
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
+  - dialogueText: ... ...
+    dialogueAudio: {fileID: 0}
+    eventIds:
+    - Level3ReachedSummit
+    - Level3StartFlashback
+    options: []
+    npcName: Alice
+    npcTag: 
+    useDialogueAudio: 0
+    fmodSoundEvent:
+      Guid:
+        Data1: 1929616748
+        Data2: 1125818260
+        Data3: 281503669
+        Data4: -634850341
+      Path: event:/Gust Wind SFX

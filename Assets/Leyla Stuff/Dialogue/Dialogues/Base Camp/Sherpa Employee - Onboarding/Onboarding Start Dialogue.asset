@@ -12,53 +12,78 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49d908a81e1ab4345bdb9ed5793418b1, type: 3}
   m_Name: Onboarding Start Dialogue
   m_EditorClassIdentifier: 
+  treeID: 31feac92-5259-4960-b7d6-e5510dbc51e3
   dialogueNodes:
-  - dialogueText: ' Hey you must be new here.'
-    fmodAudioEvent:
+  - dialogueText: Hey you must be new here.
+    dialogueAudio: {fileID: 11400000, guid: 98e125fe940c141babd5d8b069a031ad, type: 2}
+    eventIds: []
+    options: []
+    npcName: Sherpa Employee
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
       Guid:
         Data1: 0
         Data2: 0
         Data3: 0
         Data4: 0
       Path: 
-    eventIds: []
-    options: []
-    npcName: Sherpa Employee
-    npcTag: 
   - dialogueText: Let me show you around.
-    fmodAudioEvent:
+    dialogueAudio: {fileID: 11400000, guid: 98e125fe940c141babd5d8b069a031ad, type: 2}
+    eventIds: []
+    options: []
+    npcName: Sherpa Employee
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
       Guid:
         Data1: 0
         Data2: 0
         Data3: 0
         Data4: 0
       Path: 
+  - dialogueText: First lets grab those ice picks there.
+    dialogueAudio: {fileID: 11400000, guid: 98e125fe940c141babd5d8b069a031ad, type: 2}
     eventIds: []
     options: []
     npcName: Sherpa Employee
     npcTag: 
-  - dialogueText: Grab those ice picks there and try climbing by pressing left and
-      right click.
-    fmodAudioEvent:
+    useDialogueAudio: 1
+    fmodSoundEvent:
       Guid:
         Data1: 0
         Data2: 0
         Data3: 0
         Data4: 0
       Path: 
+  - dialogueText: With the ice pick you'll be able to climb parts you're not able
+      to walk. To climb, left-click to grab with your left hand, right-click for
+      your right. You'll need to alternate between them to make progress.
+    dialogueAudio: {fileID: 11400000, guid: 98e125fe940c141babd5d8b069a031ad, type: 2}
     eventIds: []
     options: []
     npcName: Sherpa Employee
     npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
   - dialogueText: Try going to Jack over there.
-    fmodAudioEvent:
+    dialogueAudio: {fileID: 11400000, guid: 98e125fe940c141babd5d8b069a031ad, type: 2}
+    eventIds:
+    - BaseCampOnboarding1
+    options: []
+    npcName: Sherpa Employee
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
       Guid:
         Data1: 0
         Data2: 0
         Data3: 0
         Data4: 0
       Path: 
-    eventIds: []
-    options: []
-    npcName: Sherpa Employee
-    npcTag: 

@@ -12,15 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49d908a81e1ab4345bdb9ed5793418b1, type: 3}
   m_Name: DialogueOption1
   m_EditorClassIdentifier: 
+  treeID: 82b18bc4-f157-4595-a898-d0ba71dc7e38
   dialogueNodes:
   - dialogueText: option 1 test
-    fmodAudioEvent:
+    dialogueAudio: {fileID: 0}
+    eventIds: []
+    options: []
+    npcName: 
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
       Guid:
         Data1: 0
         Data2: 0
         Data3: 0
         Data4: 0
       Path: 
-    eventIDs:
-    - testdialogue
-    options: []

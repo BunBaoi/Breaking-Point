@@ -12,39 +12,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49d908a81e1ab4345bdb9ed5793418b1, type: 3}
   m_Name: BaseCampArrival
   m_EditorClassIdentifier: 
+  treeID: 09c07255-5833-486d-9862-9c984eeb7d03
   dialogueNodes:
   - dialogueText: Look at this place, this mountain has got nothing on us!
-    fmodAudioEvent:
-      Guid:
-        Data1: 0
-        Data2: 0
-        Data3: 0
-        Data4: 0
-      Path: 
+    dialogueAudio: {fileID: 11400000, guid: 7aa603cac70ac442cbe1e5af68e9852b, type: 2}
     eventIds: []
     options: []
     npcName: Phillip
-  - dialogueText: "My Phillip, confident as always. Y\u2019know, it\u2019s not the
-      mountain I\u2019m worried about. It\u2019s everything else."
-    fmodAudioEvent:
+    npcTag: Phillip
+    useDialogueAudio: 1
+    fmodSoundEvent:
       Guid:
         Data1: 0
         Data2: 0
         Data3: 0
         Data4: 0
       Path: 
+  - dialogueText: "My Phillip, confident as always. Y\u2019know, it\u2019s not the
+      mountain I\u2019m worried about. It\u2019s everything else."
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
     eventIds: []
     options: []
     npcName: Alice
-  - dialogueText: Everything else? What, like the cold? The altitude? Me being too
-      handsome?
-    fmodAudioEvent:
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
       Guid:
         Data1: 0
         Data2: 0
         Data3: 0
         Data4: 0
       Path: 
+  - dialogueText: Everything else? What, like the cold? The altitude? Me being too
+      handsome?
+    dialogueAudio: {fileID: 11400000, guid: 7aa603cac70ac442cbe1e5af68e9852b, type: 2}
     eventIds: []
     options:
     - optionText: Lighthearted Response
@@ -52,61 +53,76 @@ MonoBehaviour:
     - optionText: Serious Response
       nextDialogueTree: {fileID: 11400000, guid: 3e7dcb51d7eea49eaba3f95adc6e5b7b, type: 2}
     npcName: Phillip
-  - dialogueText: "Yeah. I just hope it\u2019s enough."
-    fmodAudioEvent:
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
       Guid:
         Data1: 0
         Data2: 0
         Data3: 0
         Data4: 0
       Path: 
+  - dialogueText: "Yeah. I just hope it\u2019s enough."
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
     eventIds: []
     options: []
     npcName: Alice
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
   - dialogueText: "It is. Trust me, you\u2019ve got this. And if you ever doubt yourself,
       well, that\u2019s what I\u2019m here for, right? Your personal cheerleader!
       Aren\u2019t you lucky? "
-    fmodAudioEvent:
-      Guid:
-        Data1: 0
-        Data2: 0
-        Data3: 0
-        Data4: 0
-      Path: 
+    dialogueAudio: {fileID: 11400000, guid: 7aa603cac70ac442cbe1e5af68e9852b, type: 2}
     eventIds: []
     options: []
     npcName: Phillip
-  - dialogueText: "More like my personal clown but I guess I\u2019ll take it."
-    fmodAudioEvent:
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
       Guid:
         Data1: 0
         Data2: 0
         Data3: 0
         Data4: 0
       Path: 
+  - dialogueText: "More like my personal clown but I guess I\u2019ll take it."
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
     eventIds: []
     options: []
     npcName: Alice
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
   - dialogueText: 'We should get going towards base camp, there should be a Sherpa
       that will help us settle in. '
-    fmodAudioEvent:
-      Guid:
-        Data1: 0
-        Data2: 0
-        Data3: 0
-        Data4: 0
-      Path: 
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
     eventIds: []
     options: []
     npcName: Alice
-  - dialogueText: Lead the way madam.
-    fmodAudioEvent:
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
       Guid:
         Data1: 0
         Data2: 0
         Data3: 0
         Data4: 0
       Path: 
+  - dialogueText: Lead the way madam.
+    dialogueAudio: {fileID: 11400000, guid: 7aa603cac70ac442cbe1e5af68e9852b, type: 2}
     eventIds: []
     options:
     - optionText: Playful Response
@@ -114,3 +130,12 @@ MonoBehaviour:
     - optionText: Firm Response
       nextDialogueTree: {fileID: 11400000, guid: 212bb4d85ebcc4c7283e3667289a1247, type: 2}
     npcName: Phillip
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 

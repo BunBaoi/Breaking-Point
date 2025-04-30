@@ -12,6 +12,8 @@ public class CompanionScript : MonoBehaviour
     public float maxDistanceToPlayer = 5f;
     public float companionSpeed = 3.5f;
     public CompanionState stateOfCompanion;
+    private bool teleportLeft = true;
+    private Animator animator;
 
     [Header("Companion Visuals")]
     public GameObject companionModel;
@@ -21,15 +23,17 @@ public class CompanionScript : MonoBehaviour
     public AudioSource audioSource;
     public AudioClip[] companionSounds;
 
+    private Coroutine teleportRoutine;
+
     [Header("Keybindings")]
-    [Tooltip("Key to toggle talking state")]
+    /*[Tooltip("Key to toggle talking state")]
     public KeyCode talkKey = KeyCode.F;
     [Tooltip("Key to toggle visibility")]
     public KeyCode visibilityKey = KeyCode.H;
     [Tooltip("Key to teleport to player")]
     public KeyCode teleportKey = KeyCode.T;
     [Tooltip("Key to toggle following")]
-    public KeyCode followKey = KeyCode.S;
+    public KeyCode followKey = KeyCode.S;*/
 
     private Vector3 lastPosition;
     private Vector3 destination;
@@ -44,6 +48,8 @@ public class CompanionScript : MonoBehaviour
 
     void Start()
     {
+        animator = GetComponentInChildren<Animator>();
+
         if (AI == null)
             AI = GetComponent<NavMeshAgent>();
 
@@ -55,6 +61,12 @@ public class CompanionScript : MonoBehaviour
 
         stateOfCompanion = CompanionState.Follow;
         lastPosition = transform.position;
+
+        GameObject playerObject = GameObject.FindWithTag("Player");
+        if (playerObject != null)
+        {
+            player = playerObject.transform;
+        }
 
         // Make sure the companion is visible at start
         isVisible = true;
@@ -92,12 +104,15 @@ public class CompanionScript : MonoBehaviour
                 break;
         }
 
+        UpdateAnimation();
+
+
         // Check for key inputs using the customizable keys
-        CheckKeyInputs();
+        // CheckKeyInputs();
     }
 
     // Handle custom key inputs
-    private void CheckKeyInputs()
+    /*private void CheckKeyInputs()
     {
         // Talk key
         if (Input.GetKeyDown(talkKey))
@@ -122,6 +137,16 @@ public class CompanionScript : MonoBehaviour
         {
             ToggleFollowing();
         }
+    }*/
+
+    private void UpdateAnimation()
+    {
+        if (animator == null || AI == null)
+            return;
+
+        float speed = AI.velocity.magnitude;
+
+        animator.SetFloat("speed", speed);
     }
 
     public void FollowPlayer()
@@ -206,11 +231,65 @@ public class CompanionScript : MonoBehaviour
         CompanionState previousState = stateOfCompanion;
         stateOfCompanion = CompanionState.Teleporting;
 
+        // Validate the position on the NavMesh before teleporting
+        NavMeshHit hit;
+        Vector3 validPosition = position;
+
+        // First, check if the requested position is on the NavMesh
+        if (!NavMesh.SamplePosition(position, out hit, 5f, NavMesh.AllAreas))
+        {
+            // If not on NavMesh, find the closest valid position
+            Debug.LogWarning("Companion teleport position is not on NavMesh. Finding closest valid position.");
+
+            // Try positions around the player at different heights
+            Vector3[] testPositions = new Vector3[]
+            {
+                position + Vector3.up * 0.5f,       // Try slightly above
+                player.position + player.right * 2f, // Try to the right of player
+                player.position - player.right * 2f, // Try to the left of player
+                player.position + player.forward * 2f, // Try in front of player
+                player.position - player.forward * 2f  // Try behind player
+            };
+
+            // Check each test position
+            foreach (Vector3 testPos in testPositions)
+            {
+                if (NavMesh.SamplePosition(testPos, out hit, 5f, NavMesh.AllAreas))
+                {
+                    validPosition = hit.position;
+                    Debug.Log("Found valid NavMesh position for companion: " + validPosition);
+                    break;
+                }
+            }
+
+            // If we still don't have a valid position, use a fallback
+            if (validPosition == position)
+            {
+                // Fallback to a position near the player that's definitely on the navmesh
+                if (NavMesh.SamplePosition(player.position, out hit, 10f, NavMesh.AllAreas))
+                {
+                    validPosition = hit.position;
+                    Debug.Log("Using fallback NavMesh position for companion: " + validPosition);
+                }
+                else
+                {
+                    Debug.LogError("Cannot find any valid NavMesh position for companion teleport!");
+                    stateOfCompanion = previousState;
+                    return;
+                }
+            }
+        }
+        else
+        {
+            // The position is valid, use the exact NavMesh position
+            validPosition = hit.position;
+        }
+
         // Disable NavMeshAgent temporarily to avoid conflicts
         AI.enabled = false;
 
-        // Teleport
-        transform.position = position;
+        // Teleport to validated position
+        transform.position = validPosition;
 
         // Re-enable NavMeshAgent
         AI.enabled = true;
@@ -218,10 +297,11 @@ public class CompanionScript : MonoBehaviour
         // Return to previous state
         stateOfCompanion = previousState;
 
-        Debug.Log("Companion teleported to: " + position);
+        Debug.Log("Companion teleported to: " + validPosition);
     }
 
-    public void TeleportToPlayer()
+    // OLD METHOD, KEEPING IN CASE
+    /*public void TeleportToPlayer()
     {
         if (player != null)
         {
@@ -230,6 +310,59 @@ public class CompanionScript : MonoBehaviour
             Vector3 positionBehindPlayer = player.position - (playerForward * minDistanceToPlayer);
 
             TeleportToPosition(positionBehindPlayer);
+        }
+    }*/
+
+    public void StartTeleportingToPlayer()
+    {
+        if (teleportRoutine == null)
+        {
+            teleportRoutine = StartCoroutine(TeleportWhenClearSight());
+        }
+    }
+
+    private IEnumerator TeleportWhenClearSight()
+    {
+        while (true)
+        {
+            if (player == null)
+            {
+                teleportRoutine = null;
+                yield break;
+            }
+
+            Vector3[] directions = { -player.right, player.right };
+
+            foreach (Vector3 dir in directions)
+            {
+                Vector3 desiredPosition = player.position + dir * minDistanceToPlayer;
+                desiredPosition.y += 0.1f;
+
+                if (!Physics.Linecast(desiredPosition, player.position, out RaycastHit hit, LayerMask.GetMask("Default")))
+                {
+                    TeleportToPosition(desiredPosition);
+                    teleportRoutine = null;
+                    yield break;
+                }
+            }
+
+            // Wait a short time before checking again
+            yield return new WaitForSeconds(0.25f);
+        }
+    }
+
+    public void FacePlayer()
+    {
+        if (player != null)
+        {
+            Vector3 directionToPlayer = player.position - transform.position;
+            directionToPlayer.y = 0; // Keep rotation flat on the Y axis
+
+            if (directionToPlayer != Vector3.zero)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(directionToPlayer);
+                transform.rotation = targetRotation;
+            }
         }
     }
 

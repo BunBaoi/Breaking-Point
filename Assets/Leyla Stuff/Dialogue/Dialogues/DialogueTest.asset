@@ -12,27 +12,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49d908a81e1ab4345bdb9ed5793418b1, type: 3}
   m_Name: DialogueTest
   m_EditorClassIdentifier: 
+  treeID: ad90a330-61e9-47f7-a2db-9eb1c2974150
   dialogueNodes:
-  - dialogueText: hellooooo
-    fmodAudioEvent:
-      Guid:
-        Data1: 1765606322
-        Data2: 1118326076
-        Data3: -1774001520
-        Data4: 1115765450
-      Path: event:/TestingSoundEvent2
+  - dialogueText: you are stooooooooooopid
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
     eventIds: []
     options: []
     npcName: ok
     npcTag: 
-  - dialogueText: blehhhhhhhhblehhhhhhhhblehhhhhhhhblehhhhhhhhblehhhhhhhhblehhhhhhhhblehhhhhhhhblehhhhhhhhblehhhhhhhhblehhhhhhhhblehhhhhhhhblehhhhhhhhblehhhhhhhhblehhhhhhhhblehhhhhhhh
-    fmodAudioEvent:
+    useDialogueAudio: 1
+    fmodSoundEvent:
       Guid:
-        Data1: 1765606322
-        Data2: 1118326076
-        Data3: -1774001520
-        Data4: 1115765450
-      Path: event:/TestingSoundEvent2
+        Data1: -824021375
+        Data2: 1215717741
+        Data3: 1917500314
+        Data4: -1955761802
+      Path: event:/TestingSoundEvent
+  - dialogueText: hahahahah hahahhaha. tehe tehe
+    dialogueAudio: {fileID: 11400000, guid: 98e125fe940c141babd5d8b069a031ad, type: 2}
     eventIds: []
     options:
     - optionText: OPTION 1
@@ -41,27 +38,39 @@ MonoBehaviour:
       nextDialogueTree: {fileID: 11400000, guid: 68313fdaa6f704aaaaf9a20b72bf69d1, type: 2}
     npcName: boo
     npcTag: Test
-  - dialogueText: i am testing something
-    fmodAudioEvent:
+    useDialogueAudio: 1
+    fmodSoundEvent:
       Guid:
-        Data1: 0
-        Data2: 0
-        Data3: 0
-        Data4: 0
-      Path: 
+        Data1: 1765606322
+        Data2: 1118326076
+        Data3: -1774001520
+        Data4: 1115765450
+      Path: event:/TestingSoundEvent2
+  - dialogueText: bleh
+    dialogueAudio: {fileID: 11400000, guid: 7aa603cac70ac442cbe1e5af68e9852b, type: 2}
     eventIds: []
     options: []
     npcName: boo
     npcTag: 
-  - dialogueText: lets see if it works
-    fmodAudioEvent:
+    useDialogueAudio: 1
+    fmodSoundEvent:
       Guid:
         Data1: -824021375
         Data2: 1215717741
         Data3: 1917500314
         Data4: -1955761802
       Path: event:/TestingSoundEvent
+  - dialogueText: bleh
+    dialogueAudio: {fileID: 11400000, guid: 7aa603cac70ac442cbe1e5af68e9852b, type: 2}
     eventIds: []
     options: []
     npcName: ok
     npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 1765606322
+        Data2: 1118326076
+        Data3: -1774001520
+        Data4: 1115765450
+      Path: event:/TestingSoundEvent2

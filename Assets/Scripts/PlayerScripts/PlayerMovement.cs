@@ -1,29 +1,47 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using FMODUnity;
+using FMOD.Studio;
 using static PlayerStats;
-//using static QTEMechanic;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Player")]
     public QTEvent qTEvent;
-    public QTEMechanicScript qTEMechanicScript;
+    // public QTEMechanicScript qTEMechanicScript;
     public CharacterController controller;
     private PlayerStats playerStats;
+    public Camera playerCamera;
 
     public GameObject targetPos;
     public GameObject playerPos;
 
     [Header("Settings")]
     public float objectSpeed = 3;
+    public float defaultWalkSpeed = 12f;
     public float walkSpeed = 12f;
     public float sprintSpeed = 20f;
     public float gravity = -9.81f;
     public bool IsSprint = false;
     public float playerHeight;
+    public float zoomFOV, normalFOV;
+    public RawImage binocularsUI;
 
     [Header("Testing Purposes")]
     public bool canMove = true;
+
+    [Header("Footstep Sounds (FMOD)")]
+    public EventReference[] leftFootstepEvents; // Left footstep sounds
+    public EventReference[] rightFootstepEvents; // Right footstep sounds
+    private int leftFootstepIndex = 0;
+    private int rightFootstepIndex = 0;
+
+    [Header("Animator")]
+    public Animator animator;
+    private bool overrideAnimationSpeed = false;
+    private float overrideSpeedValue = 0f;
 
     [Header("Keybinds")]
     [SerializeField] private InputActionAsset inputActions;
@@ -36,16 +54,14 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 velocity;
     private Vector2 moveInput;
 
-    private bool applyGravity = true;
+    [SerializeField] private bool applyGravity = true;
+    private bool wasGravityApplied = false;
 
     void Awake()
     {
-        // If inputActions is not assigned via the inspector, load it from the Resources/Keybinds folder
         if (inputActions == null)
         {
-            // Load from the "Keybinds" folder in Resources
             inputActions = Resources.Load<InputActionAsset>("Keybinds/PlayerInputs");
-
             if (inputActions == null)
             {
                 Debug.LogError("PlayerInputs asset not found in Resources/Keybinds folder!");
@@ -56,28 +72,50 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         playerStats = GetComponent<PlayerStats>();
-
         movement = inputActions.FindAction(movementName);
         sprint = inputActions.FindAction(sprintName);
+        playerPos = GameObject.FindWithTag("Player");
 
-        if (movement != null)
-        {
-            movement.Enable(); // Enable the action
-        }
-        else
-        {
-            Debug.LogError($"Input action '{movementName}' not found in Input Action Asset!");
-        }
+        if (movement != null) movement.Enable();
+        if (sprint != null) sprint.Enable();
 
-        if (sprint != null)
-        {
-            sprint.Enable(); // Enable the action
-        }
-        else
-        {
-            Debug.LogError($"Input action '{sprintName}' not found in Input Action Asset!");
-        }
+        /*GameObject qteObject = GameObject.FindWithTag("QTE");
+        if (qteObject != null)
+            qTEMechanicScript = qteObject.GetComponent<QTEMechanicScript>();
+
+        GameObject qteUIObject = GameObject.FindWithTag("QTEUI");
+        if (qteUIObject != null)
+            qTEvent = qteUIObject.GetComponent<QTEvent>();
+
+        targetPos = GameObject.FindWithTag("StartPos");*/
     }
+
+    /*private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name.Contains("Game") || scene.name.Contains("Level"))
+        {
+            // Try to find and assign the components safely
+            GameObject qteObject = GameObject.FindWithTag("QTE");
+            if (qteObject != null)
+                qTEMechanicScript = qteObject.GetComponent<QTEMechanicScript>();
+
+            GameObject qteUIObject = GameObject.FindWithTag("QTEUI");
+            if (qteUIObject != null)
+                qTEvent = qteUIObject.GetComponent<QTEvent>();
+
+            targetPos = GameObject.FindWithTag("StartPos");
+        }
+    }*/
 
     void Update()
     {
@@ -87,18 +125,42 @@ public class PlayerMovement : MonoBehaviour
             HandleSprint();
         }
 
+        UpdateAnimation();
+
         ApplyGravity();
-        OxyOutputRate();
-        QTEControl();
+        // QTEControl();
+        binocularZoom();
     }
 
     void HandleGroundMovement()
     {
-        // Read movement input from InputActionAsset
         moveInput = movement.ReadValue<Vector2>();
-
         Vector3 move = transform.right * moveInput.x + transform.forward * moveInput.y;
+
+        // Move the player
         controller.Move(move * walkSpeed * Time.deltaTime);
+    }
+
+    void UpdateAnimation()
+    {
+        float currentSpeed;
+
+        if (overrideAnimationSpeed)
+        {
+            currentSpeed = overrideSpeedValue;
+        }
+        else
+        {
+            currentSpeed = moveInput.magnitude * (IsSprint ? 1f : 0.5f);
+            if (!canMove) currentSpeed = 0f;
+        }
+
+        animator.SetFloat("speed", currentSpeed);
+    }
+    public void SetAnimationSpeedOverride(bool state, float value = 0f)
+    {
+        overrideAnimationSpeed = state;
+        overrideSpeedValue = value;
     }
 
     void ApplyGravity()
@@ -107,10 +169,16 @@ public class PlayerMovement : MonoBehaviour
         {
             velocity.y += gravity * Time.deltaTime;
             controller.Move(velocity * Time.deltaTime);
+
+            // Debug log for gravity application
+            // Debug.Log($"Applying Gravity: {velocity.y} (gravity: {gravity})");
         }
         else
         {
-            velocity.y = 0; // Reset vertical velocity when gravity is not applied
+            velocity.y = 0;
+
+            // Debug log when gravity is not applied
+            // Debug.Log("Gravity disabled: velocity.y set to 0");
         }
     }
 
@@ -128,42 +196,84 @@ public class PlayerMovement : MonoBehaviour
         }
         else
         {
-            walkSpeed = 12f;
+            walkSpeed = defaultWalkSpeed;
             IsSprint = false;
         }
     }
 
-    public void QTEControl()
+    /*public void QTEControl()
     {
         if (Input.GetKeyDown(KeyCode.F) && playerStats.stateOfPlayer == PlayerStatus.QTE)
         {
             qTEMechanicScript.QTEMove();
             canMove = false;
-            Debug.Log("Player Movement Locked");
             playerStats.QTEState = true;
-
+            qTEMechanicScript.QTEMechanicScriptActive = true;
         }
-    }
-
-    public void OxyOutputRate()
-    {
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            playerStats.OxygenTankRefillRate++;
-            //Debug.log("Rate Up");
-        }
-        else if (Input.GetKeyDown(KeyCode.Q))
-        {
-            playerStats.OxygenTankRefillRate--;
-            //Debug.log("Rate Down");
-
-            // Need to add condition that the rate can't go negative
-
-        }
-    }
+    }*/
 
     public void SetMovementState(bool state)
     {
         canMove = state;
     }
+
+    // Left Footstep
+    public void PlayLeftFootstepSound()
+    {
+        if (leftFootstepEvents.Length == 0) return;
+
+        Transform footTransform = transform;
+
+        EventReference soundEventReference = leftFootstepEvents[leftFootstepIndex];
+
+        EventInstance footstepInstance = RuntimeManager.CreateInstance(soundEventReference);
+
+        // Set the 3D attributes for the footstep sound based on the foot's position
+        Vector3 footPosition = footTransform.position + new Vector3(0, 0, 0.3f);
+        footstepInstance.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(footPosition));
+
+        footstepInstance.start();
+        footstepInstance.release();
+
+        // Move to the next footstep in the array, looping back if necessary
+        leftFootstepIndex = (leftFootstepIndex + 1) % leftFootstepEvents.Length;
+    }
+
+    // Right Footstep
+    public void PlayRightFootstepSound()
+    {
+        if (rightFootstepEvents.Length == 0) return;
+
+        Transform footTransform = transform;
+
+        EventReference soundEventReference = rightFootstepEvents[rightFootstepIndex];
+
+        EventInstance footstepInstance = RuntimeManager.CreateInstance(soundEventReference);
+
+        // Set the 3D attributes for the footstep sound based on the foot's position
+        Vector3 footPosition = footTransform.position + new Vector3(0, 0, 0.3f);
+        footstepInstance.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(footPosition));
+
+        footstepInstance.start();
+        footstepInstance.release();
+
+        // Move to the next footstep in the array, looping back if necessary
+        rightFootstepIndex = (rightFootstepIndex + 1) % rightFootstepEvents.Length;
+    }
+
+    public void binocularZoom()
+    {
+        if (Input.GetKey(KeyCode.Z))
+        {
+            //Debug.Log("Z button pressed");
+            playerCamera.fieldOfView = zoomFOV;
+            binocularsUI.enabled = true;
+        }
+        else
+        {
+            playerCamera.fieldOfView = normalFOV;
+            binocularsUI.enabled = false;
+        }
+    }
+    
 }

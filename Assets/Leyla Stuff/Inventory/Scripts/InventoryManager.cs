@@ -3,49 +3,49 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
 using System.Collections;
+using System.Linq;
 
 public class InventoryManager : MonoBehaviour
 {
+    public static InventoryManager Instance;
+
     private List<InventorySlot> slots = new List<InventorySlot>();
     private int selectedSlotIndex = 0; // Currently selected inventory slot
-    private GameObject heldLeftHandItemInstance; // Instance of the item in the player's left hand
-    private GameObject heldRightHandItemInstance; // Instance of the item in the player's right hand
+    private GameObject heldLeftHandItemInstance;
+    private GameObject heldRightHandItemInstance;
     private Item currentItem;  // Reference to the currently equipped item
-    private bool isSwitchingDisabled = false; // Flag to disable item switching
-
-    private const float MaxSwitchableWeight = 10.0f; // Maximum weight allowed for switching
-    private const float WeightThreshold1 = 10.0f; // Weight threshold for first action
-    private const float WeightThreshold2 = 15.0f; // Weight threshold for second action
-
-    private GameObject playerController; // CHANGE TO ACTUAL PLAYER MOVEMENT SCRIPT LATER
-    // private PlayerClimbingState playerClimbingState;
 
     [Header("Setup Settings")]
-    public int defaultSlotCount = 4;  // Default number of inventory slots
-    public GameObject inventorySlotPrefab;  // Prefab for the inventory slots
-    public Transform inventoryPanel;  // UI panel for inventory display
-    public Transform leftHandPosition;  // Position for left hand item
-    public Transform rightHandPosition;  // Position for right hand item
+    public int defaultSlotCount = 4;
+    public GameObject inventorySlotPrefab;
+    public Transform inventoryPanel;
+    public Transform leftHandPosition;
+    public Transform rightHandPosition;
     [SerializeField] private TMP_Text updateText;
     private Coroutine currentCoroutine;
-    // public KeyCode dropKey = KeyCode.Q; // Key to drop an item
 
     [Header("Layer Setup")]
     public LayerMask groundLayer;
     [SerializeField] private LayerMask itemLayer;
 
     [Header("Keybinds")]
-    [SerializeField] private InputActionAsset inputActions;  // Input Action Asset
+    [SerializeField] private InputActionAsset inputActions;
+    [SerializeField] private TMP_Text equippedItemText;
     [SerializeField] private string scrollActionName = "Inventory Scroll";
     [SerializeField] private string dropActionName = "Drop";
     [SerializeField] private string slotActionsName = "Slot";
-    [SerializeField] private float scrollCooldown = 0.1f; // Cooldown time (in seconds)
-    private float lastScrollTime = 0f; // Time when the last scroll occurred
+    [SerializeField] private float scrollCooldown = 0f; // Cooldown time
+    private float lastScrollTime = 0f;
     private InputAction scrollAction;
     private InputAction dropAction;
     private List<InputAction> slotActions = new List<InputAction>();
 
 
+    // IF USING WEIGHT
+    private const float WeightThreshold1 = 10.0f; // Weight threshold for first action
+    private const float WeightThreshold2 = 15.0f; // Weight threshold for second action
+    private const float MaxSwitchableWeight = 10.0f; // Maximum weight allowed for switching
+    private bool isSwitchingDisabled = false; // Flag to disable item switching
 
     private ClimbingSystem climbingSystem;
 
@@ -61,10 +61,7 @@ public class InventoryManager : MonoBehaviour
                 Debug.LogError("PlayerInputs asset not found in Resources/Keybinds folder!");
             }
         }
-    }
 
-    private void Start()
-    {
         DisableScriptsOnInventoryItems();
         CreateSlots(defaultSlotCount);
 
@@ -83,7 +80,7 @@ public class InventoryManager : MonoBehaviour
 
         for (int i = 0; i < defaultSlotCount; i++)
         {
-            string actionName = slotActionsName + (i + 1); 
+            string actionName = slotActionsName + (i + 1);
             InputAction slotAction = inputActions.FindAction(actionName);
             if (slotAction != null)
             {
@@ -91,6 +88,93 @@ public class InventoryManager : MonoBehaviour
                 slotAction.Enable();
             }
         }
+
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+    }
+
+    private void Start()
+    {
+        SelectSlot(0, -1);
+
+        UpdateSlotImageForAllSlots(selectedSlotIndex);
+    }
+
+    public void SaveInventory()
+    {
+        for (int i = 0; i < slots.Count; i++)
+        {
+            // Save item in the current slot
+            Item item = slots[i].GetItem();
+            if (item != null)
+            {
+                PlayerPrefs.SetString("Inventory_Slot_" + i, item.name);
+            }
+            else
+            {
+                PlayerPrefs.SetString("Inventory_Slot_" + i, "");
+            }
+        }
+        PlayerPrefs.SetInt("SelectedSlotIndex", selectedSlotIndex);
+        PlayerPrefs.Save();
+    }
+    public void ClearInventory()
+    {
+        // Clear the items in all slots
+        foreach (var slot in slots)
+        {
+            slot.ClearSlot();
+        }
+
+        selectedSlotIndex = 0;
+
+        // Update UI to reflect cleared inventory
+        UpdateSlotImageForAllSlots(selectedSlotIndex);
+    }
+
+
+    public void LoadInventory(List<string> inventoryItems)
+    {
+        for (int i = 0; i < inventoryItems.Count; i++)
+        {
+            string itemName = inventoryItems[i];
+            Item item = FindItemByName(itemName); // Find the item by name
+            if (item != null && i < slots.Count)
+            {
+                slots[i].AddItem(item); // Add item to the corresponding slot
+            }
+            else
+            {
+                Debug.LogWarning($"Item {itemName} not found or slot index out of range.");
+            }
+        }
+
+        // Load selected slot index if available
+        selectedSlotIndex = PlayerPrefs.GetInt("SelectedSlotIndex", 0);
+        UpdateSlotImageForAllSlots(selectedSlotIndex); // Update the UI
+    }
+
+    public List<string> GetInventoryIDs()
+    {
+        List<string> itemIDs = new List<string>();
+
+        foreach (InventorySlot slot in slots)
+        {
+            Item item = slot.GetItem();
+            if (item != null)
+            {
+                itemIDs.Add(item.itemName);
+            }
+        }
+
+        return itemIDs;
+    }
+
+    private Item FindItemByName(string itemName)
+    {
+        return ItemDatabase.Instance.GetItemByName(itemName);
     }
 
     private void Update()
@@ -125,41 +209,99 @@ public class InventoryManager : MonoBehaviour
         {
             if (slotActions[i].triggered)
             {
-                SelectSlot(i);
+                int previousSlotIndex = selectedSlotIndex;  // Store the current selected slot as previous
+
+                // Call the updated SelectSlot method with both current and previous indices
+                SelectSlot(i, previousSlotIndex);
+
+                UpdateSlotImageForAllSlots(i);
+
                 break; // Exit after triggering the first matching slot action
             }
         }
     }
 
-        // Selects the inventory slot by index
-        private void SelectSlot(int index)
+        private void UpdateSlotImageForAllSlots(int selectedSlotIndex)
+    {
+        // Loop through all the slots and update their images based on whether they are selected or not
+        for (int i = 0; i < slots.Count; i++)
         {
-            // Check if the index is within valid range
-            if (index >= 0 && index < slots.Count)
+            if (i == selectedSlotIndex)
             {
-                // Prevent switching if switching is disabled
-                if (isSwitchingDisabled)
-                {
-                    Debug.Log("Cannot switch items. The currently equipped item is too heavy!");
-                    return;
-                }
-
-                // Log the correct selected slot index
-                Debug.Log("Selecting Slot: " + index);
-
-                // Now actually set the selected slot index
-                selectedSlotIndex = index;
-
-                // Update the equipped item (optional, based on your implementation)
-                UpdateEquippedItem();
+                // Update the selected slot
+                slots[i].UpdateSlotImage(true);  // Set the selected slot image
+                slots[i].UpdateSelection(true);  // Mark it as selected
             }
             else
             {
-                Debug.LogWarning("Invalid slot index: " + index + ". Available slots: " + slots.Count);
+                // Update the non-selected slots
+                slots[i].UpdateSlotImage(false); // Set the default slot image
+                slots[i].UpdateSelection(false); // Deselect the slot
             }
         }
+    }
 
-        public void CreateSlots(int slotCount)
+    private void SelectSlot(int index, int previousIndex)
+    {
+        if (index >= 0 && index < slots.Count)
+        {
+            if (isSwitchingDisabled)
+            {
+                Debug.Log("Cannot switch items. The currently equipped item is too heavy!");
+                return;
+            }
+
+            // Update the previous slot to show as unequipped and return to original scale
+            if (previousIndex >= 0 && previousIndex < slots.Count)
+            {
+                slots[previousIndex].UpdateSlotImage(false);
+                slots[previousIndex].UpdateSelection(false);
+
+                // Gradually reset the previous slot scale back to normal (1x)
+                RectTransform prevRect = slots[previousIndex].GetComponent<RectTransform>();
+                if (prevRect != null)
+                {
+                    StartCoroutine(ScaleSlotOverTime(prevRect, prevRect.localScale, Vector3.one, 0.3f));
+                }
+            }
+
+            selectedSlotIndex = index;
+
+            // Update the new selected slot to show as equipped
+            slots[selectedSlotIndex].UpdateSlotImage(true);
+            slots[selectedSlotIndex].UpdateSelection(true);
+
+            // Gradually scale up the selected slot by 1.5x
+            RectTransform selectedRect = slots[selectedSlotIndex].GetComponent<RectTransform>();
+            if (selectedRect != null)
+            {
+                StartCoroutine(ScaleSlotOverTime(selectedRect, selectedRect.localScale, new Vector3(1.5f, 1.5f, 1f), 0.3f));
+            }
+
+            UpdateEquippedItem();
+        }
+        else
+        {
+            Debug.LogWarning("Invalid slot index: " + index + ". Available slots: " + slots.Count);
+        }
+    }
+
+    // Coroutine to scale the slot over time
+    private IEnumerator ScaleSlotOverTime(RectTransform rectTransform, Vector3 fromScale, Vector3 toScale, float duration)
+    {
+        float elapsedTime = 0f;
+
+        while (elapsedTime < duration)
+        {
+            rectTransform.localScale = Vector3.Lerp(fromScale, toScale, elapsedTime / duration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        rectTransform.localScale = toScale; // Ensure the final scale is set
+    }
+
+    public void CreateSlots(int slotCount)
     {
         for (int i = 0; i < slotCount; i++)
         {
@@ -214,12 +356,30 @@ public class InventoryManager : MonoBehaviour
             Debug.Log($"Slot {selectedSlotIndex} is occupied. Finding next available slot.");
         }
 
+        // Gradually reset the previous slot scale back to normal (1x)
+        if (selectedSlotIndex >= 0 && selectedSlotIndex < slots.Count)
+        {
+            RectTransform prevRect = slots[selectedSlotIndex].GetComponent<RectTransform>();
+            if (prevRect != null)
+            {
+                StartCoroutine(ScaleSlotOverTime(prevRect, prevRect.localScale, Vector3.one, 0.3f)); // Smoothly scale back to normal size
+            }
+        }
+
         // Try to add the item to the currently selected slot first
         if (slots[selectedSlotIndex].GetItem() == null)
         {
             slots[selectedSlotIndex].AddItem(item);
             EquipItem(item);
             DisableItemPickup(item);
+
+            // Gradually scale up the selected slot by 1.5x
+            RectTransform selectedRect = slots[selectedSlotIndex].GetComponent<RectTransform>();
+            if (selectedRect != null)
+            {
+                StartCoroutine(ScaleSlotOverTime(selectedRect, selectedRect.localScale, new Vector3(1.5f, 1.5f, 1f), 0.3f)); // Smoothly scale up
+            }
+
             return true;
         }
 
@@ -230,12 +390,19 @@ public class InventoryManager : MonoBehaviour
             if (slots[slotIndex].GetItem() == null)
             {
                 slots[slotIndex].AddItem(item);
-                // Update selected slot index to the slot where the item was added
                 selectedSlotIndex = slotIndex;
 
                 // Equip the item if added to the selected slot
                 EquipItem(item);
                 DisableItemPickup(item);
+
+                // Gradually scale up the selected slot by 1.5x
+                RectTransform selectedRect = slots[selectedSlotIndex].GetComponent<RectTransform>();
+                if (selectedRect != null)
+                {
+                    StartCoroutine(ScaleSlotOverTime(selectedRect, selectedRect.localScale, new Vector3(1.5f, 1.5f, 1f), 0.3f)); // Smoothly scale up
+                }
+
                 return true;
             }
         }
@@ -392,6 +559,8 @@ public class InventoryManager : MonoBehaviour
                 Vector3 dropPosition = hit.point;
                 GameObject droppedItem = Instantiate(item.itemPrefab, dropPosition, Quaternion.identity);
 
+                ObjectTracker.Instance.TrackDroppedItem(item.itemPrefab.name, droppedItem.transform.position);
+
                 MeshRenderer meshRenderer = droppedItem.GetComponent<MeshRenderer>();
                 if (meshRenderer != null)
                 {
@@ -415,6 +584,8 @@ public class InventoryManager : MonoBehaviour
                 Vector3 fallbackPosition = leftHandPosition.position - Vector3.up * 1f;
                 GameObject droppedItem = Instantiate(item.itemPrefab, fallbackPosition, Quaternion.identity);
                 droppedItem.GetComponent<ItemPickUp>().item = item;
+
+                ObjectTracker.Instance.TrackDroppedItem(item.itemPrefab.name, droppedItem.transform.position);
             }
             EnableItemPickup(item);
         }
@@ -434,10 +605,14 @@ public class InventoryManager : MonoBehaviour
             return;
         }
 
+        int previousSlotIndex = selectedSlotIndex;  // Store the previous slot index
+
         selectedSlotIndex += direction;
         if (selectedSlotIndex >= slots.Count) selectedSlotIndex = 0;
         if (selectedSlotIndex < 0) selectedSlotIndex = slots.Count - 1;
 
+        // Pass the previous slot index to properly reset its scale
+        SelectSlot(selectedSlotIndex, previousSlotIndex);
         UpdateEquippedItem();
     }
 
@@ -457,15 +632,25 @@ public class InventoryManager : MonoBehaviour
 
     public Item GetEquippedItem()
     {
-        InventorySlot selectedSlot = slots[selectedSlotIndex];
-        // Ensure the index is within bounds
-        if (currentItem != null)
+        // Check if the selectedSlotIndex is within the valid range
+        if (selectedSlotIndex >= 0 && selectedSlotIndex < slots.Count)
         {
-            return selectedSlot.GetItem();  // Return the item in the selected slot
+            InventorySlot selectedSlot = slots[selectedSlotIndex];
+            if (selectedSlot != null && selectedSlot.GetItem() != null)
+            {
+                return selectedSlot.GetItem();
+            }
+            else
+            {
+                // Debug.LogWarning("No item equipped in the selected slot.");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Selected slot index is out of range.");
         }
 
-        Debug.LogWarning("Selected slot index is out of range.");
-        return null;  // Return null if the slot index is invalid
+        return null;
     }
 
     // Equips an item to the player's hand(s)
@@ -489,14 +674,93 @@ public class InventoryManager : MonoBehaviour
             // Check if the item is too heavy to switch
             if (item.weight > MaxSwitchableWeight)
             {
-                // Equip with weight-based switching restrictions
+                slots[selectedSlotIndex].UpdateSlotImage(true);
+                slots[selectedSlotIndex].UpdateSelection(true);
                 EquipItemWithWeightRestrictions(item);
             }
             else
             {
-                // Normal item equipping
+                slots[selectedSlotIndex].UpdateSlotImage(true);
+                slots[selectedSlotIndex].UpdateSelection(true);
                 EquipNormalItem(item);
             }
+
+            // Update UI text with rebound key names only if the item has playerInputs
+            if (item.playerInputs != null && item.playerInputs.Length > 0)
+            {
+                equippedItemText.text = "Item Keybind: " + GetReboundKeyNames(item);
+            }
+            else
+            {
+                equippedItemText.text = ""; // No input bindings, clear the text
+            }
+        }
+        else
+        {
+            equippedItemText.text = ""; // Clear text when no item is equipped
+        }
+    }
+
+    private string GetReboundKeyNames(Item item)
+    {
+        if (item.playerInputs == null || item.playerInputs.Length == 0) return "Unknown Input";
+
+        string[] keyNames = item.playerInputs
+            .Select(inputName =>
+            {
+                InputAction action = inputActions.FindAction(inputName);
+                if (action != null && action.controls.Count > 0)
+                {
+                // Determine the control scheme being used (Controller or Keyboard)
+                int bindingIndex = KeyBindingManager.Instance.IsUsingController() ? 1 : 0;
+
+                // Check if the binding exists for the selected control scheme
+                if (action.bindings.Count > bindingIndex)
+                    {
+                        InputBinding binding = action.bindings[bindingIndex];
+                        return KeyBindingManager.Instance.GetSanitisedKeyName(binding.effectivePath); // Get rebounded key name
+                }
+                }
+                return inputName; // Default to action name if no binding exists
+        })
+            .ToArray();
+
+        // Handle the formatting for 2 or more actions
+        if (keyNames.Length == 1)
+        {
+            return keyNames[0]; // Single action name
+        }
+        else if (keyNames.Length == 2)
+        {
+            return keyNames[0] + " & " + keyNames[1]; // Two actions with "&" in the middle
+        }
+        else
+        {
+            // More than two actions, put "&" before the last action
+            string lastAction = keyNames[keyNames.Length - 1];
+            string actionsExceptLast = string.Join(", ", keyNames.Take(keyNames.Length - 1));
+            return actionsExceptLast + " & " + lastAction;
+        }
+    }
+
+    private void PositionIcepickByHinge(GameObject icepickInstance, Transform handPosition)
+    {
+        if (icepickInstance == null || handPosition == null) return;
+
+        // Find the IcepickHinge in the instantiated object
+        Transform hingeTransform = icepickInstance.transform.Find("IcepickHinge");
+
+        if (hingeTransform != null)
+        {
+            // We want to position the icepick so the hinge aligns with the hand position
+            Vector3 offset = handPosition.position - hingeTransform.position;
+            icepickInstance.transform.position += offset;
+
+            Debug.Log($"Positioned icepick by the hinge point for {handPosition.name}");
+        }
+        else
+        {
+            Debug.LogWarning("IcepickHinge not found on the instantiated icepick");
         }
     }
 
@@ -504,18 +768,48 @@ public class InventoryManager : MonoBehaviour
     {
         if (item.handType == Item.HandType.SingleHand)
         {
+            // Create the equipped item instance
             heldLeftHandItemInstance = Instantiate(item.itemPrefab, leftHandPosition.position, leftHandPosition.rotation);
             heldLeftHandItemInstance.transform.SetParent(leftHandPosition);
+
+            // Apply regular scale for single hand items
+            heldLeftHandItemInstance.transform.localScale = new Vector3(1f, 1f, 1f);
+
+            // Check if this is an icepick by name or tag
+            if (item.name.ToLower().Contains("icepick") || item.itemPrefab.CompareTag("Icepick"))
+            {
+                PositionIcepickByHinge(heldLeftHandItemInstance, leftHandPosition);
+            }
 
             DisablePickUpCollider(heldLeftHandItemInstance);
         }
         else if (item.handType == Item.HandType.DoubleHand)
         {
+            // Left hand item with mirrored scale
             heldLeftHandItemInstance = Instantiate(item.itemPrefab, leftHandPosition.position, leftHandPosition.rotation);
             heldLeftHandItemInstance.transform.SetParent(leftHandPosition);
 
+            // Mirror the item in the left hand by inverting X scale
+            heldLeftHandItemInstance.transform.localScale = new Vector3(-1f, 1f, 1f);
+
+            // Check if this is an icepick by name or tag
+            if (item.name.ToLower().Contains("icepick") || item.itemPrefab.CompareTag("Icepick"))
+            {
+                PositionIcepickByHinge(heldLeftHandItemInstance, leftHandPosition);
+            }
+
+            // Right hand item with normal scale
             heldRightHandItemInstance = Instantiate(item.itemPrefab, rightHandPosition.position, rightHandPosition.rotation);
             heldRightHandItemInstance.transform.SetParent(rightHandPosition);
+
+            // Normal scale for right hand
+            heldRightHandItemInstance.transform.localScale = new Vector3(1f, 1f, 1f);
+
+            // If it's a double-handed icepick, do the same for the right hand
+            if (item.name.ToLower().Contains("icepick") || item.itemPrefab.CompareTag("Icepick"))
+            {
+                PositionIcepickByHinge(heldRightHandItemInstance, rightHandPosition);
+            }
 
             DisablePickUpCollider(heldLeftHandItemInstance);
             DisablePickUpCollider(heldRightHandItemInstance);
@@ -571,17 +865,48 @@ public class InventoryManager : MonoBehaviour
         {
             heldLeftHandItemInstance = Instantiate(item.itemPrefab, leftHandPosition.position, leftHandPosition.rotation);
             heldLeftHandItemInstance.transform.SetParent(leftHandPosition);
+
+            // Apply regular scale
+            heldLeftHandItemInstance.transform.localScale = new Vector3(1f, 1f, 1f);
+
+            // Check if this is an icepick
+            if (item.name.ToLower().Contains("icepick") || item.itemPrefab.CompareTag("Icepick"))
+            {
+                PositionIcepickByHinge(heldLeftHandItemInstance, leftHandPosition);
+            }
+
+            DisablePickUpCollider(heldLeftHandItemInstance);
         }
         // For double-hand items, equip on both hands
         else if (item.handType == Item.HandType.DoubleHand)
         {
-            // Left hand item
+            // Left hand item with mirrored X scale
             heldLeftHandItemInstance = Instantiate(item.itemPrefab, leftHandPosition.position, leftHandPosition.rotation);
             heldLeftHandItemInstance.transform.SetParent(leftHandPosition);
 
-            // Right hand item
+            // Mirror the item in the left hand by inverting X scale
+            heldLeftHandItemInstance.transform.localScale = new Vector3(-1f, 1f, 1f);
+
+            if (item.name.ToLower().Contains("icepick") || item.itemPrefab.CompareTag("Icepick"))
+            {
+                PositionIcepickByHinge(heldLeftHandItemInstance, leftHandPosition);
+            }
+
+            DisablePickUpCollider(heldLeftHandItemInstance);
+
+            // Right hand item with normal scale
             heldRightHandItemInstance = Instantiate(item.itemPrefab, rightHandPosition.position, rightHandPosition.rotation);
             heldRightHandItemInstance.transform.SetParent(rightHandPosition);
+
+            // Normal scale for right hand
+            heldRightHandItemInstance.transform.localScale = new Vector3(1f, 1f, 1f);
+
+            if (item.name.ToLower().Contains("icepick") || item.itemPrefab.CompareTag("Icepick"))
+            {
+                PositionIcepickByHinge(heldRightHandItemInstance, rightHandPosition);
+            }
+
+            DisablePickUpCollider(heldRightHandItemInstance);
         }
 
         currentItem = item;

@@ -12,28 +12,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49d908a81e1ab4345bdb9ed5793418b1, type: 3}
   m_Name: BaseCampArrival - Option 2 - Serious
   m_EditorClassIdentifier: 
+  treeID: 169262f5-5e01-43c7-b719-340247fbd5c1
   dialogueNodes:
   - dialogueText: "You joke, but I mean it, Phillip. This is real. And I don\u2019t
       know if I\u2019m ready."
-    fmodAudioEvent:
-      Guid:
-        Data1: 0
-        Data2: 0
-        Data3: 0
-        Data4: 0
-      Path: 
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
     eventIds: []
     options: []
     npcName: Alice
-  - dialogueText: "Hey, you are ready. You wouldn\u2019t be here if you weren\u2019t.
-      Trust yourself a little, yeah?"
-    fmodAudioEvent:
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
       Guid:
         Data1: 0
         Data2: 0
         Data3: 0
         Data4: 0
       Path: 
+  - dialogueText: "Hey, you are ready. You wouldn\u2019t be here if you weren\u2019t.
+      Trust yourself a little, yeah?"
+    dialogueAudio: {fileID: 11400000, guid: 7aa603cac70ac442cbe1e5af68e9852b, type: 2}
     eventIds: []
     options: []
     npcName: Phillip
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 

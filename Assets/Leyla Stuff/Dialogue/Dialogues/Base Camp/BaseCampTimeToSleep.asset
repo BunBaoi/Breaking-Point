@@ -12,120 +12,139 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49d908a81e1ab4345bdb9ed5793418b1, type: 3}
   m_Name: BaseCampTimeToSleep
   m_EditorClassIdentifier: 
+  treeID: a59a192c-8809-4e98-9db5-202e68663707
   dialogueNodes:
   - dialogueText: Did everything in your little journal hmm? Checked off every last
       box?
-    fmodAudioEvent:
-      Guid:
-        Data1: 0
-        Data2: 0
-        Data3: 0
-        Data4: 0
-      Path: 
+    dialogueAudio: {fileID: 11400000, guid: 7aa603cac70ac442cbe1e5af68e9852b, type: 2}
     eventIds: []
     options: []
     npcName: Phillip
     npcTag: 
-  - dialogueText: You say that being organised is a bad thing.
-    fmodAudioEvent:
+    useDialogueAudio: 1
+    fmodSoundEvent:
       Guid:
         Data1: 0
         Data2: 0
         Data3: 0
         Data4: 0
       Path: 
+  - dialogueText: You say that being organised is a bad thing.
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
     eventIds: []
     options: []
     npcName: Alice
     npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
   - dialogueText: "No! No. It\u2019s adorable! Like a little adventure checklist.
       \u2018Survive the wilderness, check. Keep Phillip from wandering off, double
       check.\u2019"
-    fmodAudioEvent:
+    dialogueAudio: {fileID: 11400000, guid: 7aa603cac70ac442cbe1e5af68e9852b, type: 2}
+    eventIds: []
+    options: []
+    npcName: Phillip
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
       Guid:
         Data1: 0
         Data2: 0
         Data3: 0
         Data4: 0
       Path: 
-    eventIds: []
-    options: []
-    npcName: Phillip
-    npcTag: 
   - dialogueText: "Hey! That one wasn\u2019t in there.. But maybe it should be now
       that I think about it. "
-    fmodAudioEvent:
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
+    eventIds: []
+    options: []
+    npcName: Alice
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
       Guid:
         Data1: 0
         Data2: 0
         Data3: 0
         Data4: 0
       Path: 
-    eventIds: []
-    options: []
-    npcName: Alice
-    npcTag: 
   - dialogueText: "Wouldn\u2019t blame you. I do have a habit of getting\u2026 distracted.
       Speaking of distractions, it's past your bedtime missy! "
-    fmodAudioEvent:
-      Guid:
-        Data1: 0
-        Data2: 0
-        Data3: 0
-        Data4: 0
-      Path: 
+    dialogueAudio: {fileID: 11400000, guid: 7aa603cac70ac442cbe1e5af68e9852b, type: 2}
     eventIds: []
     options: []
     npcName: Phillip
     npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 
   - dialogueText: "\u2026 "
-    fmodAudioEvent:
+    dialogueAudio: {fileID: 0}
+    eventIds: []
+    options: []
+    npcName: Alice
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
       Guid:
         Data1: 0
         Data2: 0
         Data3: 0
         Data4: 0
       Path: 
-    eventIds: []
-    options: []
-    npcName: Alice
-    npcTag: 
   - dialogueText: Hilarious. But yeah, we need all the energy we can get.
-    fmodAudioEvent:
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
+    eventIds: []
+    options: []
+    npcName: Alice
+    npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
       Guid:
         Data1: 0
         Data2: 0
         Data3: 0
         Data4: 0
       Path: 
-    eventIds: []
-    options: []
-    npcName: Alice
-    npcTag: 
   - dialogueText: Our tent is the red one right? You know, in case your list needs
       a reminder.
-    fmodAudioEvent:
-      Guid:
-        Data1: 0
-        Data2: 0
-        Data3: 0
-        Data4: 0
-      Path: 
+    dialogueAudio: {fileID: 11400000, guid: 7aa603cac70ac442cbe1e5af68e9852b, type: 2}
     eventIds: []
     options: []
     npcName: Phillip
     npcTag: 
-  - dialogueText: Ha. Ha. Very funny. Come on, let's go before you fall asleep out
-      here.
-    fmodAudioEvent:
+    useDialogueAudio: 1
+    fmodSoundEvent:
       Guid:
         Data1: 0
         Data2: 0
         Data3: 0
         Data4: 0
       Path: 
+  - dialogueText: Ha. Ha. Very funny. Come on, let's go before you fall asleep out
+      here.
+    dialogueAudio: {fileID: 11400000, guid: 00ed0a5a6a45b46719880135a5104030, type: 2}
     eventIds:
     - BaseCampGoToSleepDialogue
     options: []
     npcName: Alice
     npcTag: 
+    useDialogueAudio: 1
+    fmodSoundEvent:
+      Guid:
+        Data1: 0
+        Data2: 0
+        Data3: 0
+        Data4: 0
+      Path: 

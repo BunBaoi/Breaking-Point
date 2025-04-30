@@ -17,15 +17,12 @@ MonoBehaviour:
     keySprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
     controllerSprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
   - actionName: Advance Dialogue
-    keySprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
-    controllerSprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+    keySprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+    controllerSprite: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
   - actionName: Select Option
     keySprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
     controllerSprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
   - actionName: Interaction Scroll
-    keySprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
-    controllerSprite: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
-  - actionName: Inventory Scroll
     keySprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
     controllerSprite: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
   - actionName: Next
@@ -34,13 +31,13 @@ MonoBehaviour:
   - actionName: Previous
     keySprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
     controllerSprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
-  - actionName: PickUp
+  - actionName: Pause
     keySprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
     controllerSprite: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
-  - actionName: Drop
+  - actionName: Climb Left Grab
     keySprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
     controllerSprite: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
-  - actionName: Use
+  - actionName: Climb Right Grab
     keySprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
     controllerSprite: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
   - actionName: Move
@@ -50,5 +47,59 @@ MonoBehaviour:
     keySprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
     controllerSprite: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
   - actionName: Look
+    keySprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+    controllerSprite: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
+  - actionName: PickUp
+    keySprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+    controllerSprite: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
+  - actionName: Drop
+    keySprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+    controllerSprite: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
+  - actionName: Use
+    keySprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+    controllerSprite: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
+  - actionName: Slot 1
+    keySprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+    controllerSprite: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
+  - actionName: Slot 2
+    keySprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+    controllerSprite: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
+  - actionName: Slot 3
+    keySprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+    controllerSprite: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
+  - actionName: Slot 4
+    keySprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+    controllerSprite: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
+  - actionName: Slot 5
+    keySprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+    controllerSprite: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
+  - actionName: Slot 6
+    keySprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+    controllerSprite: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
+  - actionName: Slot 7
+    keySprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+    controllerSprite: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
+  - actionName: Slot 8
+    keySprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+    controllerSprite: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
+  - actionName: Slot 9
+    keySprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+    controllerSprite: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
+  - actionName: Slot 10
+    keySprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+    controllerSprite: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
+  - actionName: Inventory Scroll
+    keySprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+    controllerSprite: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
+  - actionName: QTEButton1
+    keySprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+    controllerSprite: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
+  - actionName: QTEButton2
+    keySprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+    controllerSprite: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
+  - actionName: QTEButton3
+    keySprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+    controllerSprite: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
+  - actionName: QTEButton4
     keySprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
     controllerSprite: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}

@@ -12,14 +12,20 @@ public class DialogueManager : MonoBehaviour
 
     [Header("Dialogue Settings")]
     [SerializeField] private TMP_Text dialogueTextUI;
+    [SerializeField] private GameObject dialoguePanel;
     // [SerializeField] private TMP_Text npcNameUI;
     [SerializeField] private Canvas dialogueCanvas;
     [SerializeField] private GameObject buttonPrefab;
     [SerializeField] private Transform buttonParent;
     [SerializeField] private Image nextDialogueIndicatorImage;
     [SerializeField] private CanvasGroup nextDialogueIndicatorCanvasGroup;
-    [SerializeField] private Camera mainCamera;  // Player camera
-    [SerializeField] private float scrollSpeed = 0.05f;
+    [SerializeField] private Camera mainCamera;
+    [SerializeField] private float scrollSpeed = 0.03f;
+    public Dictionary<string, bool> dialogueTreeProgress = new Dictionary<string, bool>();
+
+    [Header("NPC Dialogue Settings")]
+    [SerializeField] private GameObject npcDialogueTextPrefab;
+    private GameObject activeNPCBubble;
 
     [Header("Colour Settings")]
     [SerializeField] private string npcNameColorHex = "#D95959"; // Default colour
@@ -44,22 +50,6 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private string selectOptionName = "Select Option";
     [SerializeField] private string scrollName = "Interaction Scroll";
 
-    // OLD KEYBINDS
-    /* [SerializeField] private string scrollUpName = "Scroll Up";
-    // [SerializeField] private string scrollDownName = "Scroll Down";*/
-    /* public KeyCode advanceKey = KeyCode.Mouse0;
-    [SerializeField] private KeyCode selectOptionKey = KeyCode.F;*/
-
-    private InputAction advanceDialogue;
-    private InputAction selectOption;
-    private InputAction scroll;
-
-    private int selectedOptionIndex = 0;
-    [SerializeField] private GameObject scrollIndicatorPrefab;
-    [SerializeField] private GameObject selectOptionIndicatorPrefab;
-    private GameObject instantiatedScrollIndicator;
-    private GameObject instantiatedSelectOptionIndicator;
-
     [Header("Testing Purposes")]
     [SerializeField] private bool isTextScrolling = false;
     [SerializeField] private bool isFullTextShown = false;
@@ -71,12 +61,34 @@ public class DialogueManager : MonoBehaviour
     [SerializeField] private Canvas inventoryCanvas;
     [SerializeField] private GameObject[] playerHands;
 
+    [Header("Automatic Dialogue")]
+    public bool isAutomaticDialogueActive = false;
+    public bool IsAutomaticDialogueActive => isAutomaticDialogueActive;
+
+    [Header("Cooldown Settings")]
+    [SerializeField] private float cooldownTime = 1f;  // Cooldown time in seconds.
+    private float cooldownTimer = 0f;  // Timer to track the cooldown
+    public bool canStartDialogue = true;  // Flag to check if dialogue can start
+
+    private InputAction advanceDialogue;
+    private InputAction selectOption;
+    private InputAction scroll;
+
+    private int selectedOptionIndex = 0;
+    [SerializeField] private GameObject scrollIndicatorPrefab;
+    [SerializeField] private GameObject selectOptionIndicatorPrefab;
+    private GameObject instantiatedScrollIndicator;
+    private GameObject instantiatedSelectOptionIndicator;
+
+    private Coroutine currentLookAtNpcCoroutine;
     private Coroutine scrollingCoroutine;
     private Coroutine indicatorCoroutine;
+    private string currentNpcTag = null;
 
     private List<GameObject> instantiatedButtons = new List<GameObject>();
 
     private FMOD.Studio.EventInstance currentDialogueEvent;
+    private FMOD.Studio.EventInstance currentSound = default;
 
     private DialogueTree originalDialogueTree;
     private int originalIndex;
@@ -86,20 +98,17 @@ public class DialogueManager : MonoBehaviour
 
     private PlayerMovement playerMovement;
 
-    [Header("Automatic Dialogue")]
-    [SerializeField] private bool isAutomaticDialogueActive = false;
-    public bool IsAutomaticDialogueActive => isAutomaticDialogueActive;
-
-    [Header("Cooldown Settings")]
-    [SerializeField] private float cooldownTime = 1f;  // Cooldown time in seconds.
-    private float cooldownTimer = 0f;  // Timer to track the cooldown
-    public bool canStartDialogue = true;  // Flag to check if dialogue can start
-
     // access the status variables
     public bool IsTextScrolling() => isTextScrolling;
     public bool IsFullTextShown() => isFullTextShown;
     public bool OptionsAreVisible() => optionsAreVisible;
     public bool IsDialogueActive() => isDialogueActive;
+
+    // OLD KEYBINDS
+    /* [SerializeField] private string scrollUpName = "Scroll Up";
+    // [SerializeField] private string scrollDownName = "Scroll Down";*/
+    /* public KeyCode advanceKey = KeyCode.Mouse0;
+    [SerializeField] private KeyCode selectOptionKey = KeyCode.F;*/
 
     private void Awake()
     {
@@ -110,7 +119,7 @@ public class DialogueManager : MonoBehaviour
 
         if (advanceDialogue != null)
         {
-            advanceDialogue.Enable(); // Enable the action
+            advanceDialogue.Enable();
         }
         else
         {
@@ -118,7 +127,7 @@ public class DialogueManager : MonoBehaviour
         }
         if (selectOption != null)
         {
-            selectOption.Enable(); // Enable the action
+            selectOption.Enable();
         }
         else
         {
@@ -126,7 +135,7 @@ public class DialogueManager : MonoBehaviour
         }
         if (scroll != null)
         {
-            scroll.Enable(); // Enable the action
+            scroll.Enable();
         }
         else
         {
@@ -151,6 +160,11 @@ public class DialogueManager : MonoBehaviour
             {
                 Debug.LogError("PlayerInputs asset not found in Resources/Keybinds folder!");
             }
+        }
+
+        if (dialoguePanel != null)
+        {
+            dialoguePanel.SetActive(false);
         }
     }
 
@@ -185,8 +199,86 @@ public class DialogueManager : MonoBehaviour
         UpdateSelectOptionIndicatorSprite();
     }
 
+    public void SetInventoryActive(bool isActive)
+    {
+
+        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+
+        if (playerObject != null)
+        {
+            inventoryManager = playerObject.GetComponent<InventoryManager>();
+            if (inventoryManager != null)
+            {
+                inventoryManager.enabled = isActive;
+            }
+            Transform inventoryCanvasTransform = playerObject.transform.Find("Inventory Canvas");
+            if (inventoryCanvasTransform != null)
+            {
+                inventoryCanvas = inventoryCanvasTransform.GetComponent<Canvas>();
+                if (inventoryCanvas != null)
+                {
+                    inventoryCanvas.gameObject.SetActive(isActive);
+                }
+            }
+        }
+
+        GameObject leftHand = GameObject.Find("Left Hand");
+        if (leftHand != null)
+        {
+            playerHands[0] = leftHand;
+        }
+
+        GameObject rightHand = GameObject.Find("Right Hand");
+        if (rightHand != null)
+        {
+            playerHands[1] = rightHand;
+        }
+
+        foreach (var hand in playerHands)
+        {
+            if (hand != null)
+            {
+                hand.SetActive(isActive);
+            }
+        }
+    }
+
+    // current state of the dialogue tree (completed or not)
+    public void SetDialogueProgress(string treeID, bool isCompleted)
+    {
+        dialogueTreeProgress[treeID] = isCompleted;
+    }
+
+    // progress of a dialogue tree (true = completed, false = not completed)
+    public bool GetDialogueProgress(string treeID)
+    {
+        if (dialogueTreeProgress.ContainsKey(treeID))
+            return dialogueTreeProgress[treeID];
+
+        return false;
+    }
+
+    public List<string> GetAllDialogueIDs()
+    {
+        return new List<string>(dialogueTreeProgress.Keys);
+    }
+
+    public void ClearDialogueProgress()
+    {
+        dialogueTreeProgress.Clear(); // Clears all dialogue progress
+    }
+
     private void Update()
     {
+        foreach (var entry in dialogueTreeProgress)
+        {
+            Debug.Log($"Key: {entry.Key}, Value: {entry.Value}");
+        }
+        if (SettingsManager.Instance != null && SettingsManager.Instance.isMenuOpen)
+        {
+            return; // Prevent dialogue from advancing while the settings menu is open
+        }
+
         if (!canStartDialogue)
         {
             cooldownTimer -= Time.deltaTime;
@@ -197,7 +289,7 @@ public class DialogueManager : MonoBehaviour
             }
         }
 
-        if (isFullTextShown && indicatorCoroutine == null)
+        if (isFullTextShown && indicatorCoroutine == null && !isAutomaticDialogueActive)
         {
             indicatorCoroutine = StartCoroutine(FadeInAndOutIndicator());
         }
@@ -218,6 +310,11 @@ public class DialogueManager : MonoBehaviour
             }
         }
 
+        if (isDialogueActive)
+        {
+            SetInventoryActive(false);
+        }
+
         // Only process manual dialogue advancement if not in automatic dialogue mode
         if (!isAutomaticDialogueActive && !optionsAreVisible)
         {
@@ -229,6 +326,13 @@ public class DialogueManager : MonoBehaviour
                     dialogueTextUI.text = $"<color={npcNameColorHex}>{currentDialogueTree.dialogueNodes[currentIndex - 1].npcName}:</color> <color={dialogueTextColorHex}>{currentDialogueTree.dialogueNodes[currentIndex - 1].dialogueText}</color>";
                     isTextScrolling = false;
                     isFullTextShown = true;
+
+                    if (currentSound.isValid())
+                    {
+                        currentSound.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+                        currentSound.release();
+                    }
+
                     ShowOptions(currentDialogueTree.dialogueNodes[currentIndex - 1]);
                 }
                 else if (isFullTextShown)
@@ -252,7 +356,7 @@ public class DialogueManager : MonoBehaviour
         InputAction action = inputActions.FindAction(actionName);
         if (action == null) return;
 
-        // Get the first binding (keyboard) or second binding 
+        // Get the first binding (keyboard) or second binding (controller)
         int bindingIndex = KeyBindingManager.Instance.IsUsingController() ? 1 : 0;
         if (action.bindings.Count <= bindingIndex) return;
 
@@ -266,24 +370,21 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
-        // Get the keybinding from KeyBindingManager
         KeyBinding keyBinding = KeyBindingManager.Instance.GetKeybinding(actionName);
         if (keyBinding == null) return;
 
-        // Set the sprite for the indicator
         Image indicatorImage = indicatorObject.GetComponent<Image>();
         if (indicatorImage == null) return;
 
         indicatorImage.sprite = KeyBindingManager.Instance.IsUsingController() ? keyBinding.controllerSprite : keyBinding.keySprite;
 
-        // Set up the Animator
         Animator animator = indicatorObject.GetComponent<Animator>();
         if (animator == null)
         {
             animator = indicatorObject.AddComponent<Animator>();
         }
 
-        animator.enabled = true; // Ensure animator is enabled
+        animator.enabled = true;
 
         // Load the correct animator based on the key/button
         string folderPath = KeyBindingManager.Instance.IsUsingController() ? "UI/Controller/" : "UI/Keyboard/";
@@ -327,7 +428,7 @@ public class DialogueManager : MonoBehaviour
 
         if (Mathf.Abs(scrollValue) > 0.1f) // Deadzone threshold
         {
-            if (scrollValue > 0) // Scroll Up
+            if (scrollValue > 0)
             {
                 if (selectedOptionIndex > 0)
                 {
@@ -336,7 +437,7 @@ public class DialogueManager : MonoBehaviour
                     UpdateHighlightedOption();
                 }
             }
-            else if (scrollValue < 0) // Scroll Down
+            else if (scrollValue < 0)
             {
                 if (selectedOptionIndex < instantiatedButtons.Count - 1)
                 {
@@ -434,10 +535,8 @@ public class DialogueManager : MonoBehaviour
             buttonRectTransform.localPosition.z
         );
 
-        // Instantiate the indicator prefab
         instantiatedSelectOptionIndicator = Instantiate(selectOptionIndicatorPrefab, indicatorPosition, Quaternion.identity);
 
-        // Set its parent
         instantiatedSelectOptionIndicator.transform.SetParent(optionIndicatorParent, true);
 
         // Set the correct sprite based on input device
@@ -446,14 +545,14 @@ public class DialogueManager : MonoBehaviour
 
     private void UpdateSelectOptionIndicatorPosition()
     {
-        // Check if the selectedOptionIndex is within the valid range
+        // Is it within valid range?
         if (selectedOptionIndex < 0 || selectedOptionIndex >= instantiatedButtons.Count)
         {
             // Debug.LogError($"Selected option index {selectedOptionIndex} is out of range. Valid range is 0 to {instantiatedButtons.Count - 1}.");
-            return; // Exit the method if the index is invalid
+            return;
         }
 
-        // Get the position of the currently highlighted button
+        // Get the position
         RectTransform buttonRectTransform = instantiatedButtons[selectedOptionIndex].GetComponent<RectTransform>();
 
         // Calculate the new position
@@ -493,28 +592,67 @@ public class DialogueManager : MonoBehaviour
 
     public void StartDialogue(DialogueTree dialogueTree)
     {
-        // Disable the InventoryManager when dialogue starts
-        if (inventoryManager != null)
+        if (SettingsManager.Instance != null && SettingsManager.Instance.isMenuOpen)
         {
-            inventoryManager.enabled = false;
-            inventoryCanvas.gameObject.SetActive(false);
+            return; // Prevent dialogue from advancing while the settings menu is open
+        }
+
+        if (GetDialogueProgress(dialogueTree.treeID))
+        {
+            Debug.Log("Dialogue with treeID " + dialogueTree.treeID + " has already been completed.");
+            return; // Exit without showing the dialogue
+        }
+
+        SetDialogueProgress(dialogueTree.treeID, true);
+
+        PlayerStats.Instance.FadeOut();
+
+        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+
+        if (playerObject != null)
+        {
+            inventoryManager = playerObject.GetComponent<InventoryManager>();
+            if (inventoryManager != null)
+            {
+                inventoryManager.enabled = false;
+                Debug.Log("InventoryManager disabled.");
+            }
+            Transform inventoryCanvasTransform = playerObject.transform.Find("Inventory Canvas");
+            if (inventoryCanvasTransform != null)
+            {
+                inventoryCanvas = inventoryCanvasTransform.GetComponent<Canvas>();
+                if (inventoryCanvas != null)
+                {
+                    inventoryCanvas.gameObject.SetActive(false);
+                    Debug.Log("Inventory Canvas disabled.");
+                }
+            }
+        }
+
+        GameObject leftHand = GameObject.Find("Left Hand");
+        if (leftHand != null)
+        {
+            playerHands[0] = leftHand;
+        }
+
+        GameObject rightHand = GameObject.Find("Right Hand");
+        if (rightHand != null)
+        {
+            playerHands[1] = rightHand;
         }
 
         if (playerHands != null)
         {
-            // Disable all GameObjects in the playerHands array
             foreach (GameObject hand in playerHands)
             {
                 hand.SetActive(false);
             }
         }
-        // Find the Player object by tag
-        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+
         if (playerObject != null)
         {
             playerMovement = playerObject.GetComponent<PlayerMovement>();
 
-            // Disable player movement when dialogue starts
             if (playerMovement != null)
             {
                 Debug.Log("Disabling movement");
@@ -525,10 +663,13 @@ public class DialogueManager : MonoBehaviour
                 Debug.LogWarning("PlayerMovement component not found on Player.");
             }
         }
-        else
+
+        if (dialoguePanel != null)
         {
-            Debug.LogWarning("Player object not found with tag 'Player'.");
+            dialoguePanel.SetActive(true);
         }
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
         isDialogueActive = true;
         nextDialogueIndicatorCanvasGroup.alpha = 0f;
         currentDialogueTree = dialogueTree;
@@ -539,6 +680,11 @@ public class DialogueManager : MonoBehaviour
 
     public void ShowNextDialogue()
     {
+        if (SettingsManager.Instance != null && SettingsManager.Instance.isMenuOpen)
+        {
+            return; // Prevent dialogue from advancing while the settings menu is open
+        }
+
         StopCoroutine(FadeInAndOutIndicator());
         nextDialogueIndicatorCanvasGroup.alpha = 0f;
         ClearOptions();
@@ -580,23 +726,43 @@ public class DialogueManager : MonoBehaviour
             nextDialogueIndicatorCanvasGroup.alpha = 0f;
             nextDialogueIndicatorImage.gameObject.SetActive(false);
             dialogueCanvas.enabled = false;
+            PlayerStats.Instance.FadeIn();
+            // Stop the previous coroutine if it's running
+            if (currentLookAtNpcCoroutine != null)
+            {
+                StopCoroutine(currentLookAtNpcCoroutine);
+            }
             if (playerMovement != null)
             {
                 playerMovement.SetMovementState(true);
             }
-            // Enable the InventoryManager when dialogue ends
-            if (inventoryManager != null)
+            GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+            if (playerObject != null)
             {
-                inventoryManager.enabled = true;
-                inventoryCanvas.gameObject.SetActive(true);
+                if (inventoryManager != null)
+                {
+                    inventoryManager.enabled = true;
+                }
+                Transform inventoryCanvasTransform = playerObject.transform.Find("Inventory Canvas");
+                if (inventoryCanvasTransform != null)
+                {
+                    inventoryCanvas = inventoryCanvasTransform.GetComponent<Canvas>();
+                    if (inventoryCanvas != null)
+                    {
+                        inventoryCanvas.gameObject.SetActive(true);
+                    }
+                }
             }
             if (playerHands != null)
             {
-                // Enable all game objects in the playerHands array
                 foreach (GameObject hand in playerHands)
                 {
                     hand.SetActive(true);
                 }
+            }
+            if (dialoguePanel != null)
+            {
+                dialoguePanel.SetActive(false);
             }
         }
     }
@@ -604,7 +770,7 @@ public class DialogueManager : MonoBehaviour
     private void StartCooldown()
     {
         cooldownTimer = cooldownTime;
-        canStartDialogue = false;  // Disable starting new dialogue
+        canStartDialogue = false;
     }
 
     private void DisplayDialogue(DialogueNode node)
@@ -635,17 +801,27 @@ public class DialogueManager : MonoBehaviour
             npcNameUI.text = node.npcName;
         }*/
 
+        // Stop fmod event and if useDialogueAudio is false for the current node, play the fmodSoundEvent variable instead
         if (currentDialogueEvent.isValid())
         {
-            currentDialogueEvent.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+            currentDialogueEvent.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
             currentDialogueEvent.release();
         }
 
-        if (!node.fmodAudioEvent.IsNull)
+        if (!node.useDialogueAudio)
+        {
+            if (!node.fmodSoundEvent.IsNull)
+            {
+                currentDialogueEvent = FMODUnity.RuntimeManager.CreateInstance(node.fmodSoundEvent);
+                currentDialogueEvent.start();
+            }
+        }
+
+        /*if (!node.fmodAudioEvent.IsNull)
         {
             currentDialogueEvent = RuntimeManager.CreateInstance(node.fmodAudioEvent);
             currentDialogueEvent.start();
-        }
+        }*/
 
         // Trigger the camera look at the NPC if npcTag is provided
         TriggerCameraLookAtNpc(node);
@@ -663,20 +839,20 @@ public class DialogueManager : MonoBehaviour
     {
         if (!string.IsNullOrEmpty(node.npcTag))
         {
-            // Find all NPCs with the given tag
+            currentNpcTag = node.npcTag; // Update the current tag
+
             GameObject[] npcs = GameObject.FindGameObjectsWithTag(node.npcTag);
             if (npcs.Length > 0)
             {
                 GameObject closestNpc = null;
-                float closestDistance = Mathf.Infinity; // Start with a very large distance
+                float closestDistance = Mathf.Infinity;
 
-                // Find the closest NPC
                 GameObject player = GameObject.FindGameObjectWithTag("Player");
+
                 foreach (GameObject npc in npcs)
                 {
                     if (npc != null && player != null)
                     {
-                        // Calculate the distance from the player to the center of the NPC
                         Vector3 npcCenter = npc.transform.position;
                         float distance = Vector3.Distance(player.transform.position, npcCenter);
 
@@ -688,59 +864,61 @@ public class DialogueManager : MonoBehaviour
                     }
                 }
 
-                // If closest NPC found, start the look at NPC process
                 if (closestNpc != null)
                 {
-                    StartCoroutine(SmoothLookAtNpc(closestNpc));
+                    if (currentLookAtNpcCoroutine != null)
+                        StopCoroutine(currentLookAtNpcCoroutine);
+
+                    currentLookAtNpcCoroutine = StartCoroutine(SmoothLookAtNpc(closestNpc, currentNpcTag));
                 }
+            }
+        }
+        else
+        {
+            // Stop if NPC tag is null/empty
+            currentNpcTag = null;
+
+            if (currentLookAtNpcCoroutine != null)
+            {
+                StopCoroutine(currentLookAtNpcCoroutine);
+                currentLookAtNpcCoroutine = null;
             }
         }
     }
 
-    private IEnumerator SmoothLookAtNpc(GameObject npc)
+    private IEnumerator SmoothLookAtNpc(GameObject npc, string tagAtStart)
     {
         GameObject player = GameObject.FindGameObjectWithTag("Player");
+        GameObject cameraObject = GameObject.FindGameObjectWithTag("PlayerCamera");
+
+        if (cameraObject != null)
+        {
+            mainCamera = cameraObject.GetComponent<Camera>();
+        }
+
         if (npc != null && mainCamera != null && player != null)
         {
-            // Get the position of the NPC
-            Vector3 npcPosition = npc.transform.position;
-
-            // Calculate the direction vector from the camera to the NPC
-            Vector3 targetDirection = npcPosition - mainCamera.transform.position;
-
-            // Calculate the target rotation based on the direction (this will affect both yaw and pitch)
-            Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
-
             CameraController cameraController = mainCamera.GetComponent<CameraController>();
+            float smoothSpeed = 2f;
 
-            // Smoothly rotate the camera to the target rotation
-            while (Quaternion.Angle(mainCamera.transform.rotation, targetRotation) > 0.1f)
+            while (currentNpcTag == tagAtStart && !string.IsNullOrEmpty(currentNpcTag))
             {
-                // Smoothly rotate the camera horizontally (yaw) and vertically (pitch)
+                Transform head = npc.transform.Find("Head");
+                Vector3 npcHeadPosition = head != null ? head.position : npc.transform.position + Vector3.up * 1.0f;
+
+                Vector3 targetDirection = npcHeadPosition - mainCamera.transform.position;
+                Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
+
                 Quaternion currentRotation = mainCamera.transform.rotation;
-                currentRotation = Quaternion.Slerp(currentRotation, targetRotation, Time.deltaTime * 2f);
+                float targetYaw = Mathf.LerpAngle(currentRotation.eulerAngles.y, targetRotation.eulerAngles.y, Time.deltaTime * smoothSpeed);
+                float targetPitch = Mathf.LerpAngle(cameraController.xRotation, targetRotation.eulerAngles.x, Time.deltaTime * smoothSpeed);
 
-                // Smoothly adjust the pitch (xRotation) towards the target pitch
-                float targetPitch = Mathf.LerpAngle(cameraController.xRotation, targetRotation.eulerAngles.x, Time.deltaTime * 2f);
-
-                // Apply the smooth pitch (vertical) and yaw (horizontal) to the camera
-                mainCamera.transform.rotation = Quaternion.Euler(targetPitch, currentRotation.eulerAngles.y, 0);
-
-                // Also rotate the player (body) to face the NPC (yaw only)
-                player.transform.rotation = Quaternion.Euler(0, currentRotation.eulerAngles.y, 0);
-
-                // Update the camera's xRotation to reflect the smooth pitch (vertical rotation)
-                cameraController.xRotation = targetPitch;
-
-                // Adjust the mouseY position in the CameraController to match the xRotation for consistency
+                mainCamera.transform.rotation = Quaternion.Euler(targetPitch, targetYaw, 0);
+                player.transform.rotation = Quaternion.Euler(0, targetYaw, 0);
                 cameraController.xRotation = targetPitch;
 
                 yield return null;
             }
-
-            // Final alignment with the NPC (ensure no overshooting)
-            mainCamera.transform.rotation = targetRotation;
-            player.transform.rotation = Quaternion.Euler(0, targetRotation.eulerAngles.y, 0);
         }
     }
 
@@ -750,55 +928,106 @@ public class DialogueManager : MonoBehaviour
         dialogueTextUI.text = ""; // Clear the text field
 
         string fullTextWithRichText = $"<color={npcNameColorHex}>{node.npcName}:</color> {node.dialogueText}";
-
-        // For counting characters in text
         string rawFullText = $"{node.npcName}: {node.dialogueText}";
 
-        // Set text and force update for TMP calculations
         dialogueTextUI.text = fullTextWithRichText;
         dialogueTextUI.ForceMeshUpdate();
 
-        if (dialogueTextUI.textInfo.lineCount == 1) // Only center single-line text
+        // Center single-line text if applicable
+        if (dialogueTextUI.textInfo.lineCount == 1)
         {
             TMP_TextInfo textInfo = dialogueTextUI.textInfo;
-            int totalChars = rawFullText.Length + 2; // Add 2 extra characters
-
+            int totalChars = rawFullText.Length + 2;
             if (totalChars > 0)
             {
-                int middleIndex = totalChars / 2; // Get middle character index
-
-                // Ensure middle index is valid within TMP's character count
-                middleIndex = Mathf.Clamp(middleIndex, 0, textInfo.characterCount - 1);
-
-                // Get the x-position of the middle character
+                int middleIndex = Mathf.Clamp(totalChars / 2, 0, textInfo.characterCount - 1);
                 float middleCharX = textInfo.characterInfo[middleIndex].origin;
-
-                // Apply position adjustment to center the middle character at x = 0
                 RectTransform rt = dialogueTextUI.GetComponent<RectTransform>();
                 rt.localPosition = new Vector3(-middleCharX, rt.localPosition.y, rt.localPosition.z);
             }
         }
         else
         {
-            // Reset position for multi-line text
             RectTransform rt = dialogueTextUI.GetComponent<RectTransform>();
             rt.localPosition = new Vector3(0, rt.localPosition.y, rt.localPosition.z);
         }
 
-        // Scroll the dialogue text
+        DialogueAudio audioSettings = node.dialogueAudio;
+        int validCharCount = 0;
+        int npcHash = node.npcName.GetHashCode(); // Get NPC-specific hash for consistent pitch
+        bool hasPlayedFirstSound = false;
+
         for (int i = 0; i < node.dialogueText.Length; i++)
         {
             dialogueTextUI.text = $"<color={npcNameColorHex}>{node.npcName}:</color> {node.dialogueText.Substring(0, i + 1)}";
+            char currentChar = node.dialogueText[i];
+
+            // Check if the character is a letter
+            if (char.IsLetter(currentChar))
+            {
+                validCharCount++;
+
+                // Play the sound on the first letter or according to the frequency after that
+                if (audioSettings != null && node.useDialogueAudio && (!hasPlayedFirstSound || validCharCount % audioSettings.frequency == 0))
+                {
+                    hasPlayedFirstSound = true;
+
+                    // Stop previous sound if any
+                    if (currentSound.isValid())
+                    {
+                        currentSound.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+                        currentSound.release();
+                    }
+
+                    // Map letter to index: 'a' -> 0, 'b' -> 1, ..., 'z' -> 25
+                    int letterIndex = char.ToLower(currentChar) - 'a';
+                    letterIndex = Mathf.Clamp(letterIndex, 0, audioSettings.fmodSoundEvents.Length - 1);
+                    EventReference soundEventReference = audioSettings.fmodSoundEvents[letterIndex];
+
+                    // Create a new FMOD EventInstance
+                    currentSound = FMODUnity.RuntimeManager.CreateInstance(soundEventReference);
+
+                    // Use NPC hash for consistent pitch
+                    float pitch = Mathf.Lerp(audioSettings.minPitch, audioSettings.maxPitch, Mathf.Abs(npcHash % 100) / 100f);
+
+                    // Set the pitch and start the sound
+                    currentSound.setPitch(pitch);
+
+                    // Try to find the NPC GameObject
+                    GameObject targetObject = null;
+
+                    if (!string.IsNullOrEmpty(node.npcName))
+                    {
+                        targetObject = GameObject.Find(node.npcName);
+                    }
+
+                    // Fallback to player if NPC is not found or name is null
+                    if (targetObject == null)
+                    {
+                        targetObject = GameObject.FindWithTag("PlayerCamera");
+                    }
+
+                    if (targetObject != null)
+                    {
+                        currentSound.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(targetObject.transform));
+                    }
+
+                    currentSound.start();
+                }
+            }
+
             yield return new WaitForSeconds(scrollSpeed);
         }
 
-        // After scrolling, display the full formatted text
+        // Display the full formatted text
         dialogueTextUI.text = fullTextWithRichText;
 
         isTextScrolling = false;
         isFullTextShown = true;
-        ShowOptions(currentDialogueTree.dialogueNodes[currentIndex - 1]);
+
+        ShowOptions(node);
     }
+
 
     private IEnumerator FadeInAndOutIndicator()
     {
@@ -928,5 +1157,169 @@ public class DialogueManager : MonoBehaviour
     public void SetAutomaticDialogueState(bool isAutomatic)
     {
         isAutomaticDialogueActive = isAutomatic;
+    }
+
+    // NPC DIALOGUE
+
+    public void StartNPCDialogue(DialogueTree dialogueTree, Transform npcTransform)
+    {
+        if (activeNPCBubble != null)
+            Destroy(activeNPCBubble);
+
+        if (dialogueTree == null || dialogueTree.dialogueNodes == null || dialogueTree.dialogueNodes.Count == 0)
+        {
+            Debug.LogWarning("Dialogue tree is empty or null.");
+            return;
+        }
+
+        if (GetDialogueProgress(dialogueTree.treeID))
+        {
+            Debug.Log("Dialogue with treeID " + dialogueTree.treeID + " has already been completed.");
+            return;
+        }
+
+        SetDialogueProgress(dialogueTree.treeID, true);
+
+        // Start with the first dialogue node and NPC
+        DialogueNode firstNode = dialogueTree.dialogueNodes[0];
+        GameObject npc = GameObject.Find(firstNode.npcName); // Find NPC by name
+        if (npc == null)
+        {
+            Debug.LogWarning("NPC not found: " + firstNode.npcName);
+            return;
+        }
+
+        Collider npcCollider = npc.GetComponent<Collider>();
+        if (npcCollider == null)
+        {
+            Debug.LogWarning("NPC collider not found.");
+            return;
+        }
+
+        Vector3 bubblePosition = npcCollider.bounds.center + Vector3.up * 1.3f; // Adjust bubble height
+
+        activeNPCBubble = Instantiate(npcDialogueTextPrefab, bubblePosition, Quaternion.identity);
+        activeNPCBubble.transform.SetParent(npcTransform);
+
+        TMP_Text bubbleText = activeNPCBubble.GetComponentInChildren<TMP_Text>();
+
+        StartCoroutine(PlayNPCDialogueSequence(dialogueTree, bubbleText));
+    }
+
+    private IEnumerator PlayNPCDialogueSequence(DialogueTree tree, TMP_Text textField)
+    {
+        FMOD.Studio.EventInstance currentSound = default;
+
+        // Process each dialogue node
+        foreach (DialogueNode node in tree.dialogueNodes)
+        {
+            string fullText = node.dialogueText;
+            textField.text = "";
+
+            GameObject npc = GameObject.Find(node.npcName); // Update the NPC based on the current node
+            if (npc == null)
+            {
+                Debug.LogWarning("NPC not found: " + node.npcName);
+                continue; // Skip to the next node
+            }
+
+            Collider npcCollider = npc.GetComponent<Collider>();
+            if (npcCollider == null)
+            {
+                Debug.LogWarning("NPC collider not found.");
+                continue; // Skip to the next node
+            }
+
+            // Reposition the dialogue bubble above the current NPC's head
+            Vector3 bubblePosition = npcCollider.bounds.center + Vector3.up * 1.3f;
+            activeNPCBubble.transform.position = bubblePosition;
+
+            // Handle audio for dialogue
+            DialogueAudio audioSettings = node.dialogueAudio;
+            int validCharCount = 0;
+            int npcHash = node.npcName.GetHashCode();
+            bool hasPlayedFirstSound = false;
+
+            // If not using per-letter dialogue audio, play single sound
+            if (!node.useDialogueAudio)
+            {
+                if (currentSound.isValid())
+                {
+                    currentSound.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+                    currentSound.release();
+                }
+
+                if (!node.fmodSoundEvent.IsNull)
+                {
+                    currentSound = FMODUnity.RuntimeManager.CreateInstance(node.fmodSoundEvent);
+                    currentSound.start();
+                }
+            }
+
+            // Display the text one letter at a time
+            for (int i = 0; i < fullText.Length; i++)
+            {
+                textField.text = fullText.Substring(0, i + 1);
+                char currentChar = fullText[i];
+
+                if (node.useDialogueAudio && char.IsLetter(currentChar))
+                {
+                    validCharCount++;
+
+                    if (audioSettings != null && (!hasPlayedFirstSound || validCharCount % audioSettings.frequency == 0))
+                    {
+                        hasPlayedFirstSound = true;
+
+                        if (currentSound.isValid())
+                        {
+                            currentSound.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+                            currentSound.release();
+                        }
+
+                        int letterIndex = char.ToLower(currentChar) - 'a';
+                        letterIndex = Mathf.Clamp(letterIndex, 0, audioSettings.fmodSoundEvents.Length - 1);
+                        EventReference soundEventReference = audioSettings.fmodSoundEvents[letterIndex];
+
+                        currentSound = FMODUnity.RuntimeManager.CreateInstance(soundEventReference);
+                        float pitch = Mathf.Lerp(audioSettings.minPitch, audioSettings.maxPitch, Mathf.Abs(npcHash % 100) / 100f);
+                        currentSound.setPitch(pitch);
+
+                        // Try to find the NPC GameObject
+                        GameObject targetObject = null;
+
+                        if (!string.IsNullOrEmpty(node.npcName))
+                        {
+                            targetObject = GameObject.Find(node.npcName);
+                        }
+
+                        // Fallback to player if NPC is not found or name is null
+                        if (targetObject == null)
+                        {
+                            targetObject = GameObject.FindWithTag("PlayerCamera");
+                        }
+
+                        if (targetObject != null)
+                        {
+                            currentSound.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(targetObject.transform));
+                        }
+
+                        currentSound.start();
+                    }
+                }
+
+                yield return new WaitForSeconds(scrollSpeed);
+            }
+
+            yield return new WaitForSeconds(3f); // Wait for a moment before continuing
+        }
+
+        // Stop the audio and release the resources
+        if (currentSound.isValid())
+        {
+            currentSound.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+            currentSound.release();
+        }
+
+        Destroy(activeNPCBubble);
     }
 }

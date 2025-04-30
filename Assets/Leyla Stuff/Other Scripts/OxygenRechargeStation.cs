@@ -2,34 +2,47 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
+using FMODUnity;
+using FMOD.Studio;
 
 public class OxygenRechargeStation : MonoBehaviour
 {
-    [Header("General")]
+    [Header("Oxygen Refill Settings")]
     [SerializeField] private float refillRate = 1f; // Default refill rate per second
     [SerializeField] private bool isRefilling = false;
-    [SerializeField] private bool isPlayerInTrigger = false; // Track if player is in trigger
-    [SerializeField] private PlayerStats playerStats;
+    [SerializeField] private bool isPlayerInTrigger = false;
+
+    [Header("Interact Text Settings")]
+    [SerializeField] private GameObject interactTextPrefab;
+    [SerializeField] private float yAxis = 0.2f;
+    [SerializeField] private float defaultYAxis = 0.2f;
 
     [Header("Required Item")]
     [SerializeField] private Item requiredItem;
     [SerializeField] private InventoryManager inventoryManager;
 
     [Header("Keybinds")]
-    [SerializeField] private InputActionAsset inputActions; // Reference to the Input Action Asset
+    [SerializeField] private InputActionAsset inputActions;
     [SerializeField] private string interactActionName = "Interact";
-    [SerializeField] private GameObject interactTextPrefab; // Prefab for interaction text
+
     private GameObject interactTextInstance;
     private GameObject iconObject;
     private InputAction interactAction;
     private Transform player; // Reference to the player's transform
+    private SpriteRenderer spriteRenderer;
+
+    [Header("FMOD")]
+    [SerializeField] private EventReference refillSoundEvent;
+
+    [SerializeField] private EventInstance refillSoundInstance;
+    [SerializeField] private bool isRefillSoundPlaying = false;
 
     private void Start()
     {
-        GameObject player = GameObject.Find("Player");
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
-            inventoryManager = player.GetComponent<InventoryManager>(); // Get InventoryManager attached to "Player"
+            inventoryManager = player.GetComponent<InventoryManager>();
         }
     }
 
@@ -55,19 +68,42 @@ public class OxygenRechargeStation : MonoBehaviour
         {
             interactAction.Disable();
         }
+
+        refillSoundInstance.release();
     }
 
     private void Update()
     {
         if (isPlayerInTrigger && interactTextInstance != null && player != null)
         {
-            // Make the text only rotate left and right (Y-axis only)
-            Vector3 lookDirection = player.position - interactTextInstance.transform.position;
-            lookDirection.y = 0; // Ignore vertical rotation
-            interactTextInstance.transform.forward = -lookDirection.normalized; // Fix backwards issue
+            GameObject playerCamera = GameObject.FindGameObjectWithTag("PlayerCamera");
 
-            if (isPlayerInTrigger && IsHoldingRequiredItem() && IsLookingAtOxygenStation())
+            if (playerCamera != null)
             {
+                Vector3 lookDirection = player.position - interactTextInstance.transform.position;
+                lookDirection.y = 0; // Keep the text rotation horizontal (no vertical tilt)
+
+                interactTextInstance.transform.forward = -lookDirection.normalized;
+
+                Vector3 currentEulerAngles = interactTextInstance.transform.eulerAngles;
+
+                // Set the Y rotation of the interaction text based on the camera's X rotation
+                currentEulerAngles.x = playerCamera.transform.eulerAngles.x;
+                interactTextInstance.transform.eulerAngles = currentEulerAngles;
+            }
+        }
+
+        if (spriteRenderer != null)
+        {
+            // Dynamically update sprite scale if keybinding changes during the game
+            UpdateSpriteScale();
+        }
+
+        if (isPlayerInTrigger)
+        {
+            if (IsHoldingRequiredItem() && IsLookingAtOxygenStation())
+            {
+                ShowInteractText();
                 // Check if interact button is held down
                 if (interactAction.IsPressed())
                 {
@@ -81,15 +117,49 @@ public class OxygenRechargeStation : MonoBehaviour
                     StopRefilling();
                 }
             }
+            else
+            {
+                HideInteractText();
+            }
         }
     }
 
     private void StartRefilling()
     {
-        if (playerStats != null && IsLookingAtOxygenStation())
+        if (PlayerStats.Instance != null && IsLookingAtOxygenStation())
         {
             Debug.Log("Refilling oxygen...");
             isRefilling = true;
+
+            if (!isRefillSoundPlaying && PlayerStats.Instance.Oxygen < 100)
+            {
+                // Create a fresh instance each time you start refilling
+                refillSoundInstance = RuntimeManager.CreateInstance(refillSoundEvent);
+
+                // Find child with "Oxygen Refill Station" tag
+                Transform refillTarget = null;
+                foreach (Transform child in transform)
+                {
+                    if (child.CompareTag("Oxygen Refill Station"))
+                    {
+                        refillTarget = child;
+                        break;
+                    }
+                }
+
+                if (refillTarget != null)
+                {
+                    RuntimeManager.AttachInstanceToGameObject(refillSoundInstance, refillTarget);
+                    refillSoundInstance.set3DAttributes(RuntimeUtils.To3DAttributes(refillTarget));
+                    refillSoundInstance.start();
+                    isRefillSoundPlaying = true;
+                }
+                else
+                {
+                    Debug.LogWarning("No refill target found for sound.");
+                }
+            }
+
             StartCoroutine(RefillOxygen());
         }
     }
@@ -100,6 +170,125 @@ public class OxygenRechargeStation : MonoBehaviour
         {
             Debug.Log("Stopped refilling oxygen");
             isRefilling = false;
+
+            if (isRefillSoundPlaying)
+            {
+                refillSoundInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+                refillSoundInstance.release();
+                isRefillSoundPlaying = false;
+            }
+        }
+    }
+
+    void ShowInteractText()
+    {
+        if (interactTextInstance == null && interactTextPrefab != null)
+        {
+            interactTextInstance = Instantiate(interactTextPrefab);
+
+            interactTextInstance.transform.SetParent(transform, false);
+
+            Transform objectColliderTransform = transform.Find("Oxygen Tank Refill Station");
+
+            if (objectColliderTransform != null)
+            {
+                Collider objectCollider = objectColliderTransform.GetComponent<Collider>();
+
+                if (objectCollider != null)
+                {
+                    Vector3 objectTopWorldPos = objectCollider.bounds.max;
+
+                    Vector3 pickUpTopLocalPos = interactTextInstance.transform.InverseTransformPoint(objectTopWorldPos);
+
+                    interactTextInstance.transform.localPosition = new Vector3(0, pickUpTopLocalPos.y + yAxis, 0);
+                }
+                else
+                {
+                    interactTextInstance.transform.localPosition = new Vector3(0, defaultYAxis, 0);
+                }
+            }
+            else
+            {
+                interactTextInstance.transform.localPosition = new Vector3(0, defaultYAxis, 0);
+            }
+
+            string interactText = "Refill"; // Default text
+
+            KeyBinding keyBinding = KeyBindingManager.Instance.GetKeybinding(interactActionName);
+
+            TextMeshPro textMesh = interactTextInstance.GetComponent<TextMeshPro>();
+            if (textMesh != null)
+            {
+                textMesh.text = "Refill";
+
+                if (keyBinding != null)
+                {
+                    Sprite icon = KeyBindingManager.Instance.IsUsingController() ? keyBinding.controllerSprite : keyBinding.keySprite;
+
+                    // If the sprite exists, display it next to the text
+                    if (icon != null)
+                    {
+                        iconObject = new GameObject("KeybindIcon");
+                        iconObject.transform.SetParent(interactTextInstance.transform);
+
+                        // Position sprite to left of text
+                        float horizontalOffset = -textMesh.preferredWidth / 2 - 0.04f;
+                        iconObject.transform.localPosition = new Vector3(horizontalOffset, 0f, 0);
+                        iconObject.transform.rotation = interactTextInstance.transform.rotation;
+
+                        // Add a SpriteRenderer to display the icon
+                        spriteRenderer = iconObject.AddComponent<SpriteRenderer>();
+                        spriteRenderer.sprite = icon;
+                        spriteRenderer.sortingOrder = 1;
+
+                        UpdateSpriteScale();
+
+                        UpdateSprite(iconObject.gameObject, interactActionName);
+                    }
+                    else
+                    {
+                        // Get the first binding for keyboard and second for controller directly from the InputActionAsset
+                        string keyText = "";
+
+                        var interactAction = inputActions.FindAction(interactActionName);
+
+                        if (interactAction != null)
+                        {
+                            // If using a controller, get the second binding (controller binding)
+                            if (KeyBindingManager.Instance.IsUsingController())
+                            {
+                                keyText = interactAction.bindings[1].ToDisplayString();  // Second binding (controller)
+                            }
+                            else
+                            {
+                                keyText = interactAction.bindings[0].ToDisplayString();  // First binding (keyboard)
+                            }
+
+                            // Remove the word "Press" from the keyText if it exists
+                            keyText = keyText.Replace("Press ", "").Trim();
+
+                            // Set the fallback text
+                            interactText = $"[{keyText}] Refill";
+                        }
+                        else
+                        {
+                            Debug.LogError("Interact action not found in InputActionAsset");
+                        }
+                    }
+
+                    // Set the updated text (with sprite or keybinding fallback)
+                    textMesh.text = interactText;
+                }
+            }
+        }
+    }
+
+    void HideInteractText()
+    {
+        if (interactTextInstance != null)
+        {
+            Destroy(interactTextInstance);
+            interactTextInstance = null;
         }
     }
 
@@ -109,88 +298,6 @@ public class OxygenRechargeStation : MonoBehaviour
         {
             player = other.transform;
             isPlayerInTrigger = true;
-
-            if (interactTextPrefab != null && interactTextInstance == null)
-            {
-                interactTextInstance = Instantiate(interactTextPrefab);
-                interactTextInstance.transform.SetParent(transform, false);
-                interactTextInstance.transform.localPosition = new Vector3(0, 0.5f, 0);
-
-                // Declare the interactText variable
-                string interactText = "to Refill"; // Default text
-
-                // Get the keybinding data for "Interact"
-                KeyBinding keyBinding = KeyBindingManager.Instance.GetKeybinding(interactActionName);
-
-                // Update text dynamically to match the correct keybinding based on input device
-                TextMeshPro textMesh = interactTextInstance.GetComponent<TextMeshPro>();
-                if (textMesh != null)
-                {
-                    textMesh.text = "to Refill";
-
-                    // Now check if we have a keybinding sprite
-                    if (keyBinding != null)
-                    {
-                        Sprite icon = KeyBindingManager.Instance.IsUsingController() ? keyBinding.controllerSprite : keyBinding.keySprite;
-
-                        // If the sprite exists, display it next to the text
-                        if (icon != null)
-                        {
-                            // Create a object for the sprite and set it next to the text
-                            iconObject = new GameObject("KeybindIcon");
-                            iconObject.transform.SetParent(interactTextInstance.transform); // Make it a child of the text
-
-                            // Position sprite to left of text
-                            // Increase the horizontal space by adjusting the x-position further
-                            float horizontalOffset = -textMesh.preferredWidth / 2 - 0.5f; // Increased offset to add more space
-                            iconObject.transform.localPosition = new Vector3(horizontalOffset, 0.7f, 0);
-
-                            // Add a SpriteRenderer to display the icon
-                            SpriteRenderer spriteRenderer = iconObject.AddComponent<SpriteRenderer>();
-                            spriteRenderer.sprite = icon;
-                            spriteRenderer.sortingOrder = 1; // Ensure the sprite is above the text
-
-                            spriteRenderer.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-
-                            UpdateSprite(iconObject.gameObject, interactActionName);
-                        }
-                        else
-                        {
-                            // Get the first binding for keyboard and second for controller directly from the InputActionAsset
-                            string keyText = "";
-
-                            // Get the "Interact" action
-                            var interactAction = inputActions.FindAction(interactActionName);
-
-                            if (interactAction != null)
-                            {
-                                // If using a controller, get the second binding (controller binding)
-                                if (KeyBindingManager.Instance.IsUsingController())
-                                {
-                                    keyText = interactAction.bindings[1].ToDisplayString();  // Second binding (controller)
-                                }
-                                else
-                                {
-                                    keyText = interactAction.bindings[0].ToDisplayString();  // First binding (keyboard)
-                                }
-
-                                // Remove the word "Press" from the keyText if it exists
-                                keyText = keyText.Replace("Press ", "").Trim(); // Removes "Press" and any extra spaces
-
-                                // Set the fallback text to show the keybinding for "Interact"
-                                interactText = $"[{keyText}] to Refill";
-                            }
-                            else
-                            {
-                                Debug.LogError("Interact action not found in InputActionAsset");
-                            }
-                        }
-
-                        // Set the updated text (with sprite or keybinding fallback)
-                        textMesh.text = interactText;
-                    }
-                }
-            }
         }
     }
 
@@ -198,15 +305,17 @@ public class OxygenRechargeStation : MonoBehaviour
     {
         if (other.CompareTag("Player") && IsHoldingRequiredItem())
         {
-            UpdateSprite(iconObject.gameObject, interactActionName);
-            playerStats = other.GetComponent<PlayerStats>();
+            player = other.transform;
             isPlayerInTrigger = true;
             Debug.Log("player entered oxygen refill trigger");
+            if (interactTextInstance != null)
+            {
+                UpdateSprite(iconObject.gameObject, interactActionName);
+            }
         }
-        if (interactTextInstance != null && !IsHoldingRequiredItem())
+if (interactTextInstance != null && !IsHoldingRequiredItem() && !IsLookingAtOxygenStation())
         {
-            Destroy(interactTextInstance);
-            interactTextInstance = null;
+            HideInteractText();
         }
     }
 
@@ -221,8 +330,7 @@ public class OxygenRechargeStation : MonoBehaviour
 
             if (interactTextInstance != null)
             {
-                Destroy(interactTextInstance);
-                interactTextInstance = null;
+                HideInteractText();
             }
         }
     }
@@ -278,6 +386,36 @@ public class OxygenRechargeStation : MonoBehaviour
         }
     }
 
+    void UpdateSpriteScale()
+    {
+        if (spriteRenderer == null) return;
+
+        // Get the keybinding and check the device being used (controller or keyboard/mouse)
+        InputAction action = inputActions.FindAction(interactActionName);
+        if (action == null) return;
+
+        int bindingIndex = KeyBindingManager.Instance.IsUsingController() ? 1 : 0;
+        if (action.bindings.Count <= bindingIndex) return;
+
+        InputBinding binding = action.bindings[bindingIndex];
+        string boundKeyOrButton = KeyBindingManager.Instance.GetSanitisedKeyName(binding.effectivePath);
+        if (string.IsNullOrEmpty(boundKeyOrButton))
+        {
+            Debug.LogWarning($"No key binding found for action: {interactActionName}");
+            return;
+        }
+
+        Debug.Log($"Bound Key or Button for action '{interactActionName}': {boundKeyOrButton}");
+
+        // Check if it's a mouse button
+        bool isMouseButton = boundKeyOrButton.Contains("Mouse") || boundKeyOrButton.Contains("Click") || boundKeyOrButton.Contains("Scroll")
+            || boundKeyOrButton.Contains("leftStick") || boundKeyOrButton.Contains("rightStick");
+
+        // Set the scale based on whether it's a mouse button or not
+        float scale = isMouseButton ? 0.2f : 0.08f;
+        spriteRenderer.transform.localScale = new Vector3(scale, scale, scale);
+    }
+
     private bool IsLookingAtOxygenStation()
     {
         GameObject playerCamera = GameObject.FindGameObjectWithTag("PlayerCamera");
@@ -296,7 +434,7 @@ public class OxygenRechargeStation : MonoBehaviour
         int layerMask = LayerMask.GetMask("Oxygen Refill Station");
 
         // Perform the raycast with the layer mask to limit the detection to that layer.
-        if (Physics.Raycast(ray, out hit, 3f, layerMask)) // Check within 3 meters
+        if (Physics.Raycast(ray, out hit, 3f, layerMask, QueryTriggerInteraction.Ignore)) // Check within 3 meters
         {
             return hit.collider.CompareTag("Oxygen Refill Station"); // Ensure the looked-at object has the correct tag
         }
@@ -314,10 +452,18 @@ public class OxygenRechargeStation : MonoBehaviour
 
     private IEnumerator RefillOxygen()
     {
-        while (isRefilling && playerStats != null && playerStats.OxygenTank < 100)
+        while (isRefilling && PlayerStats.Instance != null && PlayerStats.Instance.Oxygen < 100)
         {
-            playerStats.OxygenTank += refillRate * Time.deltaTime;
-            playerStats.OxygenTank = Mathf.Min(playerStats.OxygenTank, 100f);
+            PlayerStats.Instance.Oxygen += refillRate * Time.deltaTime;
+
+            PlayerStats.Instance.Oxygen = Mathf.Min(PlayerStats.Instance.Oxygen, 100f);
+
+            if (PlayerStats.Instance.Oxygen >= 100f && isRefillSoundPlaying)
+            {
+                refillSoundInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+                isRefillSoundPlaying = false;
+            }
+
             yield return null;
         }
     }

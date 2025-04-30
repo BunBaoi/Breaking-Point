@@ -6,9 +6,9 @@ public class JournalPageAdder : MonoBehaviour
 
     public void AddTextPage(TextPage textPage)
     {
-        if (pageTracker != null && textPage != null)
+        if (PageTracker.Instance != null && textPage != null)
         {
-            pageTracker.AddPage(textPage);
+            PageTracker.Instance.AddPage(textPage);
         }
     }
 
@@ -16,7 +16,7 @@ public class JournalPageAdder : MonoBehaviour
     {
         if (pageTracker != null && objectivesPage != null)
         {
-            pageTracker.AddPage(objectivesPage);
+            PageTracker.Instance.AddPage(objectivesPage);
         }
     }
 }
