@@ -303,6 +303,8 @@ public class SaveManager : MonoBehaviour
         DialogueManager.Instance.ClearDialogueProgress();
         InventoryManager.Instance.ClearInventory();
 
+        yield return null;
+
         // Restore bools
         foreach (var boolState in data.boolStates)
         {
