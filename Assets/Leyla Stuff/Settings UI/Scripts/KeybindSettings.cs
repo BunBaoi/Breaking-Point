@@ -143,7 +143,10 @@ public class KeybindSettings: MonoBehaviour
         }
 
         // Update content height after adding entries
-        UpdateContentSize();
+        // UpdateContentSize();
+        LayoutRebuilder.ForceRebuildLayoutImmediate(contentRect);
+        scrollRect.verticalNormalizedPosition = 1f; // scroll to top
+
     }
 
     private void CreateKeybindEntry(InputAction action)
@@ -173,6 +176,12 @@ public class KeybindSettings: MonoBehaviour
         if (action.actionMap.name == "Main Menu")
         {
             Debug.Log($"Skipping action '{action.name}' because it's in the 'Main Menu' action map.");
+            return;
+        }
+
+        if (action.actionMap.name == "UI")
+        {
+            Debug.Log($"Skipping action '{action.name}' because it's in the 'UI' action map.");
             return;
         }
 
@@ -690,6 +699,28 @@ public class KeybindSettings: MonoBehaviour
                 {
                     newKey = "Right Stick/Right";  // Right Thumbstick Right
                 }
+                // Manually map the arrow keys to their full names
+                if (newKey == "Up")
+                {
+                    keybindText.text = "Up Arrow";
+                    newKey = "Up Arrow";
+                }
+                else if (newKey == "Down")
+                {
+                    newKey = "Down Arrow";
+                    keybindText.text = "Down Arrow";
+                }
+                else if (newKey == "Left")
+                {
+                    newKey = "Left Arrow";
+                    keybindText.text = "Left Arrow";
+                }
+                else if (newKey == "Right")
+                {
+                    newKey = "Right Arrow";
+                    keybindText.text = "Right Arrow";
+                }
+
 
                 // Add new binding to history
                 bindingHistory.Add((action.name, bindingIndex));
@@ -766,6 +797,34 @@ public class KeybindSettings: MonoBehaviour
             })
             .Start();
     }
+    private bool IsSkippableAction(InputAction action)
+    {
+        if (action == null) return true;
+
+        // Skip mouse delta and scroll bindings
+        foreach (var binding in action.bindings)
+        {
+            if (binding.path.Contains("Mouse") &&
+                (binding.path.Contains("delta") || binding.path.Contains("scroll/y") || binding.path.Contains("scroll/x")))
+            {
+                return true;
+            }
+
+            if (binding.path.Contains("anyKey"))
+            {
+                return true;
+            }
+        }
+
+        // Skip action maps we don't want to include
+        var skippedMaps = new[] { "QTE", "Main Menu", "UI" };
+        if (skippedMaps.Contains(action.actionMap.name))
+        {
+            return true;
+        }
+
+        return false;
+    }
 
     private void UnbindLatestInstance(string newKey, string currentActionName, int bindingIndex, string deviceType)
     {
@@ -841,6 +900,12 @@ public class KeybindSettings: MonoBehaviour
         foreach (var actionPair in actionDictionary)
         {
             InputAction otherAction = actionPair.Value;
+
+            if (IsSkippableAction(otherAction))
+            {
+                Debug.Log($"Skipping {otherAction.name} during global unbind check.");
+                continue;
+            }
 
             // Debugging: Log the current action
             Debug.Log($"Checking action: {otherAction.name}");
