@@ -463,6 +463,13 @@ public class SettingsManager : MonoBehaviour
         {
             OnGameOverMenuActivated();
         }
+
+        if (VentureForthInteraction.IsVentureForthPanelOpen && settingsCanvas.activeSelf)
+        {
+            Debug.Log("Venture Forth is active. Closing settings.");
+            settingsCanvas.SetActive(false);
+            isMenuOpen = false;
+        }
     }
 
     public void OnGameOverMenuActivated()
